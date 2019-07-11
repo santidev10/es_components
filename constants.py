@@ -1,4 +1,4 @@
-class ES_DICT_FIELDS:
+class EsDictFields:
     DOC = "doc"
     DOC_AS_UPSERT = "doc_as_upsert"
     OP_TYPE = "_op_type"
@@ -6,7 +6,7 @@ class ES_DICT_FIELDS:
     VERSION = "_version"
 
 
-class SECTIONS:
+class Sections:
     MAIN = "main"
 
     ADS_STATS = "ads_stats"
@@ -18,7 +18,6 @@ class SECTIONS:
     TRANSCRIPTS = "transcripts"
     CMS = "cms"
     CHANNEL = "channel"
-    DELETED = "deleted"
 
     ANALYTICS_SCHEDULE = "analytics_schedule"
     GENERAL_DATA_SCHEDULE = "general_data_schedule"
@@ -26,25 +25,27 @@ class SECTIONS:
     TRANSCRIPTS_SCHEDULE = "transcripts_schedule"
 
 
-class TIMESTAMP_FIELDS:
+class TimestampFields:
     CREATED_AT = "created_at"
     UPDATED_AT = "updated_at"
 
 
-class FILTER_OPERATORS:
+class FilterOperators:
     GREATER_THAN = "gt"
     LESS_THAN = "lt"
 
 
-class SORT_DIRECTIONS:
+class SortDirections:
     ASCENDING = "asc"
     DESCENDING = "desc"
 
 
-class FILTER_INCLUDE_EMPTY:
+class FilterIncludeEmpty:
     FIRST = "first"
     LAST = "last"
+    # pylint: disable=invalid-name
     NO = "no"
+    # pylint: enable=invalid-name
 
     ALL = (FIRST, LAST, NO)
 

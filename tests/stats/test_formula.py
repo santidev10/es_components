@@ -1,9 +1,9 @@
 from datetime import datetime
 from unittest import TestCase
 
-from es_components.stats.formula import get_linear_value
-from es_components.stats.formula import get_engage_rate
-from es_components.stats.formula import get_sentiment
+from stats.formula import get_engage_rate
+from stats.formula import get_linear_value
+from stats.formula import get_sentiment
 
 
 class TestFormulaLinearValue(TestCase):
@@ -36,7 +36,7 @@ class TestFormulaSentiment(TestCase):
         expected_sentiment = 80
 
         self.assertEqual(expected_sentiment, sentiment)
-        self.assertTrue(type(sentiment) is float)
+        self.assertTrue(isinstance(sentiment, float))
 
     def test_likes_undefined(self):
         likes = None
@@ -45,7 +45,7 @@ class TestFormulaSentiment(TestCase):
         expected_sentiment = 0
 
         self.assertEqual(expected_sentiment, sentiment)
-        self.assertTrue(type(sentiment) is float)
+        self.assertTrue(isinstance(sentiment, float))
 
     def test_dislikes_undefined(self):
         likes = 200
@@ -54,7 +54,7 @@ class TestFormulaSentiment(TestCase):
         expected_sentiment = 100
 
         self.assertEqual(expected_sentiment, sentiment)
-        self.assertTrue(type(sentiment) is float)
+        self.assertTrue(isinstance(sentiment, float))
 
     def test_all_undefined(self):
         likes = None
@@ -63,7 +63,7 @@ class TestFormulaSentiment(TestCase):
         expected_sentiment = 0
 
         self.assertEqual(expected_sentiment, sentiment)
-        self.assertTrue(type(sentiment) is float)
+        self.assertTrue(isinstance(sentiment, float))
 
 
 class TestFormulaEngageRate(TestCase):
@@ -77,7 +77,7 @@ class TestFormulaEngageRate(TestCase):
         expected_engage_rate = 15
 
         self.assertEqual(expected_engage_rate, engage_rate)
-        self.assertTrue(type(engage_rate) is float)
+        self.assertTrue(isinstance(engage_rate, float))
 
     def test_no_views(self):
         likes = None
@@ -102,7 +102,7 @@ class TestFormulaEngageRate(TestCase):
         expected_engage_rate = 100
 
         self.assertEqual(expected_engage_rate, engage_rate)
-        self.assertTrue(type(engage_rate) is float)
+        self.assertTrue(isinstance(engage_rate, float))
 
     def test_greater_then_1000(self):
         likes = 1000
@@ -114,4 +114,4 @@ class TestFormulaEngageRate(TestCase):
         expected_engage_rate = 0
 
         self.assertEqual(expected_engage_rate, engage_rate)
-        self.assertTrue(type(engage_rate) is float)
+        self.assertTrue(isinstance(engage_rate, float))

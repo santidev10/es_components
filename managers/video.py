@@ -1,12 +1,12 @@
 from datetime import datetime
 
 
-from es_components.constants import SECTIONS
+from es_components.constants import Sections
 from es_components.constants import VIDEO_CHANNEL_ID_FIELD
-from es_components.constants import FILTER_OPERATORS
+from es_components.constants import FilterOperators
 from es_components.constants import MAIN_ID_FIELD
-from es_components.constants import SORT_DIRECTIONS
-from es_components.constants import TIMESTAMP_FIELDS
+from es_components.constants import SortDirections
+from es_components.constants import TimestampFields
 from es_components.constants import CONTENT_OWNER_ID_FIELD
 from es_components.managers.base import BaseManager
 from es_components.models.video import Video
@@ -15,14 +15,14 @@ from es_components.models.video import Video
 
 class VideoManager(BaseManager):
     allowed_sections = BaseManager.allowed_sections\
-                       + (SECTIONS.GENERAL_DATA, SECTIONS.STATS, SECTIONS.ANALYTICS, SECTIONS.CHANNEL,
-                          SECTIONS.TRANSCRIPTS, SECTIONS.MONETIZATION, SECTIONS.ADS_STATS, SECTIONS.CMS,
-                          SECTIONS.ANALYTICS_SCHEDULE, SECTIONS.TRANSCRIPTS_SCHEDULE)
+                       + (Sections.GENERAL_DATA, Sections.STATS, Sections.ANALYTICS, Sections.CHANNEL,
+                          Sections.TRANSCRIPTS, Sections.MONETIZATION, Sections.ADS_STATS, Sections.CMS,
+                          Sections.ANALYTICS_SCHEDULE, Sections.TRANSCRIPTS_SCHEDULE)
     model = Video
 
     def get_all_video_ids(self, channel_id):
         _query = self.by_channel_ids_query(channel_id)
-        videos = self.model.search().source(SECTIONS.MAIN).query(_query).scan()
+        videos = self.model.search().source(Sections.MAIN).query(_query).scan()
         return [video.main.id for video in videos]
 
     def by_channel_not_equal_ids_query(self, channels_ids):
@@ -36,13 +36,13 @@ class VideoManager(BaseManager):
 
     def forced_filters(self, updated_at):
         return super(VideoManager, self).forced_filters(updated_at) &\
-               self._filter_existent_section(SECTIONS.GENERAL_DATA)
+               self._filter_existent_section(Sections.GENERAL_DATA)
 
     def get_never_updated(self, outdated_at, never_updated_section, ids=None, limit=10000):
         control_section = self._get_control_section()
-        field_updated_at = f"{control_section}.{TIMESTAMP_FIELDS.UPDATED_AT}"
+        field_updated_at = f"{control_section}.{TimestampFields.UPDATED_AT}"
 
-        _filter_outdated = self._filter_range(field_updated_at, FILTER_OPERATORS.LESS_THAN, outdated_at)
+        _filter_outdated = self._filter_range(field_updated_at, FilterOperators.LESS_THAN, outdated_at)
         _filter_nonexistent_section = self._filter_nonexistent_section(control_section)
         _filter_never_updated_section = self._filter_nonexistent_section(never_updated_section)
 
@@ -51,11 +51,11 @@ class VideoManager(BaseManager):
         _query = self.ids_query(ids)
 
         _sort = [
-            {field_updated_at: {"order": SORT_DIRECTIONS.ASCENDING}},
-            {MAIN_ID_FIELD: {"order": SORT_DIRECTIONS.ASCENDING}},
+            {field_updated_at: {"order": SortDirections.ASCENDING}},
+            {MAIN_ID_FIELD: {"order": SortDirections.ASCENDING}},
         ]
 
-        return self.search(query=_query, filter=_filter, sort=_sort, limit=limit).execute().hits
+        return self.search(query=_query, filters=_filter, sort=_sort, limit=limit).execute().hits
 
     def aggregation_avg_videos_per_channel(self, search=None):
 

@@ -3,7 +3,6 @@ from datetime import timedelta
 from .formula import get_linear_value
 
 
-
 class HistoryValueError(Exception):
     pass
 
@@ -77,7 +76,6 @@ class History:
         for field_name in self.prev_values.keys():
             self._update_field_history(field_name)
 
-
     def _update_field_history(self, field_name):
         prev_value = self.prev_values[field_name]
         value = getattr(self.section, field_name)
@@ -99,7 +97,7 @@ class History:
         values_history = new_values_history + list(values_history or [])
         values_history = values_history[:self.DAYS_LIMIT]
 
-        setattr(self.section, history_field_name,  values_history)
+        setattr(self.section, history_field_name, values_history)
 
     def prev_day_last_second(self, datetime):
         value = datetime.replace(hour=23, minute=59, second=59)

@@ -9,7 +9,7 @@ from elasticsearch_dsl import Text
 
 from es_components.config import VIDEO_INDEX_NAME
 from es_components.config import VIDEO_DOC_TYPE
-from es_components.constants import SECTIONS
+from es_components.constants import Sections
 from es_components.models.base import BaseDocument
 from es_components.models.base import BaseInnerDoc
 from es_components.models.base import BaseInnerDocWithHistory
@@ -33,7 +33,9 @@ class VideoSectionGeneralData(BaseInnerDoc):
 
 
 class VideoSectionChannel(BaseInnerDoc):
+    # pylint: disable=invalid-name
     id = Keyword()
+    # pylint: enable=invalid-name
     title = Keyword()
 
 
@@ -142,25 +144,25 @@ class Video(BaseDocument):
         doc_type = VIDEO_DOC_TYPE
 
     def populate_general_data(self, **kwargs):
-        self._populate_section(SECTIONS.GENERAL_DATA, **kwargs)
+        self._populate_section(Sections.GENERAL_DATA, **kwargs)
 
     def populate_stats(self, **kwargs):
-        self._populate_section(SECTIONS.STATS, **kwargs)
+        self._populate_section(Sections.STATS, **kwargs)
 
     def populate_analytics(self, **kwargs):
-        self._populate_section(SECTIONS.ANALYTICS, **kwargs)
+        self._populate_section(Sections.ANALYTICS, **kwargs)
 
     def populate_monetization(self, **kwargs):
-        self._populate_section(SECTIONS.MONETIZATION, **kwargs)
+        self._populate_section(Sections.MONETIZATION, **kwargs)
 
     def populate_transcripts(self, **kwargs):
-        self._populate_section(SECTIONS.TRANSCRIPTS, **kwargs)
+        self._populate_section(Sections.TRANSCRIPTS, **kwargs)
 
     def populate_ads_stats(self, **kwargs):
-        self._populate_section(SECTIONS.ADS_STATS, **kwargs)
+        self._populate_section(Sections.ADS_STATS, **kwargs)
 
     def populate_cms(self, **kwargs):
-        self._populate_section(SECTIONS.CMS, **kwargs)
+        self._populate_section(Sections.CMS, **kwargs)
 
     def populate_channel(self, **kwargs):
-        self._populate_section(SECTIONS.CHANNEL, **kwargs)
+        self._populate_section(Sections.CHANNEL, **kwargs)

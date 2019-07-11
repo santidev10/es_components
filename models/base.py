@@ -20,7 +20,9 @@ class BaseInnerDoc(InnerDoc):
 
 
 class MainSection(BaseInnerDoc):
+    # pylint: disable=invalid-name
     id = Keyword()
+    # pylint: enable=invalid-name
 
 
 class BaseInnerDocWithHistory(BaseInnerDoc):
@@ -50,6 +52,7 @@ class BaseDocument(Document):
     main = Object(MainSection)
     deleted = Object(Deleted)
 
+    # pylint: disable=redefined-builtin
     def __init__(self, id=None, **kwargs):
         """ Initialize Base Document.
 
@@ -64,6 +67,8 @@ class BaseDocument(Document):
         if "id" not in self.meta:
             self.meta["id"] = self.main.id
 
+    # pylint: enable=redefined-builtin
+
     def init_main(self, **kwargs):
         if self.main:
             raise Exception("Main section already exists. Cannot reinitialize it.")
@@ -72,7 +77,10 @@ class BaseDocument(Document):
 
     def _populate_section(self, section_name, append_uniq_kwargs=None, **init_kwargs):
         section = getattr(self, section_name)
+
+        # pylint: disable=protected-access
         section_class = self._doc_type.mapping[section_name]._doc_class
+        # pylint: enable=protected-access
 
         if not section:
             section = section_class()

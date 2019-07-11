@@ -5,13 +5,13 @@ from elasticsearch_dsl import connections
 from elasticsearch_dsl import MultiSearch
 from elasticsearch_dsl import Q
 
-from es_components.constants import ES_DICT_FIELDS
-from es_components.constants import FILTER_INCLUDE_EMPTY
-from es_components.constants import FILTER_OPERATORS
+from es_components.constants import EsDictFields
+from es_components.constants import FilterIncludeEmpty
+from es_components.constants import FilterOperators
 from es_components.constants import MAIN_ID_FIELD
-from es_components.constants import SECTIONS
-from es_components.constants import SORT_DIRECTIONS
-from es_components.constants import TIMESTAMP_FIELDS
+from es_components.constants import Sections
+from es_components.constants import SortDirections
+from es_components.constants import TimestampFields
 
 from es_components.config import ES_BULK_REFRESH_OPTION
 from es_components.config import ES_CHUNK_SIZE
@@ -28,8 +28,8 @@ class BaseManager:
     allowed_sections - a tuple of allowed sections name
     model - class of ES data model
     """
-    allowed_sections = (SECTIONS.MAIN, SECTIONS.DELETED,)
-    model = None
+    allowed_sections = (Sections.MAIN, Sections.DELETED,)
+    model: Type[BaseDocument] = None
 
     def __init__(self, sections=None):
         """ Initialize manager.
@@ -51,8 +51,8 @@ class BaseManager:
         if sections and not set(sections).issubset(set(self.allowed_sections)):
             raise SectionsNotAllowed("Cannot find such section in Data Model sections")
 
-        if SECTIONS.MAIN not in sections:
-            sections += (SECTIONS.MAIN,)
+        if Sections.MAIN not in sections:
+            sections += (Sections.MAIN,)
 
         self.sections = sections
 
@@ -87,13 +87,18 @@ class BaseManager:
 
         for i, entry in enumerate(entries):
             if entry is None:
+                # false positive pylint error
+                # pylint: disable=not-callable
                 entries[i] = self.model(id=ids[i])
+                # pylint: enable=not-callable
 
         return entries
 
     def truncate(self):
         """ Recreate index with deleting all documents. """
+        # pylint: disable=protected-access
         self.model._index.delete()
+        # pylint: enable=protected-access
         self.model.init()
 
     def delete(self, ids):
@@ -119,20 +124,22 @@ class BaseManager:
     def _search(self):
         return self.model.search().source(self.sections)
 
-    def search(self, query=None, filter=None, sort=None, limit=10000, offset=None):
+    def search(self, query=None, filters=None, sort=None, limit=10000, offset=None):
         search = self._search()
         if query:
             search = search.query(query)
-        if filter:
-            search = search.filter(filter)
+        if filters:
+            search = search.filter(filters)
         if sort:
             search = search.sort(*sort)
         return search[offset:limit]
 
     def multi_search(self, searches):
-        ms = MultiSearch(index=self.model._index._name)
-        ms._searches = searches
-        return ms.execute()
+        # pylint: disable=protected-access
+        multi_search = MultiSearch(index=self.model._index._name)
+        multi_search._searches = searches
+        # pylint: enable=protected-access
+        return multi_search.execute()
 
 
     def _upsert_generator(self, entries):
@@ -147,9 +154,9 @@ class BaseManager:
             if not _entry_dict:
                 _entry_dict = {}
 
-            if _entry_dict.get(TIMESTAMP_FIELDS.CREATED_AT) is None:
-                _entry_dict[TIMESTAMP_FIELDS.CREATED_AT] = timestamp
-            _entry_dict[TIMESTAMP_FIELDS.UPDATED_AT] = timestamp
+            if _entry_dict.get(TimestampFields.CREATED_AT) is None:
+                _entry_dict[TimestampFields.CREATED_AT] = timestamp
+            _entry_dict[TimestampFields.UPDATED_AT] = timestamp
 
             return _entry_dict
 
@@ -157,17 +164,17 @@ class BaseManager:
 
         for entry in entries:
             entry_dict = entry.to_dict(include_meta=True, skip_empty=False)
-            entry_dict[ES_DICT_FIELDS.DOC] = {}
+            entry_dict[EsDictFields.DOC] = {}
 
             for section in self.sections:
-                entry_dict[ES_DICT_FIELDS.DOC][section] = \
-                    update_timestamp(entry_dict[ES_DICT_FIELDS.SOURCE].get(section), now)
+                entry_dict[EsDictFields.DOC][section] = \
+                    update_timestamp(entry_dict[EsDictFields.SOURCE].get(section), now)
 
-            entry_dict[ES_DICT_FIELDS.OP_TYPE] = "update"
-            entry_dict[ES_DICT_FIELDS.DOC_AS_UPSERT] = True
-            del entry_dict[ES_DICT_FIELDS.SOURCE]
+            entry_dict[EsDictFields.OP_TYPE] = "update"
+            entry_dict[EsDictFields.DOC_AS_UPSERT] = True
+            del entry_dict[EsDictFields.SOURCE]
             try:
-                del entry_dict[ES_DICT_FIELDS.VERSION]
+                del entry_dict[EsDictFields.VERSION]
             except KeyError:
                 pass
 
@@ -230,47 +237,47 @@ class BaseManager:
         return self._filter_term(MAIN_ID_FIELD, ids, not_equal=True)
 
     def filter_alive(self):
-        return self._filter_nonexistent_section(SECTIONS.DELETED)
+        return self._filter_nonexistent_section(Sections.DELETED)
 
     def forced_filters(self, updated_at):
-        field_updated_at = f"{SECTIONS.MAIN}.{TIMESTAMP_FIELDS.UPDATED_AT}"
+        field_updated_at = f"{Sections.MAIN}.{TimestampFields.UPDATED_AT}"
         return self.filter_alive() & \
-               self._filter_range(field_updated_at, FILTER_OPERATORS.GREATER_THAN, updated_at)
+               self._filter_range(field_updated_at, FilterOperators.GREATER_THAN, updated_at)
 
     def search_nonexistent_section_records(self, ids=None, limit=10000):
         control_section = self._get_control_section()
-        field_updated_at = f"{control_section}.{TIMESTAMP_FIELDS.UPDATED_AT}"
+        field_updated_at = f"{control_section}.{TimestampFields.UPDATED_AT}"
 
         _filter_nonexistent_section = self._filter_nonexistent_section(control_section)
 
         _query = self.ids_query(ids) if ids is not None else None
 
         _sort = [
-            {field_updated_at: {"order": SORT_DIRECTIONS.ASCENDING}},
-            {MAIN_ID_FIELD: {"order": SORT_DIRECTIONS.ASCENDING}},
+            {field_updated_at: {"order": SortDirections.ASCENDING}},
+            {MAIN_ID_FIELD: {"order": SortDirections.ASCENDING}},
         ]
-        return self.search(query=_query, filter=_filter_nonexistent_section, sort=_sort, limit=limit)
+        return self.search(query=_query, filters=_filter_nonexistent_section, sort=_sort, limit=limit)
 
     def search_outdated_records(self, outdated_at, ids=None, limit=10000):
         control_section = self._get_control_section()
-        field_updated_at = f"{control_section}.{TIMESTAMP_FIELDS.UPDATED_AT}"
+        field_updated_at = f"{control_section}.{TimestampFields.UPDATED_AT}"
 
-        _filter_outdated = self._filter_range(field_updated_at, FILTER_OPERATORS.LESS_THAN, outdated_at)
+        _filter_outdated = self._filter_range(field_updated_at, FilterOperators.LESS_THAN, outdated_at)
 
         _query = self.ids_query(ids) if ids is not None else None
 
         _sort = [
-            {field_updated_at: {"order": SORT_DIRECTIONS.ASCENDING}},
-            {MAIN_ID_FIELD: {"order": SORT_DIRECTIONS.ASCENDING}},
+            {field_updated_at: {"order": SortDirections.ASCENDING}},
+            {MAIN_ID_FIELD: {"order": SortDirections.ASCENDING}},
         ]
-        return self.search(query=_query, filter=_filter_outdated, sort=_sort, limit=limit)
+        return self.search(query=_query, filters=_filter_outdated, sort=_sort, limit=limit)
 
-    def get_outdated(self, outdated_at, include_empty=FILTER_INCLUDE_EMPTY.NO, ids=None, limit=10000):
-        if include_empty not in FILTER_INCLUDE_EMPTY.ALL:
+    def get_outdated(self, outdated_at, include_empty=FilterIncludeEmpty.NO, ids=None, limit=10000):
+        if include_empty not in FilterIncludeEmpty.ALL:
             raise ValueError
 
         entries = []
-        if include_empty == FILTER_INCLUDE_EMPTY.FIRST:
+        if include_empty == FilterIncludeEmpty.FIRST:
             entries += self.search_nonexistent_section_records(ids=ids, limit=limit).execute().hits
 
         limit_remaining = limit - len(entries)
@@ -278,7 +285,7 @@ class BaseManager:
             entries +=  self.search_outdated_records(outdated_at, ids=ids, limit=limit_remaining).execute().hits
 
         limit_remaining = limit - len(entries)
-        if limit_remaining > 0 and include_empty == FILTER_INCLUDE_EMPTY.LAST:
+        if limit_remaining > 0 and include_empty == FilterIncludeEmpty.LAST:
             entries += self.search_nonexistent_section_records(ids=ids, limit=limit_remaining).execute().hits
 
         return entries
@@ -288,4 +295,4 @@ class BaseManager:
 
         forced_filter = self.forced_filters(updated_at)
 
-        return self.search(filter=forced_filter).execute().hits
+        return self.search(filters=forced_filter).execute().hits
