@@ -68,3 +68,4 @@ class VideoManager(BaseManager):
         avg_video_per_channel = aggregations_result.avg.value
 
         return channels, avg_video_per_channel
+
