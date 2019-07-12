@@ -1,5 +1,7 @@
 from datetime import timedelta
 
+from es_components.datetime_service import datetime_service
+
 from .formula import get_linear_value
 
 
@@ -46,14 +48,17 @@ class History:
         except AttributeError:
             return
 
-        self.prev_historydate = self.section.historydate
+        if self.prev_fetched_at:
+            self.prev_fetched_at = datetime_service.localize(self.prev_fetched_at)
+
+        if self.section.historydate:
+            self.prev_historydate = datetime_service.localize(self.section.historydate)
 
         for field_name in self.field_names:
             if not hasattr(self.section, field_name):
                 continue
             value = getattr(self.section, field_name)
-            if value:
-                self.prev_values[field_name] = value
+            self.prev_values[field_name] = value
 
     def update(self):
         if self.section is None:
@@ -61,17 +66,15 @@ class History:
 
         if self.section.fetched_at is None:
             return
+        self.section.fetched_at = datetime_service.localize(self.section.fetched_at)
 
-        if self.prev_fetched_at is None:
-            return
-
-        if self.prev_fetched_at > self.section.fetched_at:
+        if self.prev_fetched_at is not None and self.prev_fetched_at > self.section.fetched_at:
             raise HistoryValueError("Can't update a history with older values.")
 
-        if self.prev_fetched_at.date() == self.section.fetched_at.date():
-            return
-
         self.section.historydate = self.prev_day_last_second(self.section.fetched_at)
+
+        if self.prev_fetched_at is None or self.prev_fetched_at.date() == self.section.fetched_at.date():
+            return
 
         for field_name in self.prev_values.keys():
             self._update_field_history(field_name)
@@ -84,18 +87,33 @@ class History:
         history_field_name = f"{field_name}_history"
         values_history = getattr(self.section, history_field_name)
 
+        if prev_value is None and value is not None and self.prev_historydate is not None:
+            valuable_history = ((index, value) for index, value in enumerate(values_history) if value is not None)
+            last_index, prev_value = next(valuable_history, (0, None))
+            values_history = values_history[last_index+1:]
+            prev_fetched_at = self.prev_historydate - last_index * self.ONE_DAY
+        else:
+            prev_fetched_at = self.prev_fetched_at
+
         new_values_history = []
         date = self.section.historydate
-        while date >= self.prev_fetched_at:
-            val = get_linear_value(date.timestamp(),
-                                   self.prev_fetched_at.timestamp(), prev_value,
-                                   self.section.fetched_at.timestamp(), value)
-            val = value_type(val)
+        while date >= prev_fetched_at:
+            try:
+                val = get_linear_value(date.timestamp(),
+                                       prev_fetched_at.timestamp(), prev_value,
+                                       self.section.fetched_at.timestamp(), value)
+                val = value_type(val)
+            except TypeError:
+                val = None
+
             new_values_history.append(val)
             date -= self.ONE_DAY
 
         values_history = new_values_history + list(values_history or [])
         values_history = values_history[:self.DAYS_LIMIT]
+
+        if all([value is None for value in values_history]):
+            values_history = []
 
         setattr(self.section, history_field_name, values_history)
 
