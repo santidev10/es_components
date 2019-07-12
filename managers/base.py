@@ -27,7 +27,6 @@ from es_components.models.base import BaseDocument
 from es_components.utils import chunks
 
 
-
 class BaseManager:
     """
     allowed_sections - a tuple of allowed sections name
