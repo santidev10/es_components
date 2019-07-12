@@ -1,11 +1,10 @@
 from elasticsearch_dsl import Date
 from elasticsearch_dsl import Document
-from elasticsearch_dsl import Object
 from elasticsearch_dsl import InnerDoc
 from elasticsearch_dsl import Keyword
+from elasticsearch_dsl import Object
 from elasticsearch_dsl import Text
 from elasticsearch_dsl.utils import AttrList
-
 
 from es_components.stats import History
 
@@ -94,4 +93,3 @@ class BaseDocument(Document):
                 values = getattr(section, name)
                 values = AttrList(set(list(values) + extra_values))
                 setattr(section, name, values)
-
