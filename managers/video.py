@@ -1,6 +1,3 @@
-from datetime import datetime
-
-
 from es_components.constants import Sections
 from es_components.constants import VIDEO_CHANNEL_ID_FIELD
 from es_components.constants import FilterOperators
@@ -10,7 +7,6 @@ from es_components.constants import TimestampFields
 from es_components.constants import CONTENT_OWNER_ID_FIELD
 from es_components.managers.base import BaseManager
 from es_components.models.video import Video
-
 
 
 class VideoManager(BaseManager):
@@ -72,3 +68,4 @@ class VideoManager(BaseManager):
         avg_video_per_channel = aggregations_result.avg.value
 
         return channels, avg_video_per_channel
+
