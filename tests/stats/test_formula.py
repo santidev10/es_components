@@ -1,9 +1,9 @@
 from datetime import datetime
 from unittest import TestCase
 
-from stats.formula import get_engage_rate
-from stats.formula import get_linear_value
-from stats.formula import get_sentiment
+from es_components.stats.formula import get_engage_rate
+from es_components.stats.formula import get_linear_value
+from es_components.stats.formula import get_sentiment
 
 
 class TestFormulaLinearValue(TestCase):

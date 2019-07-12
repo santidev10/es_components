@@ -1,4 +1,5 @@
 from datetime import datetime
+from typing import Type
 
 from elasticsearch.helpers import bulk
 from elasticsearch_dsl import connections
@@ -19,6 +20,8 @@ from es_components.config import ES_REQUEST_LIMIT
 
 from es_components.exceptions import DataModelNotSpecified
 from es_components.exceptions import SectionsNotAllowed
+
+from es_components.models.base import BaseDocument
 
 from es_components.utils import chunks
 
@@ -45,7 +48,7 @@ class BaseManager:
 
         if sections is None:
             sections = ()
-        elif type(sections) == str:
+        elif isinstance(sections, str):
             sections = (sections,)
 
         if sections and not set(sections).issubset(set(self.allowed_sections)):
@@ -118,8 +121,12 @@ class BaseManager:
 
         for _entries in chunks(entries, ES_REQUEST_LIMIT):
 
-            bulk(connections.get_connection(), self._upsert_generator(_entries),
-                chunk_size=ES_CHUNK_SIZE, refresh=ES_BULK_REFRESH_OPTION)
+            bulk(
+                connections.get_connection(),
+                self._upsert_generator(_entries),
+                chunk_size=ES_CHUNK_SIZE,
+                refresh=ES_BULK_REFRESH_OPTION
+            )
 
     def _search(self):
         return self.model.search().source(self.sections)
@@ -232,7 +239,7 @@ class BaseManager:
     @staticmethod
     def filter_term(field, values, not_equal=False):
         condition = "must_not" if not_equal else "must"
-        term = "terms" if type(values) == list else "term"
+        term = "terms" if isinstance(values, list) else "term"
 
         _filter = {
             "bool": {
@@ -309,7 +316,7 @@ class BaseManager:
 
         limit_remaining = limit - len(entries)
         if limit_remaining > 0:
-            entries +=  self.search_outdated_records(outdated_at, ids=ids, limit=limit_remaining).execute().hits
+            entries += self.search_outdated_records(outdated_at, ids=ids, limit=limit_remaining).execute().hits
 
         limit_remaining = limit - len(entries)
         if limit_remaining > 0 and include_empty == FilterIncludeEmpty.LAST:
