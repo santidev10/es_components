@@ -1,10 +1,10 @@
 from elasticsearch_dsl import Boolean
 from elasticsearch_dsl import Date
 from elasticsearch_dsl import Double
-from elasticsearch_dsl import Object
 from elasticsearch_dsl import Float
-from elasticsearch_dsl import Long
 from elasticsearch_dsl import Keyword
+from elasticsearch_dsl import Long
+from elasticsearch_dsl import Object
 from elasticsearch_dsl import Text
 
 from es_components.config import CHANNEL_INDEX_NAME
@@ -60,11 +60,6 @@ class ChannelSectionStats(BaseInnerDocWithHistory):
     observed_videos_dislikes = Long(index=False)
     observed_videos_dislikes_history = Long(index=False, multi=True)
     observed_videos_comments = Long(index=False)
-    comments = Long(index=False)
-    comments_history = Long(index=False, multi=True)
-    last_day_comments = Long()
-    last_7day_comments = Long()
-    last_30day_days_comments = Long()
     engage_rate = Double()
     engage_rate_history = Double(index=False, multi=True)
     sentiment = Double()
@@ -72,7 +67,7 @@ class ChannelSectionStats(BaseInnerDocWithHistory):
 
     class History:
         all = (
-            "subscribers", "views", "comments", "total_videos_count", "views_per_video", "observed_videos_count",
+            "subscribers", "views", "total_videos_count", "views_per_video", "observed_videos_count",
             "observed_videos_views", "observed_videos_likes", "observed_videos_dislikes", "sentiment", "engage_rate"
         )
 

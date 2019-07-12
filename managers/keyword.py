@@ -10,4 +10,3 @@ class KeywordManager(BaseManager):
     def forced_filters(self, updated_at):
         return super(KeywordManager, self).forced_filters(updated_at) &\
                self._filter_existent_section(Sections.STATS)
-
