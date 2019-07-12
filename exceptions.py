@@ -4,4 +4,3 @@ class DataModelNotSpecified(Exception):
 
 class SectionsNotAllowed(Exception):
     pass
-

@@ -8,6 +8,7 @@ class EsDictFields:
 
 class Sections:
     MAIN = "main"
+    DELETED = "deleted"
 
     ADS_STATS = "ads_stats"
     ANALYTICS = "analytics"

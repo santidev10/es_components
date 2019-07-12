@@ -2,8 +2,8 @@ from datetime import datetime
 from unittest import TestCase
 
 from components.channel import ChannelSectionStats
-from stats import History
-from stats import HistoryValueError
+from es_components.stats import History
+from es_components.stats import HistoryValueError
 
 
 class TestHistory(TestCase):
