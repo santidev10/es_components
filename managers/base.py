@@ -1,4 +1,3 @@
-from datetime import datetime
 from typing import Type
 
 from elasticsearch.helpers import bulk
@@ -18,12 +17,15 @@ from es_components.config import ES_BULK_REFRESH_OPTION
 from es_components.config import ES_CHUNK_SIZE
 from es_components.config import ES_REQUEST_LIMIT
 
+from es_components.datetime_service import datetime_service
+
 from es_components.exceptions import DataModelNotSpecified
 from es_components.exceptions import SectionsNotAllowed
 
 from es_components.models.base import BaseDocument
 
 from es_components.utils import chunks
+
 
 
 class BaseManager:
@@ -161,13 +163,13 @@ class BaseManager:
             if not _entry_dict:
                 _entry_dict = {}
 
-            if _entry_dict.get(TimestampFields.CREATED_AT) is None:
-                _entry_dict[TimestampFields.CREATED_AT] = timestamp
-            _entry_dict[TimestampFields.UPDATED_AT] = timestamp
+            timestamp_created_at = _entry_dict.get(TimestampFields.CREATED_AT)
+            _entry_dict[TimestampFields.CREATED_AT] = timestamp if timestamp_created_at is None \
+                                                                else datetime_service.localize(timestamp_created_at)
 
             return _entry_dict
 
-        now = datetime.utcnow()
+        now = datetime_service.now()
 
         for entry in entries:
             entry_dict = entry.to_dict(include_meta=True, skip_empty=False)
@@ -176,6 +178,8 @@ class BaseManager:
             for section in self.sections:
                 entry_dict[EsDictFields.DOC][section] = \
                     update_timestamp(entry_dict[EsDictFields.SOURCE].get(section), now)
+
+                self._drop_invalid_field_from_section_dict(entry, entry_dict, section)
 
             entry_dict[EsDictFields.OP_TYPE] = "update"
             entry_dict[EsDictFields.DOC_AS_UPSERT] = True
@@ -186,6 +190,19 @@ class BaseManager:
                 pass
 
             yield entry_dict
+
+    def _drop_invalid_field_from_section_dict(self, entry, entry_dict, section):
+        # pylint: disable=protected-access
+        doc_type = entry._doc_type.name
+        doc_mapping = entry._doc_type.mapping.to_dict()[doc_type][EsDictFields.PROPERTIES]
+        # pylint: enable=protected-access
+
+        section_mapping = doc_mapping[section][EsDictFields.PROPERTIES].keys()
+
+        invalid_fields = entry_dict[EsDictFields.DOC][section].keys() - section_mapping
+
+        for invalid_field in invalid_fields:
+            entry_dict[EsDictFields.DOC][section][invalid_field] = None
 
     def _get_control_section(self):
         return self.sections[0]
@@ -325,7 +342,7 @@ class BaseManager:
         return entries
 
     def get_by_forced_filter(self):
-        updated_at = datetime.utcnow().date()
+        updated_at = datetime_service.now().date()
 
         forced_filter = self.forced_filters(updated_at)
 
