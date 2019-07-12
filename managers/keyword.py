@@ -7,7 +7,6 @@ class KeywordManager(BaseManager):
     allowed_sections = BaseManager.allowed_sections + (Sections.STATS, Sections.STATS_SCHEDULE)
     model = Keyword
 
-    def forced_filters(self, updated_at=None):
+    def forced_filters(self, updated_at):
         return super(KeywordManager, self).forced_filters(updated_at) &\
-               self.filter_existent_section(Sections.STATS)
-
+               self._filter_existent_section(Sections.STATS)
