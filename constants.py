@@ -4,6 +4,7 @@ class EsDictFields:
     OP_TYPE = "_op_type"
     SOURCE = "_source"
     VERSION = "_version"
+    PROPERTIES = "properties"
 
 
 class Sections:
