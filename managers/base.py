@@ -1,4 +1,4 @@
-from typing import Type
+from datetime import datetime
 
 from elasticsearch.helpers import bulk
 from elasticsearch_dsl import connections
