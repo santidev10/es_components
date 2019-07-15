@@ -51,7 +51,7 @@ class VideoManager(BaseManager):
             {MAIN_ID_FIELD: {"order": SortDirections.ASCENDING}},
         ]
 
-        return self.search(query=_query, filters=_filter, sort=_sort, limit=limit).execute().hits
+        return self.search(queries=_query, filters=_filter, sort=_sort, limit=limit).execute().hits
 
     def aggregation_avg_videos_per_channel(self, search=None):
 

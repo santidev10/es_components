@@ -132,12 +132,14 @@ class BaseManager:
     def _search(self):
         return self.model.search().source(self.sections)
 
-    def search(self, query=None, filters=None, sort=None, limit=10000, offset=None):
+    def search(self, queries=None, filters=None, sort=None, limit=10000, offset=None):
         search = self._search()
-        if query:
-            search = search.query(query)
+        if queries:
+            queries = queries if isinstance(queries, list) else [queries]
+            search = search.query(*queries)
         if filters:
-            search = search.filter(filters)
+            filters = filters if isinstance(filters, list) else [filters]
+            search = search.filter(*filters)
         if sort:
             search = search.sort(*sort)
         return search[offset:limit]
@@ -165,6 +167,8 @@ class BaseManager:
             timestamp_created_at = _entry_dict.get(TimestampFields.CREATED_AT)
             _entry_dict[TimestampFields.CREATED_AT] = timestamp if timestamp_created_at is None \
                                                                 else datetime_service.localize(timestamp_created_at)
+
+            _entry_dict[TimestampFields.UPDATED_AT] = timestamp
 
             return _entry_dict
 
@@ -306,7 +310,7 @@ class BaseManager:
             {field_updated_at: {"order": SortDirections.ASCENDING}},
             {MAIN_ID_FIELD: {"order": SortDirections.ASCENDING}},
         ]
-        return self.search(query=_query, filters=_filter_nonexistent_section, sort=_sort, limit=limit)
+        return self.search(queries=_query, filters=_filter_nonexistent_section, sort=_sort, limit=limit)
 
     def search_outdated_records(self, outdated_at, ids=None, limit=10000):
         control_section = self._get_control_section()
@@ -320,7 +324,7 @@ class BaseManager:
             {field_updated_at: {"order": SortDirections.ASCENDING}},
             {MAIN_ID_FIELD: {"order": SortDirections.ASCENDING}},
         ]
-        return self.search(query=_query, filters=_filter_outdated, sort=_sort, limit=limit)
+        return self.search(queries=_query, filters=_filter_outdated, sort=_sort, limit=limit)
 
     def get_outdated(self, outdated_at, include_empty=FilterIncludeEmpty.NO, ids=None, limit=10000):
         if include_empty not in FilterIncludeEmpty.ALL:
