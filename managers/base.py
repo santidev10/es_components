@@ -231,8 +231,7 @@ class BaseManager:
         }
         return Q(_filter)
 
-    @staticmethod
-    def filter_nonexistent_section(section):
+    def _filter_nonexistent_section(self, section):
         _filter = {
             "bool": {
                 "must_not": {
