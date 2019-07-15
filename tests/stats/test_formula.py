@@ -149,7 +149,10 @@ class TestCumulativeCounter(MathTestCase):
 
         # all diffs are normal
         expected_is_normal = [True for _ in expected_diffs]
+
+        # pylint: disable=no-member
         self.assertMathListEqual(expected_is_normal, list(dataframe.is_normal))
+        # pylint: enable=no-member
 
         # all diffs are expected
         self.assertMathListEqual(expected_diffs, list(dataframe.diffs))
@@ -163,7 +166,9 @@ class TestCumulativeCounter(MathTestCase):
 
         # every diff is normal except negatives
         expected_is_normal = [math.isnan(diff) or diff >= 0 for diff in expected_diffs]
+        # pylint: disable=no-member
         self.assertListEqual(expected_is_normal, list(dataframe.is_normal))
+        # pylint: enable=no-member
 
         # all diffs are expected
         expected_diffs = [math.nan if diff < 0 else diff for diff in expected_diffs]
@@ -181,7 +186,9 @@ class TestCumulativeCounter(MathTestCase):
         expected_is_normal[9] = False   # 66000 -> 0
         expected_is_normal[11] = False  # 0 -> 81000
         expected_is_normal[14] = False  # 100000 -> 550
+        # pylint: disable=no-member
         self.assertMathListEqual(expected_is_normal, list(dataframe.is_normal))
+        # pylint: enable=no-member
 
     def test_tailing_sum_1(self):
         history = [750, 650, 550, 100000, 90000, 81000, 0, 0, 66000, 55000,
