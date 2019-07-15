@@ -183,17 +183,28 @@ class BaseManager:
     def _get_control_section(self):
         return self.sections[0]
 
-    def _filter_range(self, field, operator, value):
+    @staticmethod
+    def filter_range(field, gte=None, gt=None, lte=None, lt=None):
+        range_value = {}
+
+        if gte:
+            range_value[FilterOperators.GREATER_EQUAL_THAN] = gte
+        if gt:
+            range_value[FilterOperators.GREATER_THAN] = gt
+        if lte:
+            range_value[FilterOperators.LESS_EQUAL_THAN] = lte
+        if lt:
+            range_value[FilterOperators.LESS_THAN] = lt
+
         _filter = {
             "range": {
-                field: {
-                    operator: value
-                }
+                field: range_value
             }
         }
         return Q(_filter)
 
-    def _filter_nonexistent_section(self, section):
+    @staticmethod
+    def filter_nonexistent_section(section):
         _filter = {
             "bool": {
                 "must_not": {
@@ -205,7 +216,8 @@ class BaseManager:
         }
         return Q(_filter)
 
-    def _filter_existent_section(self, section):
+    @staticmethod
+    def filter_existent_section(section):
         _filter = {
             "bool": {
                 "must": {
@@ -217,7 +229,8 @@ class BaseManager:
         }
         return Q(_filter)
 
-    def _filter_term(self, field, values, not_equal=False):
+    @staticmethod
+    def filter_term(field, values, not_equal=False):
         condition = "must_not" if not_equal else "must"
         term = "terms" if type(values) == list else "term"
 
@@ -230,25 +243,39 @@ class BaseManager:
         }
         return Q(_filter)
 
-    def ids_query(self, ids):
-        return self._filter_term(MAIN_ID_FIELD, ids)
+    @staticmethod
+    def query_regexp(field, value):
+        _query = {
+            "regexp": {
+                field: value
+            }
+        }
+        return Q(_query)
 
-    def ids_not_equal_query(self, ids):
-        return self._filter_term(MAIN_ID_FIELD, ids, not_equal=True)
+    @classmethod
+    def ids_query(cls, ids):
+        return cls.filter_term(MAIN_ID_FIELD, ids)
 
-    def filter_alive(self):
-        return self._filter_nonexistent_section(Sections.DELETED)
+    @classmethod
+    def ids_not_equal_query(cls, ids):
+        return cls.filter_term(MAIN_ID_FIELD, ids, not_equal=True)
 
-    def forced_filters(self, updated_at):
+    @classmethod
+    def filter_alive(cls):
+        return cls.filter_nonexistent_section(Sections.DELETED)
+
+    def forced_filters(self, updated_at=None):
+        if not updated_at:
+            updated_at = datetime.utcnow().date()
+
         field_updated_at = f"{Sections.MAIN}.{TimestampFields.UPDATED_AT}"
-        return self.filter_alive() & \
-               self._filter_range(field_updated_at, FilterOperators.GREATER_THAN, updated_at)
+        return self.filter_alive() & self.filter_range(field_updated_at, gt=updated_at)
 
     def search_nonexistent_section_records(self, ids=None, limit=10000):
         control_section = self._get_control_section()
         field_updated_at = f"{control_section}.{TimestampFields.UPDATED_AT}"
 
-        _filter_nonexistent_section = self._filter_nonexistent_section(control_section)
+        _filter_nonexistent_section = self.filter_nonexistent_section(control_section)
 
         _query = self.ids_query(ids) if ids is not None else None
 
@@ -262,7 +289,7 @@ class BaseManager:
         control_section = self._get_control_section()
         field_updated_at = f"{control_section}.{TimestampFields.UPDATED_AT}"
 
-        _filter_outdated = self._filter_range(field_updated_at, FilterOperators.LESS_THAN, outdated_at)
+        _filter_outdated = self.filter_range(field_updated_at, lt=outdated_at)
 
         _query = self.ids_query(ids) if ids is not None else None
 
@@ -296,3 +323,19 @@ class BaseManager:
         forced_filter = self.forced_filters(updated_at)
 
         return self.search(filters=forced_filter).execute().hits
+
+    def aggs_from_dict(self, aggregations, search=None, size=0):
+
+        if not aggregations:
+            return None
+
+        if not search:
+            search = self.model._search()
+
+        search.update_from_dict({
+            "size": size,
+            "aggs": aggregations
+        })
+        aggregations_result = search.execute().aggregations
+
+        return aggregations_result

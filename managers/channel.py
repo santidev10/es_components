@@ -14,6 +14,6 @@ class ChannelManager(BaseManager):
     def by_content_owner_ids_query(self, content_owner_ids):
         return self._filter_term(CONTENT_OWNER_ID_FIELD, content_owner_ids)
 
-    def forced_filters(self, updated_at):
+    def forced_filters(self, updated_at=None):
         return super(ChannelManager, self).forced_filters(updated_at) &\
-               self._filter_existent_section(Sections.GENERAL_DATA)
+               self.filter_existent_section(Sections.GENERAL_DATA)

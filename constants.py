@@ -32,7 +32,9 @@ class TimestampFields:
 
 class FilterOperators:
     GREATER_THAN = "gt"
+    GREATER_EQUAL_THAN = "gte"
     LESS_THAN = "lt"
+    LESS_EQUAL_THAN = "lte"
 
 
 class SortDirections:

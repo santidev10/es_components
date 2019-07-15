@@ -26,25 +26,25 @@ class VideoManager(BaseManager):
         return [video.main.id for video in videos]
 
     def by_channel_not_equal_ids_query(self, channels_ids):
-        return self._filter_term(VIDEO_CHANNEL_ID_FIELD, channels_ids, not_equal=True)
+        return self.filter_term(VIDEO_CHANNEL_ID_FIELD, channels_ids, not_equal=True)
 
     def by_channel_ids_query(self, channels_ids):
-        return self._filter_term(VIDEO_CHANNEL_ID_FIELD, channels_ids)
+        return self.filter_term(VIDEO_CHANNEL_ID_FIELD, channels_ids)
 
     def by_content_owner_ids_query(self, content_owner_ids):
-        return self._filter_term(CONTENT_OWNER_ID_FIELD, content_owner_ids)
+        return self.filter_term(CONTENT_OWNER_ID_FIELD, content_owner_ids)
 
-    def forced_filters(self, updated_at):
+    def forced_filters(self, updated_at=None):
         return super(VideoManager, self).forced_filters(updated_at) &\
-               self._filter_existent_section(Sections.GENERAL_DATA)
+               self.filter_existent_section(Sections.GENERAL_DATA)
 
     def get_never_updated(self, outdated_at, never_updated_section, ids=None, limit=10000):
         control_section = self._get_control_section()
         field_updated_at = f"{control_section}.{TimestampFields.UPDATED_AT}"
 
-        _filter_outdated = self._filter_range(field_updated_at, FilterOperators.LESS_THAN, outdated_at)
-        _filter_nonexistent_section = self._filter_nonexistent_section(control_section)
-        _filter_never_updated_section = self._filter_nonexistent_section(never_updated_section)
+        _filter_outdated = self.filter_range(field_updated_at, FilterOperators.LESS_THAN, outdated_at)
+        _filter_nonexistent_section = self.filter_nonexistent_section(control_section)
+        _filter_never_updated_section = self.filter_nonexistent_section(never_updated_section)
 
         _filter = _filter_never_updated_section & _filter_outdated | _filter_nonexistent_section
 
