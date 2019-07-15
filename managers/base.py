@@ -1,4 +1,3 @@
-from datetime import datetime
 from typing import Type
 
 from elasticsearch.helpers import bulk
@@ -293,7 +292,7 @@ class BaseManager:
 
     def forced_filters(self, updated_at=None):
         if not updated_at:
-            updated_at = datetime.utcnow().date()
+            updated_at = datetime_service.now().date()
 
         field_updated_at = f"{Sections.MAIN}.{TimestampFields.UPDATED_AT}"
         return self.filter_alive() & self.filter_range(field_updated_at, gt=updated_at)
