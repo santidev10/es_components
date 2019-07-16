@@ -34,24 +34,24 @@ class VideoManager(BaseManager):
         return super(VideoManager, self).forced_filters(updated_at) &\
                self._filter_existent_section(Sections.GENERAL_DATA)
 
-    def get_never_updated(self, outdated_at, never_updated_section, ids=None, limit=10000):
+    def get_never_updated(self, outdated_at, never_updated_section, channel_id, limit=10000):
         control_section = self._get_control_section()
         field_updated_at = f"{control_section}.{TimestampFields.UPDATED_AT}"
 
         _filter_outdated = self._filter_range(field_updated_at, FilterOperators.LESS_THAN, outdated_at)
         _filter_nonexistent_section = self._filter_nonexistent_section(control_section)
         _filter_never_updated_section = self._filter_nonexistent_section(never_updated_section)
+        _filter_channel_id = self.by_channel_ids_query(channel_id)
 
-        _filter = _filter_never_updated_section & _filter_outdated | _filter_nonexistent_section
+        _filter = _filter_channel_id & _filter_never_updated_section & _filter_outdated | _filter_nonexistent_section
 
-        _query = self.ids_query(ids)
 
         _sort = [
             {field_updated_at: {"order": SortDirections.ASCENDING}},
             {MAIN_ID_FIELD: {"order": SortDirections.ASCENDING}},
         ]
 
-        return self.search(query=_query, filters=_filter, sort=_sort, limit=limit).execute().hits
+        return self.search(filters=_filter, sort=_sort, limit=limit).execute().hits
 
     def aggregation_avg_videos_per_channel(self, search=None):
 
