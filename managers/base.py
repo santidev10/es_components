@@ -294,7 +294,7 @@ class BaseManager:
         return cls.filter_nonexistent_section(Sections.DELETED)
 
     def forced_filters(self):
-        updated_at = datetime_service.utcnow() - timedelta(days=self.forced_filter_oudated_days)
+        updated_at = datetime_service.now() - timedelta(days=self.forced_filter_oudated_days)
 
         field_updated_at = f"{Sections.MAIN}.{TimestampFields.UPDATED_AT}"
         return self.filter_alive() & self.filter_range(field_updated_at, gt=updated_at)
