@@ -85,11 +85,11 @@ class ExistsField:
 class Field:
     def __init__(self, query, value_cls):
         self.__query = query
-        self.value_cls = value_cls
+        self.__value_cls = value_cls
 
     def field(self, value):
         self.__query.set_field(value)
-        return self.value_cls(self.__query)
+        return self.__value_cls(self.__query)
 
 
 class Value:
