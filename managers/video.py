@@ -30,8 +30,8 @@ class VideoManager(BaseManager):
     def by_content_owner_ids_query(self, content_owner_ids):
         return self.filter_term(CONTENT_OWNER_ID_FIELD, content_owner_ids)
 
-    def forced_filters(self, updated_at=None):
-        return super(VideoManager, self).forced_filters(updated_at) &\
+    def forced_filters(self):
+        return super(VideoManager, self).forced_filters() &\
                self.filter_existent_section(Sections.GENERAL_DATA)
 
     def get_never_updated(self, outdated_at, never_updated_section, ids=None, limit=10000):

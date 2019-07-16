@@ -1,3 +1,4 @@
+from datetime import timedelta
 from typing import Type
 
 from elasticsearch.helpers import bulk
@@ -8,6 +9,7 @@ from elasticsearch_dsl import Q
 from es_components.constants import EsDictFields
 from es_components.constants import FilterIncludeEmpty
 from es_components.constants import FilterOperators
+from es_components.constants import FORCED_FILTER_OUDATED_DAYS
 from es_components.constants import MAIN_ID_FIELD
 from es_components.constants import Sections
 from es_components.constants import SortDirections
@@ -34,6 +36,7 @@ class BaseManager:
     """
     allowed_sections = (Sections.MAIN, Sections.DELETED,)
     model: Type[BaseDocument] = None
+    forced_filter_oudated_days = FORCED_FILTER_OUDATED_DAYS
 
     def __init__(self, sections=None):
         """ Initialize manager.
@@ -290,9 +293,8 @@ class BaseManager:
     def filter_alive(cls):
         return cls.filter_nonexistent_section(Sections.DELETED)
 
-    def forced_filters(self, updated_at=None):
-        if not updated_at:
-            updated_at = datetime_service.now().date()
+    def forced_filters(self):
+        updated_at = datetime_service.utcnow() - timedelta(days=self.forced_filter_oudated_days)
 
         field_updated_at = f"{Sections.MAIN}.{TimestampFields.UPDATED_AT}"
         return self.filter_alive() & self.filter_range(field_updated_at, gt=updated_at)
