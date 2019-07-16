@@ -135,14 +135,12 @@ class BaseManager:
     def _search(self):
         return self.model.search().source(self.sections)
 
-    def search(self, queries=None, filters=None, sort=None, limit=10000, offset=None):
+    def search(self, query=None, filters=None, sort=None, limit=10000, offset=None):
         search = self._search()
-        if queries:
-            queries = queries if isinstance(queries, list) else [queries]
-            search = search.query(*queries)
+        if query:
+            search = search.query(query)
         if filters:
-            filters = filters if isinstance(filters, list) else [filters]
-            search = search.filter(*filters)
+            search = search.filter(filters)
         if sort:
             search = search.sort(*sort)
         return search[offset:limit]
@@ -233,7 +231,7 @@ class BaseManager:
         }
         return Q(_filter)
 
-    def _filter_nonexistent_section(self, section):
+    def filter_nonexistent_section(self, section):
         _filter = {
             "bool": {
                 "must_not": {
@@ -281,17 +279,14 @@ class BaseManager:
         }
         return Q(_query)
 
-    @classmethod
-    def ids_query(cls, ids):
-        return cls.filter_term(MAIN_ID_FIELD, ids)
+    def ids_query(self, ids):
+        return self.filter_term(MAIN_ID_FIELD, ids)
 
-    @classmethod
-    def ids_not_equal_query(cls, ids):
-        return cls.filter_term(MAIN_ID_FIELD, ids, not_equal=True)
+    def ids_not_equal_query(self, ids):
+        return self.filter_term(MAIN_ID_FIELD, ids, not_equal=True)
 
-    @classmethod
-    def filter_alive(cls):
-        return cls.filter_nonexistent_section(Sections.DELETED)
+    def filter_alive(self):
+        return self.filter_nonexistent_section(Sections.DELETED)
 
     def forced_filters(self):
         updated_at = datetime_service.now() - timedelta(days=self.forced_filter_oudated_days)
@@ -311,7 +306,7 @@ class BaseManager:
             {field_updated_at: {"order": SortDirections.ASCENDING}},
             {MAIN_ID_FIELD: {"order": SortDirections.ASCENDING}},
         ]
-        return self.search(queries=_query, filters=_filter_nonexistent_section, sort=_sort, limit=limit)
+        return self.search(query=_query, filters=_filter_nonexistent_section, sort=_sort, limit=limit)
 
     def search_outdated_records(self, outdated_at, ids=None, limit=10000):
         control_section = self._get_control_section()
@@ -325,7 +320,7 @@ class BaseManager:
             {field_updated_at: {"order": SortDirections.ASCENDING}},
             {MAIN_ID_FIELD: {"order": SortDirections.ASCENDING}},
         ]
-        return self.search(queries=_query, filters=_filter_outdated, sort=_sort, limit=limit)
+        return self.search(query=_query, filters=_filter_outdated, sort=_sort, limit=limit)
 
     def get_outdated(self, outdated_at, include_empty=FilterIncludeEmpty.NO, ids=None, limit=10000):
         if include_empty not in FilterIncludeEmpty.ALL:
