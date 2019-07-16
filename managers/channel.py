@@ -2,6 +2,7 @@ from es_components.managers.base import BaseManager
 from es_components.models.channel import Channel
 from es_components.constants import Sections
 from es_components.constants import CONTENT_OWNER_ID_FIELD
+from es_components.query_builder import QueryBuilder
 
 
 class ChannelManager(BaseManager):
@@ -12,8 +13,8 @@ class ChannelManager(BaseManager):
     model = Channel
 
     def by_content_owner_ids_query(self, content_owner_ids):
-        return self.filter_term(CONTENT_OWNER_ID_FIELD, content_owner_ids)
+        return QueryBuilder().create().must().terms().field(CONTENT_OWNER_ID_FIELD).value(content_owner_ids).get()
 
     def forced_filters(self):
         return super(ChannelManager, self).forced_filters() &\
-               self.filter_existent_section(Sections.GENERAL_DATA)
+               self._filter_existent_section(Sections.GENERAL_DATA)

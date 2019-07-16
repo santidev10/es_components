@@ -1,12 +1,12 @@
 from es_components.constants import Sections
 from es_components.constants import VIDEO_CHANNEL_ID_FIELD
-from es_components.constants import FilterOperators
 from es_components.constants import MAIN_ID_FIELD
 from es_components.constants import SortDirections
 from es_components.constants import TimestampFields
 from es_components.constants import CONTENT_OWNER_ID_FIELD
 from es_components.managers.base import BaseManager
 from es_components.models.video import Video
+from es_components.query_builder import QueryBuilder
 
 
 class VideoManager(BaseManager):
@@ -22,25 +22,25 @@ class VideoManager(BaseManager):
         return [video.main.id for video in videos]
 
     def by_channel_not_equal_ids_query(self, channels_ids):
-        return self.filter_term(VIDEO_CHANNEL_ID_FIELD, channels_ids, not_equal=True)
+        return QueryBuilder().create().must_not().terms().field(VIDEO_CHANNEL_ID_FIELD).value(channels_ids).get()
 
     def by_channel_ids_query(self, channels_ids):
-        return self.filter_term(VIDEO_CHANNEL_ID_FIELD, channels_ids)
+        return QueryBuilder().create().must().terms().field(VIDEO_CHANNEL_ID_FIELD).value(channels_ids).get()
 
     def by_content_owner_ids_query(self, content_owner_ids):
-        return self.filter_term(CONTENT_OWNER_ID_FIELD, content_owner_ids)
+        return QueryBuilder().create().must().terms().field(CONTENT_OWNER_ID_FIELD).value(content_owner_ids).get()
 
     def forced_filters(self):
         return super(VideoManager, self).forced_filters() &\
-               self.filter_existent_section(Sections.GENERAL_DATA)
+               self._filter_existent_section(Sections.GENERAL_DATA)
 
     def get_never_updated(self, outdated_at, never_updated_section, channel_id, limit=10000):
         control_section = self._get_control_section()
         field_updated_at = f"{control_section}.{TimestampFields.UPDATED_AT}"
 
-        _filter_outdated = self.filter_range(field_updated_at, FilterOperators.LESS_THAN, outdated_at)
-        _filter_nonexistent_section = self.filter_nonexistent_section(control_section)
-        _filter_never_updated_section = self.filter_nonexistent_section(never_updated_section)
+        _filter_outdated =  QueryBuilder().create().must().range().field(field_updated_at).lt(outdated_at).get()
+        _filter_nonexistent_section = self._filter_nonexistent_section(control_section)
+        _filter_never_updated_section = self._filter_nonexistent_section(never_updated_section)
         _filter_channel_id = self.by_channel_ids_query(channel_id)
 
         _filter = _filter_channel_id & _filter_never_updated_section & _filter_outdated | _filter_nonexistent_section

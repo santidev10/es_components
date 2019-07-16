@@ -4,11 +4,9 @@ from typing import Type
 from elasticsearch.helpers import bulk
 from elasticsearch_dsl import connections
 from elasticsearch_dsl import MultiSearch
-from elasticsearch_dsl import Q
 
 from es_components.constants import EsDictFields
 from es_components.constants import FilterIncludeEmpty
-from es_components.constants import FilterOperators
 from es_components.constants import FORCED_FILTER_OUDATED_DAYS
 from es_components.constants import MAIN_ID_FIELD
 from es_components.constants import Sections
@@ -27,6 +25,7 @@ from es_components.exceptions import SectionsNotAllowed
 from es_components.models.base import BaseDocument
 
 from es_components.utils import chunks
+from es_components.query_builder import QueryBuilder
 
 
 class BaseManager:
@@ -211,94 +210,33 @@ class BaseManager:
     def _get_control_section(self):
         return self.sections[0]
 
-    @staticmethod
-    def filter_range(field, gte=None, gt=None, lte=None, lt=None):
-        range_value = {}
+    def _filter_nonexistent_section(self, section):
+        return QueryBuilder().create().must_not().exists().field(section).get()
 
-        if gte:
-            range_value[FilterOperators.GREATER_EQUAL_THAN] = gte
-        if gt:
-            range_value[FilterOperators.GREATER_THAN] = gt
-        if lte:
-            range_value[FilterOperators.LESS_EQUAL_THAN] = lte
-        if lt:
-            range_value[FilterOperators.LESS_THAN] = lt
-
-        _filter = {
-            "range": {
-                field: range_value
-            }
-        }
-        return Q(_filter)
-
-    def filter_nonexistent_section(self, section):
-        _filter = {
-            "bool": {
-                "must_not": {
-                    "exists": {
-                        "field": section
-                    }
-                }
-            }
-        }
-        return Q(_filter)
-
-    @staticmethod
-    def filter_existent_section(section):
-        _filter = {
-            "bool": {
-                "must": {
-                    "exists": {
-                        "field": section
-                    }
-                }
-            }
-        }
-        return Q(_filter)
-
-    @staticmethod
-    def filter_term(field, values, not_equal=False):
-        condition = "must_not" if not_equal else "must"
-        term = "terms" if isinstance(values, list) else "term"
-
-        _filter = {
-            "bool": {
-                condition: {
-                    term: {field: values}
-                }
-            }
-        }
-        return Q(_filter)
-
-    @staticmethod
-    def query_regexp(field, value):
-        _query = {
-            "regexp": {
-                field: value
-            }
-        }
-        return Q(_query)
+    def _filter_existent_section(self, section):
+        return QueryBuilder().create().must().exists().field(section).get()
 
     def ids_query(self, ids):
-        return self.filter_term(MAIN_ID_FIELD, ids)
+        return QueryBuilder().create().must().terms().field(MAIN_ID_FIELD).value(ids).get()
 
     def ids_not_equal_query(self, ids):
-        return self.filter_term(MAIN_ID_FIELD, ids, not_equal=True)
+        return QueryBuilder().create().must_not().terms().field(MAIN_ID_FIELD).value(ids).get()
 
     def filter_alive(self):
-        return self.filter_nonexistent_section(Sections.DELETED)
+        return self._filter_nonexistent_section(Sections.DELETED)
 
     def forced_filters(self):
         updated_at = datetime_service.now() - timedelta(days=self.forced_filter_oudated_days)
 
         field_updated_at = f"{Sections.MAIN}.{TimestampFields.UPDATED_AT}"
-        return self.filter_alive() & self.filter_range(field_updated_at, gt=updated_at)
+        filter_range = QueryBuilder().create().must().range().field(field_updated_at).gt(updated_at).get()
+        return self.filter_alive() & filter_range
 
     def search_nonexistent_section_records(self, ids=None, limit=10000):
         control_section = self._get_control_section()
         field_updated_at = f"{control_section}.{TimestampFields.UPDATED_AT}"
 
-        _filter_nonexistent_section = self.filter_nonexistent_section(control_section)
+        _filter_nonexistent_section = self._filter_nonexistent_section(control_section)
 
         _query = self.ids_query(ids) if ids is not None else None
 
@@ -312,7 +250,7 @@ class BaseManager:
         control_section = self._get_control_section()
         field_updated_at = f"{control_section}.{TimestampFields.UPDATED_AT}"
 
-        _filter_outdated = self.filter_range(field_updated_at, lt=outdated_at)
+        _filter_outdated = QueryBuilder().create().must().range().field(field_updated_at).lt(outdated_at).get()
 
         _query = self.ids_query(ids) if ids is not None else None
 

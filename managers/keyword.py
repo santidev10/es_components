@@ -9,5 +9,5 @@ class KeywordManager(BaseManager):
 
     def forced_filters(self):
         return super(KeywordManager, self).forced_filters() &\
-               self.filter_existent_section(Sections.STATS)
+               self._filter_existent_section(Sections.STATS)
 
