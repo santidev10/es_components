@@ -32,11 +32,6 @@ class TimestampFields:
     UPDATED_AT = "updated_at"
 
 
-class FilterOperators:
-    GREATER_THAN = "gt"
-    LESS_THAN = "lt"
-
-
 class SortDirections:
     ASCENDING = "asc"
     DESCENDING = "desc"
@@ -52,6 +47,7 @@ class FilterIncludeEmpty:
     ALL = (FIRST, LAST, NO)
 
 
+FORCED_FILTER_OUDATED_DAYS = 7
 MAIN_ID_FIELD = "main.id"
 VIDEO_CHANNEL_ID_FIELD = "channel.id"
 CONTENT_OWNER_ID_FIELD = "cms.content_owner_id"
