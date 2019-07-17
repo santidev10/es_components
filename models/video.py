@@ -48,7 +48,7 @@ class VideoSectionStats(BaseInnerDocWithHistory):
     last_day_views = Long()
     last_7day_views = Long()
     last_30day_views = Long()
-    views_per_day = Long()
+    views_per_day = Double()
     likes = Long()
     likes_history = Long(index=False, multi=True)
     last_day_likes = Long()
