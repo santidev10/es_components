@@ -32,13 +32,6 @@ class TimestampFields:
     UPDATED_AT = "updated_at"
 
 
-class FilterOperators:
-    GREATER_THAN = "gt"
-    GREATER_EQUAL_THAN = "gte"
-    LESS_THAN = "lt"
-    LESS_EQUAL_THAN = "lte"
-
-
 class SortDirections:
     ASCENDING = "asc"
     DESCENDING = "desc"

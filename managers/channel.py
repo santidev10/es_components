@@ -13,7 +13,8 @@ class ChannelManager(BaseManager):
     model = Channel
 
     def by_content_owner_ids_query(self, content_owner_ids):
-        return QueryBuilder().create().must().terms().field(CONTENT_OWNER_ID_FIELD).value(content_owner_ids).get()
+        return QueryBuilder().build().must().terms().field(CONTENT_OWNER_ID_FIELD)\
+            .value(content_owner_ids).get()
 
     def forced_filters(self):
         return super(ChannelManager, self).forced_filters() &\

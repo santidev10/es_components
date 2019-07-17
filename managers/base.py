@@ -211,16 +211,16 @@ class BaseManager:
         return self.sections[0]
 
     def _filter_nonexistent_section(self, section):
-        return QueryBuilder().create().must_not().exists().field(section).get()
+        return QueryBuilder().build().must_not().exists().field(section).get()
 
     def _filter_existent_section(self, section):
-        return QueryBuilder().create().must().exists().field(section).get()
+        return QueryBuilder().build().must().exists().field(section).get()
 
     def ids_query(self, ids):
-        return QueryBuilder().create().must().terms().field(MAIN_ID_FIELD).value(ids).get()
+        return QueryBuilder().build().must().terms().field(MAIN_ID_FIELD).value(ids).get()
 
     def ids_not_equal_query(self, ids):
-        return QueryBuilder().create().must_not().terms().field(MAIN_ID_FIELD).value(ids).get()
+        return QueryBuilder().build().must_not().terms().field(MAIN_ID_FIELD).value(ids).get()
 
     def filter_alive(self):
         return self._filter_nonexistent_section(Sections.DELETED)
@@ -229,7 +229,8 @@ class BaseManager:
         updated_at = datetime_service.now() - timedelta(days=self.forced_filter_oudated_days)
 
         field_updated_at = f"{Sections.MAIN}.{TimestampFields.UPDATED_AT}"
-        filter_range = QueryBuilder().create().must().range().field(field_updated_at).gt(updated_at).get()
+        filter_range = QueryBuilder().build().must().range().field(field_updated_at)\
+            .gt(updated_at).get()
         return self.filter_alive() & filter_range
 
     def search_nonexistent_section_records(self, ids=None, limit=10000):
@@ -250,7 +251,8 @@ class BaseManager:
         control_section = self._get_control_section()
         field_updated_at = f"{control_section}.{TimestampFields.UPDATED_AT}"
 
-        _filter_outdated = QueryBuilder().create().must().range().field(field_updated_at).lt(outdated_at).get()
+        _filter_outdated = QueryBuilder().build().must().range().field(field_updated_at)\
+            .lt(outdated_at).get()
 
         _query = self.ids_query(ids) if ids is not None else None
 
@@ -270,11 +272,13 @@ class BaseManager:
 
         limit_remaining = limit - len(entries)
         if limit_remaining > 0:
-            entries += self.search_outdated_records(outdated_at, ids=ids, limit=limit_remaining).execute().hits
+            entries += self.search_outdated_records(outdated_at, ids=ids, limit=limit_remaining)\
+                .execute().hits
 
         limit_remaining = limit - len(entries)
         if limit_remaining > 0 and include_empty == FilterIncludeEmpty.LAST:
-            entries += self.search_nonexistent_section_records(ids=ids, limit=limit_remaining).execute().hits
+            entries += self.search_nonexistent_section_records(ids=ids, limit=limit_remaining)\
+                .execute().hits
 
         return entries
 
@@ -285,13 +289,13 @@ class BaseManager:
 
         return self.search(filters=forced_filter).execute().hits
 
-    def aggs_from_dict(self, aggregations, search=None, size=0):
+    def get_aggregation(self, aggregations, search=None, size=0):
 
         if not aggregations:
             return None
 
         if not search:
-            search = self.model._search()
+            search = self._search()
 
         search.update_from_dict({
             "size": size,

@@ -1,7 +1,5 @@
 from elasticsearch_dsl import Q
 
-from es_components.constants import FilterOperators
-
 
 class QueryBuilder:
     def __init__(self):
@@ -22,11 +20,11 @@ class QueryBuilder:
     def set_rule(self, value):
         self.__rule = value
 
-    def create(self):
+    def build(self):
         return Condition(self)
 
     def get(self):
-        _filter = {
+        query_filter = {
             "bool": {
                 self.__condition: {
                     self.__rule: {
@@ -35,7 +33,7 @@ class QueryBuilder:
                 }
             }
         }
-        return Q(_filter)
+        return Q(query_filter)
 
 
 class Condition:
@@ -107,19 +105,19 @@ class RangeValue:
         self.values = {}
 
     def lt(self, value):
-        self.values[FilterOperators.LESS_THAN] = value
+        self.values["lt"] = value
         return self
 
     def lte(self, value):
-        self.values[FilterOperators.LESS_EQUAL_THAN] = value
+        self.values["lte"] = value
         return self
 
     def gt(self, value):
-        self.values[FilterOperators.GREATER_THAN] = value
+        self.values["gt"] = value
         return self
 
     def gte(self, value):
-        self.values[FilterOperators.GREATER_EQUAL_THAN] = value
+        self.values["gte"] = value
         return self
 
     def get(self):
