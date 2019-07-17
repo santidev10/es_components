@@ -52,7 +52,7 @@ class ChannelSectionStats(BaseInnerDocWithHistory):
     last_7day_views = Long()
     last_30day_views = Long()
     views_per_video = Double()
-    views_per_video_history = Long(index=False, multi=True)
+    views_per_video_history = Double(index=False, multi=True)
     observed_videos_views = Long(index=False)
     observed_videos_views_history = Long(index=False, multi=True)
     observed_videos_likes = Long(index=False)
