@@ -286,8 +286,6 @@ class BaseManager:
         return entries
 
     def get_by_forced_filter(self):
-        updated_at = datetime_service.now().date()
-
-        forced_filter = self.forced_filters(updated_at)
+        forced_filter = self.forced_filters()
 
         return self.search(filters=forced_filter).execute().hits
