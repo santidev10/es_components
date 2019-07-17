@@ -85,6 +85,15 @@ class VideoSectionAnalytics(BaseInnerDoc):
     likes = Object(enabled=False)
     dislikes = Object(enabled=False)
     minutes_watched = Object(enabled=False)
+    gender_male = Double()
+    gender_female = Double()
+    age_group_13_17 = Double()
+    age_group_18_24 = Double()
+    age_group_25_34 = Double()
+    age_group_35_44 = Double()
+    age_group_45_54 = Double()
+    age_group_55_64 = Double()
+    age_group_65_ = Double()
 
 
 class VideoSectionTranscripts(BaseInnerDoc):

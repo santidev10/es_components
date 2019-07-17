@@ -96,6 +96,7 @@ class ChannelSectionAnalytics(BaseInnerDoc):
     is_auth = Boolean()
     gender_male = Double()
     gender_female = Double()
+    # fixme: consider removing this or adding it to transform
     gender_other = Double()
     age_group_13_17 = Double()
     age_group_18_24 = Double()
