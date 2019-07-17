@@ -4,6 +4,7 @@ from typing import Type
 from elasticsearch.helpers import bulk
 from elasticsearch_dsl import connections
 from elasticsearch_dsl import MultiSearch
+from elasticsearch_dsl import Q
 
 from es_components.constants import EsDictFields
 from es_components.constants import FilterIncludeEmpty
@@ -138,7 +139,9 @@ class BaseManager:
         search = self._search()
         if query:
             search = search.query(query)
-        if filters:
+        if filters and isinstance(filters, list):
+            search = search.query(Q("bool", filter=filters))
+        elif filters:
             search = search.filter(filters)
         if sort:
             search = search.sort(*sort)
@@ -288,19 +291,3 @@ class BaseManager:
         forced_filter = self.forced_filters(updated_at)
 
         return self.search(filters=forced_filter).execute().hits
-
-    def get_aggregation(self, aggregations, search=None, size=0):
-
-        if not aggregations:
-            return None
-
-        if not search:
-            search = self._search()
-
-        search.update_from_dict({
-            "size": size,
-            "aggs": aggregations
-        })
-        aggregations_result = search.execute().aggregations
-
-        return aggregations_result
