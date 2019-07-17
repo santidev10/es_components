@@ -85,9 +85,11 @@ class ChannelManager(BaseManager):
         range_aggs = {}
 
         for field in self.range_aggregation_fields:
-            range_aggs[field] = {
-                "min": {"field": field},
-                # "max": {"field": field},
+            range_aggs["{}:min".format(field)] = {
+                "min": {"field": field}
+            }
+            range_aggs["{}:max".format(field)] = {
+                "max": {"field": field}
             }
         return range_aggs
 
