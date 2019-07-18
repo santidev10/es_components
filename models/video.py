@@ -2,13 +2,14 @@ from elasticsearch_dsl import Boolean
 from elasticsearch_dsl import Date
 from elasticsearch_dsl import Double
 from elasticsearch_dsl import Float
+from elasticsearch_dsl import InnerDoc
 from elasticsearch_dsl import Keyword
 from elasticsearch_dsl import Long
 from elasticsearch_dsl import Object
 from elasticsearch_dsl import Text
 
-from es_components.config import VIDEO_INDEX_NAME
 from es_components.config import VIDEO_DOC_TYPE
+from es_components.config import VIDEO_INDEX_NAME
 from es_components.constants import Sections
 from es_components.models.base import BaseDocument
 from es_components.models.base import BaseInnerDoc
@@ -96,8 +97,17 @@ class VideoSectionAnalytics(BaseInnerDoc):
     age_group_65_ = Double()
 
 
-class VideoSectionTranscripts(BaseInnerDoc):
+class VideoCaptionsItem(InnerDoc):
     text = Text(index=False)
+    name = Text(index=False)
+    language_code = Text(index=False)
+    status = Text(index=False)
+    caption_id = Text(index=False)
+    youtube_updated_at = Date(index=False)
+
+
+class VideoSectionTranscripts(BaseInnerDoc):
+    items = Object(VideoCaptionsItem, multi=True)
 
 
 class VideoSectionMonetization(BaseInnerDoc):
