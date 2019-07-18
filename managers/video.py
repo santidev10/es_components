@@ -12,9 +12,9 @@ from es_components.query_builder import QueryBuilder
 class VideoManager(BaseManager):
     allowed_sections = BaseManager.allowed_sections\
                        + (Sections.GENERAL_DATA, Sections.STATS, Sections.ANALYTICS,
-                          Sections.CHANNEL, Sections.TRANSCRIPTS, Sections.MONETIZATION,
+                          Sections.CHANNEL, Sections.CAPTIONS, Sections.MONETIZATION,
                           Sections.ADS_STATS, Sections.CMS, Sections.ANALYTICS_SCHEDULE,
-                          Sections.TRANSCRIPTS_SCHEDULE)
+                          Sections.CAPTIONS_SCHEDULE)
     model = Video
 
     def get_all_video_ids(self, channel_id):
