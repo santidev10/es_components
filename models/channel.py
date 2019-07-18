@@ -74,6 +74,7 @@ class ChannelSectionStats(BaseInnerDocWithHistory):
 
 class ChannelSectionAnalytics(BaseInnerDoc):
     """ Nested analytics section for Channel document """
+    fetched_at = Date(index=False)
     direct_auth = Boolean(index=False)
     auth_timestamp = Date()
     content_owner_id = Keyword(index=False, multi=True)

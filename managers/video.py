@@ -18,59 +18,73 @@ class VideoManager(BaseManager):
     model = Video
 
     def get_all_video_ids(self, channel_id):
+        return list(self.get_all_video_ids_generator(channel_id))
+
+    def get_all_video_ids_generator(self, channel_id):
         _query = self.by_channel_ids_query(channel_id)
-        videos = self.model.search().source(Sections.MAIN).query(_query).scan()
-        return [video.main.id for video in videos]
+        videos_generator = self.model.search().source(Sections.MAIN).query(_query).scan()
+        yield from (video.main.id for video in videos_generator)
 
-    def by_channel_not_equal_ids_query(self, channels_ids):
-        return QueryBuilder().build().must_not().terms().field(VIDEO_CHANNEL_ID_FIELD)\
-            .value(channels_ids).get()
-
-    def by_channel_ids_query(self, channels_ids):
-        return QueryBuilder().build().must().terms().field(VIDEO_CHANNEL_ID_FIELD)\
-            .value(channels_ids).get()
+    def by_channel_ids_query(self, channels_ids, must=True):
+        query = QueryBuilder().build()
+        query = query.must() if must else query.must_not()
+        query = query.terms() if isinstance(channels_ids, list) else query.term()
+        query = query.field(VIDEO_CHANNEL_ID_FIELD).value(channels_ids)
+        values = query.get()
+        return values
 
     def by_content_owner_ids_query(self, content_owner_ids):
-        return QueryBuilder().build().must().terms().field(CONTENT_OWNER_ID_FIELD)\
-            .value(content_owner_ids).get()
+        query = QueryBuilder().build().must()
+        query = query.terms() if isinstance(content_owner_ids, list) else query.term()
+        query = query.field(CONTENT_OWNER_ID_FIELD).value(content_owner_ids)
+        values = query.get()
+        return values
 
     def forced_filters(self):
         return super(VideoManager, self).forced_filters() &\
                self._filter_existent_section(Sections.GENERAL_DATA)
 
-    def get_never_updated(self, outdated_at, never_updated_section, channel_id, limit=10000):
+    def get_never_updated_generator(self, outdated_at, never_updated_section, channels_ids=None,
+                                    content_owner_ids=None):
+
         control_section = self._get_control_section()
         field_updated_at = f"{control_section}.{TimestampFields.UPDATED_AT}"
 
-        _filter_outdated = QueryBuilder().build().must().range().field(field_updated_at)\
-            .lt(outdated_at).get()
+        _filter_outdated = QueryBuilder().build().must().range().field(field_updated_at).lt(outdated_at).get()
         _filter_nonexistent_section = self._filter_nonexistent_section(control_section)
         _filter_never_updated_section = self._filter_nonexistent_section(never_updated_section)
-        _filter_channel_id = self.by_channel_ids_query(channel_id)
 
-        _filter = _filter_channel_id & _filter_never_updated_section \
-                  & _filter_outdated | _filter_nonexistent_section
+        if channels_ids is not None and content_owner_ids is None:
+            _filter = self.by_channel_ids_query(channels_ids)
+        elif content_owner_ids is not None and channels_ids is None:
+            _filter = self.by_content_owner_ids_query(content_owner_ids)
+        else:
+            raise AttributeError("One of two parameters must be specified: channel_id OR content_owner_id")
 
+        _filter &= _filter_never_updated_section & _filter_outdated | _filter_nonexistent_section
 
         _sort = [
             {field_updated_at: {"order": SortDirections.ASCENDING}},
             {MAIN_ID_FIELD: {"order": SortDirections.ASCENDING}},
         ]
 
-        return self.search(filters=_filter, sort=_sort, limit=limit).execute().hits
+        yield from self.search(filters=_filter, sort=_sort).scan()
 
-    def aggregation_avg_videos_per_channel(self, search=None):
+    def get_total_count_for_channels(self, channels_ids):
+        search = self.search(query=self.by_channel_ids_query(channels_ids))
+        result = search.execute()
+        return result.hits.total
 
-        if not search:
-            search = self._search()
+    def search_nonexistent_section_records_by_channel_id(self, channel_id=None, limit=10000):
+        control_section = self._get_control_section()
+        field_updated_at = f"{control_section}.{TimestampFields.UPDATED_AT}"
 
-        search.aggs.bucket("video_per_channel", "terms", field=VIDEO_CHANNEL_ID_FIELD)
-        search.aggs.pipeline("avg", "avg_bucket", buckets_path="video_per_channel>_count")
+        _filter_nonexistent_section = self._filter_nonexistent_section(control_section)
 
-        aggregations_result = search.execute().aggregations
-        video_per_channel = aggregations_result.video_per_channel.buckets
+        _query = self.by_channel_ids_query(channel_id) if channel_id is not None else None
 
-        channels = [_video_per_channel.key for _video_per_channel in video_per_channel]
-        avg_video_per_channel = aggregations_result.avg.value
-
-        return channels, avg_video_per_channel
+        _sort = [
+            {field_updated_at: {"order": SortDirections.ASCENDING}},
+            {MAIN_ID_FIELD: {"order": SortDirections.ASCENDING}},
+        ]
+        return self.search(query=_query, filters=_filter_nonexistent_section, sort=_sort, limit=limit)
