@@ -74,6 +74,7 @@ class VideoSectionStats(BaseInnerDocWithHistory):
 
 class VideoSectionAnalytics(BaseInnerDoc):
     """ Nested analytics section for Video document """
+    fetched_at = Date(index=False)
     direct_auth = Boolean()
     content_owner_id = Keyword()
     gender = Object(enabled=False)

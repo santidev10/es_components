@@ -38,7 +38,7 @@ class BaseManager:
     model: Type[BaseDocument] = None
     forced_filter_oudated_days = FORCED_FILTER_OUDATED_DAYS
 
-    def __init__(self, sections=None):
+    def __init__(self, sections=None, upsert_sections=None):
         """ Initialize manager.
 
         :param sections: tuple of sections name. If sections is not specified,
@@ -50,6 +50,7 @@ class BaseManager:
         if not self.model:
             raise DataModelNotSpecified("Data Model is not specified")
 
+        # sections ------------->
         if sections is None:
             sections = ()
         elif isinstance(sections, str):
@@ -62,6 +63,20 @@ class BaseManager:
             sections += (Sections.MAIN,)
 
         self.sections = sections
+
+        # upsert_sections ------>
+        if upsert_sections is None:
+            upsert_sections = sections
+        elif isinstance(upsert_sections, str):
+            upsert_sections = (upsert_sections,)
+
+        if upsert_sections and not set(upsert_sections).issubset(set(self.allowed_sections)):
+            raise SectionsNotAllowed("Cannot find such upsert_section in Data Model sections")
+
+        if Sections.MAIN not in upsert_sections:
+            upsert_sections += (Sections.MAIN,)
+
+        self.upsert_sections = upsert_sections
 
     def get(self, ids, skip_none=False):
         """ Retrieve model entities.
@@ -181,7 +196,7 @@ class BaseManager:
             entry_dict = entry.to_dict(include_meta=True, skip_empty=False)
             entry_dict[EsDictFields.DOC] = {}
 
-            for section in self.sections:
+            for section in self.upsert_sections:
                 entry_dict[EsDictFields.DOC][section] = \
                     update_timestamp(entry_dict[EsDictFields.SOURCE].get(section), now)
 
