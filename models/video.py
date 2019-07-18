@@ -106,7 +106,7 @@ class VideoCaptionsItem(InnerDoc):
     youtube_updated_at = Date(index=False)
 
 
-class VideoSectionTranscripts(BaseInnerDoc):
+class VideoSectionCaptions(BaseInnerDoc):
     items = Object(VideoCaptionsItem, multi=True)
 
 
@@ -147,14 +147,14 @@ class Video(BaseDocument):
     general_data = Object(VideoSectionGeneralData)
     stats = Object(VideoSectionStats)
     analytics = Object(VideoSectionAnalytics)
-    transcripts = Object(VideoSectionTranscripts)
+    captions = Object(VideoSectionCaptions)
     monetization = Object(VideoSectionMonetization)
     ads_stats = Object(VideoSectionAdsStats)
     cms = Object(VideoSectionCMS)
     channel = Object(VideoSectionChannel)
 
     analytics_schedule = Object(Schedule)
-    transcripts_schedule = Object(Schedule)
+    captions_schedule = Object(Schedule)
 
     class Index:
         name = VIDEO_INDEX_NAME
@@ -174,8 +174,8 @@ class Video(BaseDocument):
     def populate_monetization(self, **kwargs):
         self._populate_section(Sections.MONETIZATION, **kwargs)
 
-    def populate_transcripts(self, **kwargs):
-        self._populate_section(Sections.TRANSCRIPTS, **kwargs)
+    def populate_captions(self, **kwargs):
+        self._populate_section(Sections.CAPTIONS, **kwargs)
 
     def populate_ads_stats(self, **kwargs):
         self._populate_section(Sections.ADS_STATS, **kwargs)
