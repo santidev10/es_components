@@ -25,9 +25,9 @@ class VideoManager(BaseManager):
         videos_generator = self.model.search().source(Sections.MAIN).query(_query).scan()
         yield from (video.main.id for video in videos_generator)
 
-    def by_channel_ids_query(self, channels_ids, must=True):
+    def by_channel_ids_query(self, channels_ids, invert=False):
         query = QueryBuilder().build()
-        query = query.must() if must else query.must_not()
+        query = query.must_not() if invert else query.must()
         query = query.terms() if isinstance(channels_ids, list) else query.term()
         query = query.field(VIDEO_CHANNEL_ID_FIELD).value(channels_ids)
         values = query.get()
