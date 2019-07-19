@@ -73,18 +73,35 @@ class VideoManager(BaseManager):
     def get_total_count_for_channels(self, channels_ids):
         search = self.search(query=self.by_channel_ids_query(channels_ids))
         result = search.execute()
-        return result.hits.total
+        total = result.hits.total
+        return total
 
-    def search_nonexistent_section_records_by_channel_id(self, channel_id=None, limit=10000):
+    def get_total_count_for_content_owners(self, content_owner_ids):
+        search = self.search(query=self.by_content_owner_ids_query(content_owner_ids))
+        result = search.execute()
+        total = result.hits.total
+        return total
+
+    def _search_nonexistent_section_records(self, query, limit):
         control_section = self._get_control_section()
         field_updated_at = f"{control_section}.{TimestampFields.UPDATED_AT}"
 
-        _filter_nonexistent_section = self._filter_nonexistent_section(control_section)
+        filter_nonexistent_section = self._filter_nonexistent_section(control_section)
 
-        _query = self.by_channel_ids_query(channel_id) if channel_id is not None else None
-
-        _sort = [
+        sort = [
             {field_updated_at: {"order": SortDirections.ASCENDING}},
             {MAIN_ID_FIELD: {"order": SortDirections.ASCENDING}},
         ]
-        return self.search(query=_query, filters=_filter_nonexistent_section, sort=_sort, limit=limit)
+
+        records = self.search(query=query, filters=filter_nonexistent_section, sort=sort, limit=limit)
+        return records
+
+    def search_nonexistent_section_records_by_channel_id(self, channel_id=None, limit=10000):
+        query = self.by_channel_ids_query(channel_id) if channel_id is not None else None
+        records  =  self._search_nonexistent_section_records(query=query, limit=limit)
+        return records
+
+    def search_nonexistent_section_records_by_content_owner_id(self, content_owner_id=None, limit=10000):
+        query = self.by_content_owner_ids_query(content_owner_id) if content_owner_id is not None else None
+        records = self._search_nonexistent_section_records(query=query, limit=limit)
+        return records

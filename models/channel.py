@@ -91,10 +91,7 @@ class ChannelSectionAnalytics(BaseInnerDoc):
     minutes_watched = Object(enabled=False)
     subscribers_gained = Object(enabled=False)
     subscribers_lost = Object(enabled=False)
-    verified = Boolean()
     has_audience = Boolean()
-    is_cms = Boolean()
-    is_auth = Boolean()
     gender_male = Double()
     gender_female = Double()
     # fixme: consider removing this or adding it to transform
