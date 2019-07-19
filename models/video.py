@@ -2,13 +2,14 @@ from elasticsearch_dsl import Boolean
 from elasticsearch_dsl import Date
 from elasticsearch_dsl import Double
 from elasticsearch_dsl import Float
+from elasticsearch_dsl import InnerDoc
 from elasticsearch_dsl import Keyword
 from elasticsearch_dsl import Long
 from elasticsearch_dsl import Object
 from elasticsearch_dsl import Text
 
-from es_components.config import VIDEO_INDEX_NAME
 from es_components.config import VIDEO_DOC_TYPE
+from es_components.config import VIDEO_INDEX_NAME
 from es_components.constants import Sections
 from es_components.models.base import BaseDocument
 from es_components.models.base import BaseInnerDoc
@@ -96,8 +97,17 @@ class VideoSectionAnalytics(BaseInnerDoc):
     age_group_65_ = Double()
 
 
-class VideoSectionTranscripts(BaseInnerDoc):
+class VideoCaptionsItem(InnerDoc):
     text = Text(index=False)
+    name = Text(index=False)
+    language_code = Text(index=False)
+    status = Text(index=False)
+    caption_id = Text(index=False)
+    youtube_updated_at = Date(index=False)
+
+
+class VideoSectionCaptions(BaseInnerDoc):
+    items = Object(VideoCaptionsItem, multi=True)
 
 
 class VideoSectionMonetization(BaseInnerDoc):
@@ -137,14 +147,14 @@ class Video(BaseDocument):
     general_data = Object(VideoSectionGeneralData)
     stats = Object(VideoSectionStats)
     analytics = Object(VideoSectionAnalytics)
-    transcripts = Object(VideoSectionTranscripts)
+    captions = Object(VideoSectionCaptions)
     monetization = Object(VideoSectionMonetization)
     ads_stats = Object(VideoSectionAdsStats)
     cms = Object(VideoSectionCMS)
     channel = Object(VideoSectionChannel)
 
     analytics_schedule = Object(Schedule)
-    transcripts_schedule = Object(Schedule)
+    captions_schedule = Object(Schedule)
 
     class Index:
         name = VIDEO_INDEX_NAME
@@ -164,8 +174,8 @@ class Video(BaseDocument):
     def populate_monetization(self, **kwargs):
         self._populate_section(Sections.MONETIZATION, **kwargs)
 
-    def populate_transcripts(self, **kwargs):
-        self._populate_section(Sections.TRANSCRIPTS, **kwargs)
+    def populate_captions(self, **kwargs):
+        self._populate_section(Sections.CAPTIONS, **kwargs)
 
     def populate_ads_stats(self, **kwargs):
         self._populate_section(Sections.ADS_STATS, **kwargs)

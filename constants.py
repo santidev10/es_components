@@ -17,14 +17,14 @@ class Sections:
     MONETIZATION = "monetization"
     SOCIAL = "social"
     STATS = "stats"
-    TRANSCRIPTS = "transcripts"
+    CAPTIONS = "captions"
     CMS = "cms"
     CHANNEL = "channel"
 
     ANALYTICS_SCHEDULE = "analytics_schedule"
     GENERAL_DATA_SCHEDULE = "general_data_schedule"
     STATS_SCHEDULE = "stats_schedule"
-    TRANSCRIPTS_SCHEDULE = "transcripts_schedule"
+    CAPTIONS_SCHEDULE = "captions_schedule"
 
 
 class TimestampFields:
