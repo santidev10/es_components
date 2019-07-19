@@ -98,7 +98,7 @@ class VideoManager(BaseManager):
 
     def search_nonexistent_section_records_by_channel_id(self, channel_id=None, limit=10000):
         query = self.by_channel_ids_query(channel_id) if channel_id is not None else None
-        records  =  self._search_nonexistent_section_records(query=query, limit=limit)
+        records = self._search_nonexistent_section_records(query=query, limit=limit)
         return records
 
     def search_nonexistent_section_records_by_content_owner_id(self, content_owner_id=None, limit=10000):
