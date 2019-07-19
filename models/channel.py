@@ -22,6 +22,7 @@ class ChannelSectionGeneralData(BaseInnerDoc):
     description = Text(index=False)
     thumbnail_image_url = Text(index=False)
     country = Keyword()
+    country_original = Keyword()
     youtube_published_at = Date(index=False)
     video_tags = Keyword(index=False, multi=True)
     top_category = Keyword()
@@ -150,6 +151,14 @@ class ChannelSectionCMS(BaseInnerDoc):
     content_owner_id = Keyword(multi=True)
 
 
+class ChannelSectionCustomPropetries(BaseInnerDoc):
+    emails = Keyword(index=False, multi=True)
+    country = Keyword(index=False)
+    preferred = Boolean(index=False)
+    social_links = Text(index=False, multi=True)
+    channel_group = Keyword(index=False)
+
+
 class Channel(BaseDocument):
     general_data = Object(ChannelSectionGeneralData)
     stats = Object(ChannelSectionStats)
@@ -158,6 +167,7 @@ class Channel(BaseDocument):
     social = Object(ChannelSectionSocial)
     ads_stats = Object(ChannelSectionAdsStats)
     cms = Object(ChannelSectionCMS)
+    custom_properties = Object(ChannelSectionCustomPropetries)
 
     general_data_schedule = Object(Schedule)
     stats_schedule = Object(Schedule)
@@ -189,3 +199,6 @@ class Channel(BaseDocument):
 
     def populate_cms(self, **kwargs):
         self._populate_section(Sections.CMS, **kwargs)
+
+    def populate_custom_properties(self, **kwargs):
+        self._populate_section(Sections.CUSTOM_PROPERTIES, **kwargs)
