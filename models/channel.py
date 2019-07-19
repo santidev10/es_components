@@ -150,11 +150,11 @@ class ChannelSectionCMS(BaseInnerDoc):
 
 
 class ChannelSectionCustomPropetries(BaseInnerDoc):
-    emails = Keyword(index=False, multi=True)
+    emails = Keyword(multi=True)
     country = Keyword(index=False)
-    preferred = Boolean(index=False)
-    social_links = Text(index=False, multi=True)
-    channel_group = Keyword(index=False)
+    preferred = Boolean()
+    social_links = Object(enabled=False)
+    channel_group = Keyword()
 
 
 class Channel(BaseDocument):
