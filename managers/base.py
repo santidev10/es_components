@@ -51,7 +51,7 @@ class BaseManager:
             raise DataModelNotSpecified("Data Model is not specified")
 
         self.sections = self._init_sections(sections)
-        self.upsert_sections = self._init_upsert_sections(upsert_sections)
+        self.upsert_sections = self._init_sections(upsert_sections or sections)
 
     def _init_sections(self, sections):
         if sections is None:
@@ -67,21 +67,6 @@ class BaseManager:
             sections += (Sections.MAIN,)
 
         return sections
-
-    def _init_upsert_sections(self, upsert_sections):
-        if upsert_sections is None:
-            return self.sections
-
-        if isinstance(upsert_sections, str):
-            upsert_sections = (upsert_sections,)
-
-        if upsert_sections and not set(upsert_sections).issubset(set(self.allowed_sections)):
-            raise SectionsNotAllowed("Cannot find such upsert_section in Data Model sections")
-
-        if Sections.MAIN not in upsert_sections:
-            upsert_sections += (Sections.MAIN,)
-
-        return upsert_sections
 
     def get(self, ids, skip_none=False):
         """ Retrieve model entities.
