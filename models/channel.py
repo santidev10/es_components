@@ -13,7 +13,7 @@ from es_components.constants import Sections
 from es_components.models.base import BaseDocument
 from es_components.models.base import BaseInnerDoc
 from es_components.models.base import Schedule
-from es_components.models.base import SectionAnalytics
+from es_components.models.base import CommonSectionAnalytics
 from es_components.models.base import BaseInnerDocWithHistory
 
 
@@ -119,7 +119,7 @@ class ChannelSectionCMS(BaseInnerDoc):
 class Channel(BaseDocument):
     general_data = Object(ChannelSectionGeneralData)
     stats = Object(ChannelSectionStats)
-    analytics = Object(SectionAnalytics)
+    analytics = Object(CommonSectionAnalytics)
     monetization = Object(ChannelSectionMonetization)
     social = Object(ChannelSectionSocial)
     ads_stats = Object(ChannelSectionAdsStats)

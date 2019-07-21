@@ -44,7 +44,7 @@ class Schedule(BaseInnerDoc):
     pass
 
 
-class SectionAnalytics(BaseInnerDoc):
+class CommonSectionAnalytics(BaseInnerDoc):
     """ Nested analytics section """
     fetched_at = Date(index=False)
     direct_auth = Boolean()
@@ -77,7 +77,7 @@ class SectionAnalytics(BaseInnerDoc):
 
     # country
     country = Object(enabled=False)
-    
+
     # traffic_source
     traffic_source = Object(enabled=False)
 
