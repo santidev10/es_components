@@ -134,18 +134,3 @@ class BaseDocument(Document):
                 values = AttrList(set(list(values) + extra_values))
                 setattr(section, name, values)
 
-    @classmethod
-    def init_backup(cls, suffix="_backup", using=None):
-        """
-        Create the backup_index and populate the mappings in elasticsearch.
-        """
-        name = f"{cls.Index.name}{suffix}"
-        index = cls._index.clone(name=name)
-        main_doc_type = index._doc_types[0]._doc_type
-        mapping_properties = main_doc_type.mapping.properties._params["properties"]
-        for props in mapping_properties.values():
-            props._mapping.properties._params = {}
-            props._params["enabled"] = False
-
-        index.save(using=using)
-
