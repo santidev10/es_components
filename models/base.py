@@ -79,7 +79,11 @@ class BaseDocument(Document):
 
         # pylint: disable=protected-access
         section_class = self._doc_type.mapping[section_name]._doc_class
+        section_class_properties = set(section_class._doc_type.mapping)
         # pylint: enable=protected-access
+        properties_missed_in_mapping = init_kwargs.keys() - section_class_properties
+        if properties_missed_in_mapping:
+            raise ValueError(f"Extra fields: {properties_missed_in_mapping}")
 
         if not section:
             section = section_class()
