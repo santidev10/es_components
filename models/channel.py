@@ -13,6 +13,7 @@ from es_components.constants import Sections
 from es_components.models.base import BaseDocument
 from es_components.models.base import BaseInnerDoc
 from es_components.models.base import Schedule
+from es_components.models.base import SectionAnalytics
 from es_components.models.base import BaseInnerDocWithHistory
 
 
@@ -72,39 +73,6 @@ class ChannelSectionStats(BaseInnerDocWithHistory):
         )
 
 
-class ChannelSectionAnalytics(BaseInnerDoc):
-    """ Nested analytics section for Channel document """
-    fetched_at = Date(index=False)
-    direct_auth = Boolean(index=False)
-    auth_timestamp = Date()
-    content_owner_id = Keyword(index=False, multi=True)
-    cms_title = Keyword()
-    gender = Object(enabled=False)
-    age_group = Object(enabled=False)
-    demographics = Object(enabled=False)
-    country = Object(enabled=False)
-    traffic_sources = Object(enabled=False)
-    comments = Object(enabled=False)
-    views = Object(enabled=False)
-    likes = Object(enabled=False)
-    dislikes = Object(enabled=False)
-    minutes_watched = Object(enabled=False)
-    subscribers_gained = Object(enabled=False)
-    subscribers_lost = Object(enabled=False)
-    has_audience = Boolean()
-    gender_male = Double()
-    gender_female = Double()
-    # fixme: consider removing this or adding it to transform
-    gender_other = Double()
-    age_group_13_17 = Double()
-    age_group_18_24 = Double()
-    age_group_25_34 = Double()
-    age_group_35_44 = Double()
-    age_group_45_54 = Double()
-    age_group_55_64 = Double()
-    age_group_65_ = Double()
-
-
 class ChannelSectionMonetization(BaseInnerDoc):
     """ Nested monetization section for Channel document """
     rate = Double()
@@ -151,7 +119,7 @@ class ChannelSectionCMS(BaseInnerDoc):
 class Channel(BaseDocument):
     general_data = Object(ChannelSectionGeneralData)
     stats = Object(ChannelSectionStats)
-    analytics = Object(ChannelSectionAnalytics)
+    analytics = Object(SectionAnalytics)
     monetization = Object(ChannelSectionMonetization)
     social = Object(ChannelSectionSocial)
     ads_stats = Object(ChannelSectionAdsStats)
