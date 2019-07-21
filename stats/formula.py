@@ -1,3 +1,5 @@
+from statistics import mean
+
 import pandas
 
 
@@ -68,3 +70,8 @@ def get_counter_dataframe_tailing_sum(dataframe, count, max_errors=None, cast_ty
         value = cast_type(value)
 
     return value
+
+
+def get_is_strange_views(views_history):
+    deltas = [views_history[i - 1] - views_history[i] for i in range(1, len(views_history))]
+    return mean(deltas[:2]) > mean(deltas[2:]) * 1.5

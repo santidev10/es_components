@@ -72,6 +72,7 @@ class VideoSectionStats(BaseInnerDocWithHistory):
     channel_subscribers = Long()
     is_strange_sentiment = Boolean()
     is_strange_engage_rate = Boolean()
+    is_strange_views = Boolean()
 
     class History:
         all = ("views", "likes", "dislikes", "comments", "sentiment", "engage_rate")
