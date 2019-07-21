@@ -51,6 +51,7 @@ class SectionAnalytics(BaseInnerDoc):
     auth_timestamp = Date()
     content_owner_id = Keyword(multi=True)
     cms_title = Keyword()
+
     # general info
     comments = Object(enabled=False)
     views = Object(enabled=False)
@@ -59,6 +60,7 @@ class SectionAnalytics(BaseInnerDoc):
     minutes_watched = Object(enabled=False)
     subscribers_gained = Object(enabled=False)
     subscribers_lost = Object(enabled=False)
+
     # audience
     audience = Object(enabled=False)
     age = Object(enabled=False)
@@ -72,8 +74,10 @@ class SectionAnalytics(BaseInnerDoc):
     gender = Object(enabled=False)
     gender_male = Double()
     gender_female = Double()
+
     # country
     country = Object(enabled=False)
+    
     # traffic_source
     traffic_source = Object(enabled=False)
 
