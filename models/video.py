@@ -15,6 +15,7 @@ from es_components.models.base import BaseDocument
 from es_components.models.base import BaseInnerDoc
 from es_components.models.base import BaseInnerDocWithHistory
 from es_components.models.base import Schedule
+from es_components.models.base import CommonSectionAnalytics
 
 
 class VideoSectionGeneralData(BaseInnerDoc):
@@ -72,32 +73,6 @@ class VideoSectionStats(BaseInnerDocWithHistory):
         all = ("views", "likes", "dislikes", "comments")
 
 
-class VideoSectionAnalytics(BaseInnerDoc):
-    """ Nested analytics section for Video document """
-    fetched_at = Date(index=False)
-    direct_auth = Boolean()
-    content_owner_id = Keyword()
-    gender = Object(enabled=False)
-    age_group = Object(enabled=False)
-    demographics = Object(enabled=False)
-    country = Object(enabled=False)
-    traffic_sources = Object(enabled=False)
-    comments = Object(enabled=False)
-    views = Object(enabled=False)
-    likes = Object(enabled=False)
-    dislikes = Object(enabled=False)
-    minutes_watched = Object(enabled=False)
-    gender_male = Double()
-    gender_female = Double()
-    age_group_13_17 = Double()
-    age_group_18_24 = Double()
-    age_group_25_34 = Double()
-    age_group_35_44 = Double()
-    age_group_45_54 = Double()
-    age_group_55_64 = Double()
-    age_group_65_ = Double()
-
-
 class VideoCaptionsItem(InnerDoc):
     text = Text(index=False)
     name = Text(index=False)
@@ -147,7 +122,7 @@ class VideoSectionCMS(BaseInnerDoc):
 class Video(BaseDocument):
     general_data = Object(VideoSectionGeneralData)
     stats = Object(VideoSectionStats)
-    analytics = Object(VideoSectionAnalytics)
+    analytics = Object(CommonSectionAnalytics)
     captions = Object(VideoSectionCaptions)
     monetization = Object(VideoSectionMonetization)
     ads_stats = Object(VideoSectionAdsStats)

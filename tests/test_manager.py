@@ -2,9 +2,9 @@ from unittest import TestCase
 
 from elasticsearch_dsl import Object
 
+from elasticsearch_dsl import Keyword
 from es_components.connections import init_es_connection
 from es_components.managers.base import BaseManager
-from elasticsearch_dsl import Keyword
 from es_components.models.base import BaseDocument
 from es_components.models.base import BaseInnerDoc
 

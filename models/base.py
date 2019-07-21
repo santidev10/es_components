@@ -1,5 +1,7 @@
+from elasticsearch_dsl import Boolean
 from elasticsearch_dsl import Date
 from elasticsearch_dsl import Document
+from elasticsearch_dsl import Double
 from elasticsearch_dsl import InnerDoc
 from elasticsearch_dsl import Keyword
 from elasticsearch_dsl import Object
@@ -40,6 +42,44 @@ class BaseInnerDocWithHistory(BaseInnerDoc):
 
 class Schedule(BaseInnerDoc):
     pass
+
+
+class CommonSectionAnalytics(BaseInnerDoc):
+    """ Nested analytics section """
+    fetched_at = Date(index=False)
+    direct_auth = Boolean()
+    auth_timestamp = Date()
+    content_owner_id = Keyword(multi=True)
+    cms_title = Keyword()
+
+    # general info
+    comments = Object(enabled=False)
+    views = Object(enabled=False)
+    likes = Object(enabled=False)
+    dislikes = Object(enabled=False)
+    minutes_watched = Object(enabled=False)
+    subscribers_gained = Object(enabled=False)
+    subscribers_lost = Object(enabled=False)
+
+    # audience
+    audience = Object(enabled=False)
+    age = Object(enabled=False)
+    age_13_17 = Double()
+    age_18_24 = Double()
+    age_25_34 = Double()
+    age_35_44 = Double()
+    age_45_54 = Double()
+    age_55_64 = Double()
+    age_65_ = Double()
+    gender = Object(enabled=False)
+    gender_male = Double()
+    gender_female = Double()
+
+    # country
+    country = Object(enabled=False)
+
+    # traffic_source
+    traffic_source = Object(enabled=False)
 
 
 class Deleted(BaseInnerDoc):
@@ -97,3 +137,4 @@ class BaseDocument(Document):
                 values = getattr(section, name)
                 values = AttrList(set(list(values) + extra_values))
                 setattr(section, name, values)
+
