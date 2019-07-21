@@ -15,7 +15,7 @@ from es_components.models.base import BaseDocument
 from es_components.models.base import BaseInnerDoc
 from es_components.models.base import BaseInnerDocWithHistory
 from es_components.models.base import Schedule
-from es_components.models.base import SectionAnalytics
+from es_components.models.base import CommonSectionAnalytics
 
 
 class VideoSectionGeneralData(BaseInnerDoc):
@@ -122,7 +122,7 @@ class VideoSectionCMS(BaseInnerDoc):
 class Video(BaseDocument):
     general_data = Object(VideoSectionGeneralData)
     stats = Object(VideoSectionStats)
-    analytics = Object(SectionAnalytics)
+    analytics = Object(CommonSectionAnalytics)
     captions = Object(VideoSectionCaptions)
     monetization = Object(VideoSectionMonetization)
     ads_stats = Object(VideoSectionAdsStats)
