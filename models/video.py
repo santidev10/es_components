@@ -64,13 +64,15 @@ class VideoSectionStats(BaseInnerDocWithHistory):
     last_7day_comments = Long()
     last_30day_days_comments = Long()
     engage_rate = Long()
+    engage_rate_history = Long(index=False, multi=True)
     sentiment = Long()
+    sentiment_history = Long(index=False, multi=True)
     flags = Keyword(multi=True)
     trends = Keyword(multi=True)
     channel_subscribers = Long()
 
     class History:
-        all = ("views", "likes", "dislikes", "comments")
+        all = ("views", "likes", "dislikes", "comments", "sentiment", "engage_rate")
 
 
 class VideoCaptionsItem(InnerDoc):
