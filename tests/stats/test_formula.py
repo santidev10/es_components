@@ -3,7 +3,7 @@ from datetime import datetime
 from unittest import TestCase
 
 from es_components.stats.formula import get_counter_dataframe
-from es_components.stats.formula import get_counter_dataframe_tailing_mean
+from es_components.stats.formula import get_counter_dataframe_tailing_diffs_mean
 from es_components.stats.formula import get_counter_dataframe_tailing_sum
 from es_components.stats.formula import get_engage_rate
 from es_components.stats.formula import get_linear_value
@@ -268,7 +268,7 @@ class TestCumulativeCounter(MathTestCase):
         history = [60, 40, 30]
 
         dataframe = get_counter_dataframe(history)
-        value = get_counter_dataframe_tailing_mean(dataframe)
+        value = get_counter_dataframe_tailing_diffs_mean(dataframe)
 
         self.assertEqual(15, value)
 
@@ -276,7 +276,7 @@ class TestCumulativeCounter(MathTestCase):
         history = [60, 40, 30]
 
         dataframe = get_counter_dataframe(history)
-        value = get_counter_dataframe_tailing_mean(dataframe, count=1)
+        value = get_counter_dataframe_tailing_diffs_mean(dataframe, count=1)
 
         self.assertEqual(20, value)
 
@@ -284,7 +284,7 @@ class TestCumulativeCounter(MathTestCase):
         history = [60, 40, 30]
 
         dataframe = get_counter_dataframe(history)
-        value = get_counter_dataframe_tailing_mean(dataframe, offset=1)
+        value = get_counter_dataframe_tailing_diffs_mean(dataframe, offset=1)
 
         self.assertEqual(10, value)
 
@@ -292,6 +292,6 @@ class TestCumulativeCounter(MathTestCase):
         history = [110, 70, 40, 20, 10]
 
         dataframe = get_counter_dataframe(history)
-        value = get_counter_dataframe_tailing_mean(dataframe, offset=2, count=2)
+        value = get_counter_dataframe_tailing_diffs_mean(dataframe, offset=2, count=2)
 
         self.assertEqual(15, value)

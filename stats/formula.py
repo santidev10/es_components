@@ -70,7 +70,7 @@ def get_counter_dataframe_tailing_sum(dataframe, count, max_errors=None, cast_ty
     return value
 
 
-def get_counter_dataframe_tailing_mean(dataframe, count=None, offset=0, max_errors=None, cast_type=None):
+def get_counter_dataframe_tailing_diffs_mean(dataframe, count=None, offset=0, max_errors=None, cast_type=None):
     count = count or dataframe.diffs.count()
     start, end = -count - offset, -offset or None
     if max_errors is not None:
