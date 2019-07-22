@@ -68,3 +68,21 @@ def get_counter_dataframe_tailing_sum(dataframe, count, max_errors=None, cast_ty
         value = cast_type(value)
 
     return value
+
+
+def get_counter_dataframe_tailing_mean(dataframe, count=None, offset=0, max_errors=None, cast_type=None):
+    count = count or dataframe.diffs.count()
+    start, end = -count - offset, -offset or None
+    if max_errors is not None:
+        total_count = dataframe.is_normal[start:end].count()
+        normal_count = dataframe[start:end].is_normal[dataframe.is_normal].count()
+        errors_count = total_count - normal_count
+        if errors_count > max_errors:
+            return None
+
+    value = dataframe.diffs[start:end].mean()
+
+    if cast_type and cast_type is not None.__class__:
+        value = cast_type(value)
+
+    return value
