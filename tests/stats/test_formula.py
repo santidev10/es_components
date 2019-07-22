@@ -1,14 +1,13 @@
-from datetime import datetime
 import math
-
+from datetime import datetime
 from unittest import TestCase
 
+from es_components.stats.formula import get_counter_dataframe
+from es_components.stats.formula import get_counter_dataframe_tailing_diffs_mean
+from es_components.stats.formula import get_counter_dataframe_tailing_sum
 from es_components.stats.formula import get_engage_rate
 from es_components.stats.formula import get_linear_value
 from es_components.stats.formula import get_sentiment
-from es_components.stats.formula import get_counter_dataframe
-from es_components.stats.formula import get_counter_dataframe_tailing_sum
-
 from .base import MathTestCase
 
 
@@ -145,7 +144,7 @@ class TestCumulativeCounter(MathTestCase):
 
         # reversed values order
         self.assertEqual(dataframe.history[0], history[-1])
-        self.assertEqual(dataframe.history[len(history)-1], history[0])
+        self.assertEqual(dataframe.history[len(history) - 1], history[0])
 
         # all diffs are normal
         expected_is_normal = [True for _ in expected_diffs]
@@ -183,7 +182,7 @@ class TestCumulativeCounter(MathTestCase):
 
         # every diff is normal except failed by the 3-sigma rule
         expected_is_normal = [True for _ in expected_diffs]
-        expected_is_normal[9] = False   # 66000 -> 0
+        expected_is_normal[9] = False  # 66000 -> 0
         expected_is_normal[11] = False  # 0 -> 81000
         expected_is_normal[14] = False  # 100000 -> 550
         # pylint: disable=no-member
@@ -264,3 +263,35 @@ class TestCumulativeCounter(MathTestCase):
 
         actual_type = type(value)
         self.assertEqual(expected_type, actual_type)
+
+    def test_tail_mean(self):
+        history = [60, 40, 30]
+
+        dataframe = get_counter_dataframe(history)
+        value = get_counter_dataframe_tailing_diffs_mean(dataframe)
+
+        self.assertEqual(15, value)
+
+    def test_tail_mean_count(self):
+        history = [60, 40, 30]
+
+        dataframe = get_counter_dataframe(history)
+        value = get_counter_dataframe_tailing_diffs_mean(dataframe, count=1)
+
+        self.assertEqual(20, value)
+
+    def test_tail_mean_offset(self):
+        history = [60, 40, 30]
+
+        dataframe = get_counter_dataframe(history)
+        value = get_counter_dataframe_tailing_diffs_mean(dataframe, offset=1)
+
+        self.assertEqual(10, value)
+
+    def test_tail_mean_count_offset(self):
+        history = [110, 70, 40, 20, 10]
+
+        dataframe = get_counter_dataframe(history)
+        value = get_counter_dataframe_tailing_diffs_mean(dataframe, offset=2, count=2)
+
+        self.assertEqual(15, value)
