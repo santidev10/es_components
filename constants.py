@@ -20,6 +20,7 @@ class Sections:
     CAPTIONS = "captions"
     CMS = "cms"
     CHANNEL = "channel"
+    CUSTOM_PROPERTIES = "custom_properties"
 
     ANALYTICS_SCHEDULE = "analytics_schedule"
     GENERAL_DATA_SCHEDULE = "general_data_schedule"
