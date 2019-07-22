@@ -68,7 +68,6 @@ class VideoSectionStats(BaseInnerDocWithHistory):
     sentiment = Long()
     sentiment_history = Long(index=False, multi=True)
     flags = Keyword(multi=True)
-    trends = Keyword(multi=True)
     channel_subscribers = Long()
 
     class History:
