@@ -27,6 +27,8 @@ class Sections:
     STATS_SCHEDULE = "stats_schedule"
     CAPTIONS_SCHEDULE = "captions_schedule"
 
+    SEGMENTS = "segments"
+
 
 class TimestampFields:
     CREATED_AT = "created_at"

@@ -34,7 +34,7 @@ class BaseManager:
     allowed_sections - a tuple of allowed sections name
     model - class of ES data model
     """
-    allowed_sections = (Sections.MAIN, Sections.DELETED,)
+    allowed_sections = (Sections.MAIN, Sections.DELETED, Sections.SEGMENTS)
     model: Type[BaseDocument] = None
     forced_filter_oudated_days = FORCED_FILTER_OUDATED_DAYS
 
