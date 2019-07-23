@@ -5,6 +5,7 @@ from elasticsearch_dsl import Long
 from elasticsearch_dsl import Object
 
 from es_components.config import KEYWORD_INDEX_NAME
+from es_components.config import KEYWORD_INDEX_PREFIX
 from es_components.config import KEYWORD_DOC_TYPE
 from es_components.models.base import BaseDocument
 from es_components.models.base import BaseInnerDoc
@@ -38,6 +39,7 @@ class Keyword(BaseDocument):
 
     class Index:
         name = KEYWORD_INDEX_NAME
+        prefix = KEYWORD_INDEX_PREFIX
 
     class Meta:
         doc_type = KEYWORD_DOC_TYPE

@@ -138,3 +138,8 @@ class BaseDocument(Document):
                 values = AttrList(set(list(values) + extra_values))
                 setattr(section, name, values)
 
+    @classmethod
+    def _matches(cls, hit):
+        # override _matches to match indices in a prefix instead of just ALIAS
+        # hit is the raw dict as returned by elasticsearch
+        return hit["_index"].startswith(cls.Index.prefix)

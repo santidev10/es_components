@@ -10,6 +10,7 @@ from elasticsearch_dsl import Text
 
 from es_components.config import VIDEO_DOC_TYPE
 from es_components.config import VIDEO_INDEX_NAME
+from es_components.config import VIDEO_INDEX_PREFIX
 from es_components.constants import Sections
 from es_components.models.base import BaseDocument
 from es_components.models.base import BaseInnerDoc
@@ -135,6 +136,7 @@ class Video(BaseDocument):
 
     class Index:
         name = VIDEO_INDEX_NAME
+        prefix = VIDEO_INDEX_PREFIX
 
     class Meta:
         doc_type = VIDEO_DOC_TYPE
