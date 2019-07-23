@@ -8,6 +8,7 @@ from elasticsearch_dsl import Object
 from elasticsearch_dsl import Text
 from elasticsearch_dsl.utils import AttrList
 
+from es_components.constants import Sections
 from es_components.stats import History
 
 
@@ -87,9 +88,14 @@ class Deleted(BaseInnerDoc):
     reason = Text(index=False)
 
 
+class CommonSegmentSection(BaseInnerDoc):
+    uuid = Keyword(multi=True)
+
+
 class BaseDocument(Document):
     main = Object(MainSection)
     deleted = Object(Deleted)
+    segments = Object(CommonSegmentSection)
 
     # pylint: disable=redefined-builtin
     def __init__(self, id=None, **kwargs):
@@ -138,3 +144,5 @@ class BaseDocument(Document):
                 values = AttrList(set(list(values) + extra_values))
                 setattr(section, name, values)
 
+    def populate_segments(self, **kwargs):
+        self._populate_section(Sections.SEGMENTS, **kwargs)
