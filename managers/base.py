@@ -290,9 +290,12 @@ class BaseManager:
 
         return self.search(filters=forced_filter).execute().hits
 
-    def search_related_to_segments_generator(self, segment_ids):
-        search_filter = QueryBuilder().build() \
+    def filter_items_related_to_segments(self, segment_ids):
+        """
+        :param segment_ids: List[<UUID>] - list of segments uuids
+        :return: query to filter items related to given kist of segments
+        """
+        return QueryBuilder().build() \
             .must() \
             .terms().field("segments.uuid") \
             .value(segment_ids).get()
-        yield from self.search(query=search_filter).scan()
