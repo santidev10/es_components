@@ -38,8 +38,6 @@ COUNT_AGGREGATION = (
     "general_data.country",
     "general_data.top_category",
     "general_data.top_language",
-    "analytics",
-    "analytics.verified",
     "analytics.is_auth",
     "analytics.is_cms",
     "custom_properties.preferred",
@@ -48,9 +46,10 @@ COUNT_AGGREGATION = (
 
 COUNT_EXISTS_AGGREGATION = (
     "custom_properties.emails",
-    "ads_stats"
+    "ads_stats",
+    "analytics"
 )
-COUNT_MISSING_AGGREGATION = ("custom_properties.emails",)
+COUNT_MISSING_AGGREGATION = ("custom_properties.emails", "analytics",)
 
 PERCENTILES_AGGREGATION = (
     "stats.subscribers",
