@@ -12,7 +12,7 @@ from es_components.stats import History
 
 
 class BaseInnerDoc(InnerDoc):
-    created_at = Date(index=False)
+    created_at = Date()
     updated_at = Date()
 
     def update(self, **kwargs):
