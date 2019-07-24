@@ -65,6 +65,10 @@ class Rule:
         self.__query.set_rule("terms")
         return Field(self.__query, Value)
 
+    def match_phrase(self):
+        self.__query.set_rule("match_phrase")
+        return Field(self.__query, Value)
+
     def range(self):
         self.__query.set_rule("range")
         return Field(self.__query, RangeValue)
