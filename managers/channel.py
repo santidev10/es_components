@@ -18,13 +18,13 @@ RANGE_AGGREGATION = (
     "stats.views_per_video",
     "stats.sentiment",
     "stats.engage_rate",
-    "analytics.age_group_13_17",
-    "analytics.age_group_18_24",
-    "analytics.age_group_25_34",
-    "analytics.age_group_35_44",
-    "analytics.age_group_45_54",
-    "analytics.age_group_55_64",
-    "analytics.age_group_65_",
+    "analytics.age13_17",
+    "analytics.age18_24",
+    "analytics.age25_34",
+    "analytics.age35_44",
+    "analytics.age45_54",
+    "analytics.age55_64",
+    "analytics.age65_",
     "analytics.gender_male",
     "analytics.gender_female",
     "analytics.gender_other",
@@ -42,11 +42,15 @@ COUNT_AGGREGATION = (
     "analytics.verified",
     "analytics.is_auth",
     "analytics.is_cms",
-    "custom_properties.emails",
-    "monetization.preferred",
-    "ads_stats",
+    "custom_properties.preferred",
     "analytics.cms_title"
 )
+
+COUNT_EXISTS_AGGREGATION = (
+    "custom_properties.emails",
+    "ads_stats"
+)
+COUNT_MISSING_AGGREGATION = ("custom_properties.emails",)
 
 PERCENTILES_AGGREGATION = (
     "stats.subscribers",
@@ -73,6 +77,8 @@ class ChannelManager(BaseManager):
     range_aggregation_fields = RANGE_AGGREGATION
     count_aggregation_fields = COUNT_AGGREGATION
     percentiles_aggregation_fields = PERCENTILES_AGGREGATION
+    count_exists_aggregation_fields = COUNT_EXISTS_AGGREGATION
+    count_missing_aggregation_fields = COUNT_MISSING_AGGREGATION
 
     def by_content_owner_ids_query(self, content_owner_ids):
         return QueryBuilder().build().must().terms().field(CONTENT_OWNER_ID_FIELD)\
@@ -119,6 +125,23 @@ class ChannelManager(BaseManager):
             }
         return percentiles_aggs
 
+    def __get_count_exists_aggs_result(self, search):
+        result = {}
+
+        for field in self.count_exists_aggregation_fields:
+            exists_filter = self._filter_existent_section(field)
+            exists_count = search.filter(exists_filter).count()
+            result[f"{field}:exists"] = exists_count
+
+        for field in self.count_missing_aggregation_fields:
+            missing_filter = self._filter_nonexistent_section(field)
+            missing_count = search.filter(missing_filter).count()
+            result[f"{field}:missing"] = missing_count
+
+        return result
+
+
+
     def get_aggregation(self, search=None, size=0):
         if not search:
             search = self._search()
@@ -131,6 +154,10 @@ class ChannelManager(BaseManager):
             "size": size,
             "aggs": aggregation
         })
-        aggregations_result = search.execute().aggregations
+        aggregations_result = search.execute().aggregations.to_dict()
+
+        count_exists_aggs_result = self.__get_count_exists_aggs_result(search)
+
+        aggregations_result.update(count_exists_aggs_result)
 
         return aggregations_result
