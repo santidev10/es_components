@@ -8,6 +8,7 @@ from elasticsearch_dsl import Object
 from elasticsearch_dsl import Text
 
 from es_components.config import CHANNEL_INDEX_NAME
+from es_components.config import CHANNEL_INDEX_PREFIX
 from es_components.config import CHANNEL_DOC_TYPE
 from es_components.constants import Sections
 from es_components.models.base import BaseDocument
@@ -141,6 +142,7 @@ class Channel(BaseDocument):
 
     class Index:
         name = CHANNEL_INDEX_NAME
+        prefix = CHANNEL_INDEX_PREFIX
 
     class Meta:
         doc_type = CHANNEL_DOC_TYPE
