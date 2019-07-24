@@ -13,7 +13,7 @@ from es_components.stats import History
 
 
 class BaseInnerDoc(InnerDoc):
-    created_at = Date(index=False)
+    created_at = Date()
     updated_at = Date()
 
     def update(self, **kwargs):
@@ -143,6 +143,12 @@ class BaseDocument(Document):
                 values = getattr(section, name)
                 values = AttrList(set(list(values) + extra_values))
                 setattr(section, name, values)
+
+    @classmethod
+    def _matches(cls, hit):
+        # override _matches to match indices in a prefix instead of just ALIAS
+        # hit is the raw dict as returned by elasticsearch
+        return hit["_index"].startswith(cls.Index.prefix)
 
     def populate_segments(self, **kwargs):
         self._populate_section(Sections.SEGMENTS, **kwargs)

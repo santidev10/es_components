@@ -1,12 +1,16 @@
 import os
 
+
 CHANNEL_INDEX_NAME = "channels"
+CHANNEL_INDEX_PREFIX = "channels_"
 CHANNEL_DOC_TYPE = "channel"
 
 VIDEO_INDEX_NAME = "videos"
+VIDEO_INDEX_PREFIX = "videos_"
 VIDEO_DOC_TYPE = "video"
 
 KEYWORD_INDEX_NAME = "keywords"
+KEYWORD_INDEX_PREFIX = "keywords_"
 KEYWORD_DOC_TYPE = "keyword"
 
 ES_REQUEST_LIMIT = int(os.getenv("ES_REQUEST_LIMIT", "10000"))
