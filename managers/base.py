@@ -1,3 +1,5 @@
+import os
+import re
 from datetime import timedelta
 from typing import Type
 
@@ -308,21 +310,7 @@ class BaseManager:
         if Sections.SEGMENTS not in self.upsert_sections:
             raise BrokenPipeError(f"This manager can't update {Sections.SEGMENTS} section")
         script = dict(
-            source=f""
-            f"def segments = ctx._source.segments;"
-            f"if (segments == null) {{ segments = ['created_at': params.now] }}"
-            f"def uuid = segments.uuid;"
-            f"if (uuid == null) {{ uuid = [] }}"
-            f"uuid = Stream.concat("
-            f"    uuid.stream(),"
-            f"    [params.uuid].stream()"
-            f")"
-            f"    .distinct()"
-            f"    .sorted()"
-            f"    .collect(Collectors.toList());"
-            f"segments.uuid = uuid;"
-            f"segments.updated_at = params.now;"
-            f"ctx._source.segments = segments;",
+            source=CachedScriptsReader.get_script("add_to_segment.painless"),
             params=dict(
                 uuid=segment_uuid,
                 now=datetime_service.now().isoformat(),
@@ -348,15 +336,7 @@ class BaseManager:
         if Sections.SEGMENTS not in self.upsert_sections:
             raise BrokenPipeError(f"This manager can't update {Sections.SEGMENTS} section")
         script = dict(
-            source=f""
-            f"def segments = ctx._source.segments;"
-            f"if ( segments == null) {{ segments = ['created_at': params.now] }}"
-            f"def uuid = segments.uuid;"
-            f"if ( uuid == null ) {{ uuid = [] }}"
-            f"uuid.removeIf(item -> item == params.uuid);"
-            f"segments.uuid = uuid;"
-            f"segments.updated_at = params.now;"
-            f"ctx._source.segments = segments;",
+            source=CachedScriptsReader.get_script("remove_from_segment.painless"),
             params=dict(
                 uuid=segment_uuid,
                 now=datetime_service.now().isoformat(),
@@ -365,3 +345,15 @@ class BaseManager:
         return self.update(filter_query) \
             .script(**script) \
             .execute()
+
+
+class CachedScriptsReader:
+    _scripts_cache = {}
+    _scripts_dir = os.path.join(os.path.dirname(os.path.realpath(__file__)), "scripts")
+
+    @classmethod
+    def get_script(cls, script_name):
+        if script_name not in cls._scripts_cache:
+            with open(os.path.join(cls._scripts_dir, script_name), "r") as file:
+                cls._scripts_cache[script_name] = re.sub(r"[\n\s]+", " ", file.read())
+        return cls._scripts_cache[script_name]

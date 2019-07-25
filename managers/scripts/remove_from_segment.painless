@@ -1,0 +1,12 @@
+def segments = ctx._source.segments;
+if ( segments == null) {
+    segments = ['created_at': params.now];
+}
+def uuid = segments.uuid;
+if ( uuid == null ) {
+    uuid = [];
+}
+uuid.removeIf(item -> item == params.uuid);
+segments.uuid = uuid;
+segments.updated_at = params.now;
+ctx._source.segments = segments;
