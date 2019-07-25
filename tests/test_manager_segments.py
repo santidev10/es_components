@@ -5,12 +5,16 @@ from datetime import timedelta
 from unittest import TestCase
 from unittest.mock import patch
 
+from elasticsearch_dsl import Keyword
+from elasticsearch_dsl import Object
+
 from es_components.connections import init_es_connection
 from es_components.constants import MAIN_ID_FIELD
 from es_components.constants import Sections
 from es_components.datetime_service import datetime_service
 from es_components.managers.base import BaseManager
 from es_components.models.base import BaseDocument
+from es_components.models.base import BaseInnerDoc
 from es_components.query_builder import QueryBuilder
 
 
@@ -222,7 +226,7 @@ class ESManagerSegmentsRemoveTestCase(ESManagerSegmentsBaseTestCase):
 
 
 class ESManagerSegmentsAddByIdsTestCase(ESManagerSegmentsBaseTestCase):
-    def test_add_to_segment_by_ids(self):
+    def test_add_to_segment_by_ids_creates_multiple(self):
         item_id_1 = generate_item_id()
         item_id_2 = generate_item_id()
         segment_id = generate_segment_id()
@@ -232,8 +236,46 @@ class ESManagerSegmentsAddByIdsTestCase(ESManagerSegmentsBaseTestCase):
         self.assertEqual([segment_id], self.manager_segments.get([item_id_1])[0].segments.uuid)
         self.assertEqual([segment_id], self.manager_segments.get([item_id_2])[0].segments.uuid)
 
+    def test_add_to_segment_by_ids_does_not_replace_existing_sections(self):
+        test_datetime = datetime(2020, 1, 2, 12, 2, 3)
+        item_id = generate_item_id()
+        custom_manager = TestSegmentManager(("custom_section",))
+        test_property = "test_custom_property_value"
+        item = custom_manager.get_or_create([item_id])[0]
+        item.populate_custom_section(
+            test_property=test_property
+        )
+        with self.patch_now(test_datetime):
+            custom_manager.upsert([item])
+        segment_id = generate_segment_id()
+
+        self.manager_segments.add_to_segment_by_ids(ids=[item_id], segment_uuid=segment_id)
+
+        item = custom_manager.get([item_id])[0]
+        self.assertEqual(test_property, item.custom_section.test_property)
+        self.assertEqual(test_datetime, item.custom_section.created_at)
+
+    def test_add_to_segment_by_ids_does_not_perform_get(self):
+        item_id_1 = generate_item_id()
+        item_id_2 = generate_item_id()
+        segment_id = generate_segment_id()
+
+        with patch.object(BaseManager, "get") as get_mock:
+            self.manager_segments.add_to_segment_by_ids(ids=[item_id_1, item_id_2], segment_uuid=segment_id)
+
+            get_mock.assert_not_called()
+
+
+class CustomSection(BaseInnerDoc):
+    test_property = Keyword()
+
 
 class TestSegmentDoc(BaseDocument):
+    custom_section = Object(CustomSection)
+
+    def populate_custom_section(self, **kwargs):
+        return self._populate_section("custom_section", **kwargs)
+
     class Index:
         name = "test_segment_documents"
 
@@ -242,7 +284,7 @@ class TestSegmentDoc(BaseDocument):
 
 
 class TestSegmentManager(BaseManager):
-    allowed_sections = BaseManager.allowed_sections
+    allowed_sections = BaseManager.allowed_sections + ("custom_section",)
     model = TestSegmentDoc
 
 

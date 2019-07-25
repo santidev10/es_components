@@ -335,8 +335,7 @@ class BaseManager:
     def add_to_segment_by_ids(self, ids, segment_uuid):
         if Sections.SEGMENTS not in self.upsert_sections:
             raise BrokenPipeError(f"This manager can't update {Sections.SEGMENTS} section")
-        # fixme: create without get
-        items = self.get_or_create(ids)
+        items = [self.model(id=item_id) for item_id in ids]
         self.upsert(items)
         query = QueryBuilder().build() \
             .must() \
