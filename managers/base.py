@@ -148,6 +148,9 @@ class BaseManager:
             search = search.sort(*sort)
         return search[offset:limit]
 
+    def update(self, filter_query):
+        return self.model._index.updateByQuery().filter(filter_query)
+
     def multi_search(self, searches):
         # pylint: disable=protected-access
         multi_search = MultiSearch(index=self.model._index._name)
@@ -302,9 +305,33 @@ class BaseManager:
             .value(segment_ids).get()
 
     def add_to_segment(self, filter_query, segment_uuid):
-        raise NotImplementedError
+        if Sections.SEGMENTS not in self.upsert_sections:
+            raise BrokenPipeError(f"This manager can't update {Sections.SEGMENTS} section")
+        script = dict(
+            source=f""
+            f"def segments = ctx._source.segments;"
+            f"if (segments == null) {{ segments = new HashMap() }}"
+            f"def uuid = segments.uuid;"
+            f"if (uuid == null) {{ uuid = [] }}"
+            f"uuid = Stream.concat("
+            f"    uuid.stream(),"
+            f"    [params.uuid].stream()"
+            f")"
+            f"    .distinct()"
+            f"    .sorted()"
+            f"    .collect(Collectors.toList());"
+            f"segments.uuid = uuid;"
+            f"ctx._source.segments = segments;",
+            params=dict(uuid=segment_uuid)
+        )
+        return self.update(filter_query) \
+            .script(**script) \
+            .execute()
 
     def add_to_segment_by_ids(self, ids, segment_uuid):
+        if Sections.SEGMENTS not in self.upsert_sections:
+            raise BrokenPipeError(f"This manager can't update {Sections.SEGMENTS} section")
+        # fixme: create without get
         items = self.get_or_create(ids)
         self.upsert(items)
         query = QueryBuilder().build() \
@@ -315,4 +342,19 @@ class BaseManager:
         return self.add_to_segment(filter_query=query, segment_uuid=segment_uuid)
 
     def remove_from_segment(self, filter_query, segment_uuid):
-        raise NotImplementedError
+        if Sections.SEGMENTS not in self.upsert_sections:
+            raise BrokenPipeError(f"This manager can't update {Sections.SEGMENTS} section")
+        script = dict(
+            source=f""
+            f"def segments = ctx._source.segments;"
+            f"if ( segments == null) {{ return null }}"
+            f"def uuid = segments.uuid;"
+            f"if ( uuid == null ) {{ return null }}"
+            f"uuid.removeIf(item -> item == params.uuid);"
+            f"segments.uuid = uuid;"
+            f"ctx._source.segments = segments;",
+            params=dict(uuid=segment_uuid)
+        )
+        return self.update(filter_query) \
+            .script(**script) \
+            .execute()
