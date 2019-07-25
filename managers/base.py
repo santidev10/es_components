@@ -304,9 +304,6 @@ class BaseManager:
     def add_to_segment(self, filter_query, segment_uuid):
         raise NotImplementedError
 
-    def remove_from_segment(self, filter_query, segment_uuid):
-        raise NotImplementedError
-
     def add_to_segment_by_ids(self, ids, segment_uuid):
         items = self.get_or_create(ids)
         self.upsert(items)
@@ -316,3 +313,6 @@ class BaseManager:
             .value(ids) \
             .get()
         return self.add_to_segment(filter_query=query, segment_uuid=segment_uuid)
+
+    def remove_from_segment(self, filter_query, segment_uuid):
+        raise NotImplementedError
