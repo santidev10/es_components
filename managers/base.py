@@ -310,7 +310,7 @@ class BaseManager:
         script = dict(
             source=f""
             f"def segments = ctx._source.segments;"
-            f"if (segments == null) {{ segments = new HashMap() }}"
+            f"if (segments == null) {{ segments = ['created_at': params.now] }}"
             f"def uuid = segments.uuid;"
             f"if (uuid == null) {{ uuid = [] }}"
             f"uuid = Stream.concat("
@@ -321,8 +321,12 @@ class BaseManager:
             f"    .sorted()"
             f"    .collect(Collectors.toList());"
             f"segments.uuid = uuid;"
+            f"segments.updated_at = params.now;"
             f"ctx._source.segments = segments;",
-            params=dict(uuid=segment_uuid)
+            params=dict(
+                uuid=segment_uuid,
+                now=datetime_service.now().isoformat(),
+            )
         )
         return self.update(filter_query) \
             .script(**script) \
@@ -347,13 +351,17 @@ class BaseManager:
         script = dict(
             source=f""
             f"def segments = ctx._source.segments;"
-            f"if ( segments == null) {{ return null }}"
+            f"if ( segments == null) {{ segments = ['created_at': params.now] }}"
             f"def uuid = segments.uuid;"
-            f"if ( uuid == null ) {{ return null }}"
+            f"if ( uuid == null ) {{ uuid = [] }}"
             f"uuid.removeIf(item -> item == params.uuid);"
             f"segments.uuid = uuid;"
+            f"segments.updated_at = params.now;"
             f"ctx._source.segments = segments;",
-            params=dict(uuid=segment_uuid)
+            params=dict(
+                uuid=segment_uuid,
+                now=datetime_service.now().isoformat(),
+            )
         )
         return self.update(filter_query) \
             .script(**script) \

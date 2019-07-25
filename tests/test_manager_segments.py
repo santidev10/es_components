@@ -1,9 +1,14 @@
 import itertools
+from contextlib import contextmanager
+from datetime import datetime
+from datetime import timedelta
 from unittest import TestCase
+from unittest.mock import patch
 
 from es_components.connections import init_es_connection
 from es_components.constants import MAIN_ID_FIELD
 from es_components.constants import Sections
+from es_components.datetime_service import datetime_service
 from es_components.managers.base import BaseManager
 from es_components.models.base import BaseDocument
 from es_components.query_builder import QueryBuilder
@@ -20,32 +25,47 @@ class ESManagerSegmentsBaseTestCase(TestCase):
         self.manager_main = TestSegmentManager(sections=(Sections.MAIN,))
         self.manager_segments = TestSegmentManager(sections=(Sections.SEGMENTS,))
 
+    @contextmanager
+    def patch_now(self, dt):
+        with patch.object(datetime_service, "now", return_value=dt):
+            yield
+
 
 class ESManagerSegmentsAddTestCase(ESManagerSegmentsBaseTestCase):
 
     def test_add_segment_to_existing_without_section(self):
+        test_datetime = datetime(2020, 1, 2, 12, 2, 3)
         item_id = generate_item_id()
         segment_id = generate_segment_id()
         items = self.manager_main.get_or_create([item_id])
         self.manager_main.upsert(items)
 
         query = QueryBuilder().build().must().terms().field(MAIN_ID_FIELD).value([item_id]).get()
-        self.manager_segments.add_to_segment(filter_query=query, segment_uuid=segment_id)
+        with self.patch_now(test_datetime):
+            self.manager_segments.add_to_segment(filter_query=query, segment_uuid=segment_id)
 
         item = self.manager_segments.get([item_id])[0]
         self.assertEqual([segment_id], item.segments.uuid)
+        self.assertEqual(test_datetime, item.segments.created_at)
+        self.assertEqual(test_datetime, item.segments.updated_at)
 
     def test_add_segment_to_existing_with_sections(self):
+        test_created_at = datetime(2020, 1, 2, 12, 2, 3)
+        test_updated_at = test_created_at + timedelta(days=2, minutes=3)
         item_id = generate_item_id()
         segment_id = generate_segment_id()
         items = self.manager_segments.get_or_create([item_id])
-        self.manager_segments.upsert(items)
+        with self.patch_now(test_created_at):
+            self.manager_segments.upsert(items)
 
         query = QueryBuilder().build().must().terms().field(MAIN_ID_FIELD).value([item_id]).get()
-        self.manager_segments.add_to_segment(filter_query=query, segment_uuid=segment_id)
+        with self.patch_now(test_updated_at):
+            self.manager_segments.add_to_segment(filter_query=query, segment_uuid=segment_id)
 
         item = self.manager_segments.get([item_id])[0]
         self.assertEqual([segment_id], item.segments.uuid)
+        self.assertEqual(test_created_at, item.segments.created_at)
+        self.assertEqual(test_updated_at, item.segments.updated_at)
 
     def test_add_segment_to_missing(self):
         item_id = generate_item_id()
@@ -115,17 +135,6 @@ class ESManagerSegmentsAddTestCase(ESManagerSegmentsBaseTestCase):
 
 
 class ESManagerSegmentsRemoveTestCase(ESManagerSegmentsBaseTestCase):
-    def test_remove_segment_missing_segment(self):
-        item_id = generate_item_id()
-        segment_id = generate_segment_id()
-        items = self.manager_main.get_or_create([item_id])
-        self.manager_main.upsert(items)
-
-        query = QueryBuilder().build().must().terms().field(MAIN_ID_FIELD).value([item_id]).get()
-        self.manager_segments.remove_from_segment(filter_query=query, segment_uuid=segment_id)
-
-        self.assertEqual([], self.manager_segments.get([item_id])[0].segments.uuid)
-
     def test_remove_segment_missing_entity(self):
         item_id = generate_item_id()
         segment_id = generate_segment_id()
@@ -135,18 +144,40 @@ class ESManagerSegmentsRemoveTestCase(ESManagerSegmentsBaseTestCase):
 
         self.assertEqual([], self.manager_main.get([item_id], skip_none=True))
 
-    def test_remove_segment_existing(self):
+    def test_remove_segment_from_existing_without_section(self):
+        test_datetime = datetime(2020, 1, 2, 12, 2, 3)
+        item_id = generate_item_id()
+        segment_id = generate_segment_id()
+        items = self.manager_main.get_or_create([item_id])
+        self.manager_main.upsert(items)
+
+        query = QueryBuilder().build().must().terms().field(MAIN_ID_FIELD).value([item_id]).get()
+        with self.patch_now(test_datetime):
+            self.manager_segments.remove_from_segment(filter_query=query, segment_uuid=segment_id)
+
+        item = self.manager_segments.get([item_id])[0]
+        self.assertEqual([], item.segments.uuid)
+        self.assertEqual(test_datetime, item.segments.created_at)
+        self.assertEqual(test_datetime, item.segments.updated_at)
+
+    def test_remove_segment_from_existing_with_section(self):
+        test_created_at = datetime(2020, 1, 2, 12, 2, 3)
+        test_updated_at = test_created_at + timedelta(days=2, minutes=3)
         item_id = generate_item_id()
         segment_id = generate_segment_id()
         item = self.manager_segments.get_or_create([item_id])[0]
         item.populate_segments(uuid=[segment_id])
-        self.manager_segments.upsert([item])
+        with self.patch_now(test_created_at):
+            self.manager_segments.upsert([item])
 
         query = QueryBuilder().build().must().terms().field(MAIN_ID_FIELD).value([item_id]).get()
-        self.manager_segments.remove_from_segment(filter_query=query, segment_uuid=segment_id)
+        with self.patch_now(test_updated_at):
+            self.manager_segments.remove_from_segment(filter_query=query, segment_uuid=segment_id)
 
         item = self.manager_segments.get([item_id])[0]
         self.assertEqual([], item.segments.uuid)
+        self.assertEqual(test_created_at, item.segments.created_at)
+        self.assertEqual(test_updated_at, item.segments.updated_at)
 
     def test_remove_duplicates(self):
         item_id = generate_item_id()
