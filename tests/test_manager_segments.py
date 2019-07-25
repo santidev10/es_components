@@ -2,6 +2,7 @@ import itertools
 from unittest import TestCase
 
 from es_components.connections import init_es_connection
+from es_components.constants import MAIN_ID_FIELD
 from es_components.constants import Sections
 from es_components.managers.base import BaseManager
 from es_components.models.base import BaseDocument
@@ -25,7 +26,7 @@ class ESManagerSegmentsTestCase(TestCase):
         items = self.manager_main.get_or_create([item_id])
         self.manager_main.upsert(items)
 
-        query = QueryBuilder().build().must().term().field("main.id").value(item_id).get()
+        query = QueryBuilder().build().must().term().field(MAIN_ID_FIELD).value(item_id).get()
         self.manager_segments.add_to_segment(filter_query=query, segment_uuid=segment_id)
 
         item = self.manager_segments.get([item_id])[0]
@@ -35,7 +36,7 @@ class ESManagerSegmentsTestCase(TestCase):
         item_id = generate_item_id()
         segment_id = generate_segment_id()
 
-        query = QueryBuilder().build().must().term().field("main.id").value(item_id).get()
+        query = QueryBuilder().build().must().term().field(MAIN_ID_FIELD).value(item_id).get()
         self.manager_segments.add_to_segment(filter_query=query, segment_uuid=segment_id)
 
         self.assertEqual([], self.manager_main.get(item_id))
@@ -47,7 +48,7 @@ class ESManagerSegmentsTestCase(TestCase):
         item = self.manager_main.get_or_create([item_id_1])[0]
         self.manager_main.upsert([item])
 
-        query = QueryBuilder().build().must().term().field("main.id").value(item_id_2).get()
+        query = QueryBuilder().build().must().term().field(MAIN_ID_FIELD).value(item_id_2).get()
         self.manager_segments.add_to_segment(filter_query=query, segment_uuid=segment_id)
 
         self.assertEqual([], self.manager_main.get(item_id_1))
@@ -59,7 +60,7 @@ class ESManagerSegmentsTestCase(TestCase):
         item.populate_segments(uuid=[segment_id])
         self.manager_main.upsert([item])
 
-        query = QueryBuilder().build().must().term().field("main.id").value(item_id).get()
+        query = QueryBuilder().build().must().term().field(MAIN_ID_FIELD).value(item_id).get()
         self.manager_segments.add_to_segment(filter_query=query, segment_uuid=segment_id)
 
         item = self.manager_segments.get([item_id])[0]
@@ -73,7 +74,7 @@ class ESManagerSegmentsTestCase(TestCase):
         item.populate_segments(uuid=[segment_id_1])
         self.manager_main.upsert([item])
 
-        query = QueryBuilder().build().must().term().field("main.id").value(item_id).get()
+        query = QueryBuilder().build().must().term().field(MAIN_ID_FIELD).value(item_id).get()
         self.manager_segments.add_to_segment(filter_query=query, segment_uuid=segment_id_2)
 
         item = self.manager_segments.get([item_id])[0]
@@ -89,7 +90,7 @@ class ESManagerSegmentsTestCase(TestCase):
         items = self.manager_main.get_or_create([item_id_1, item_id_2])
         self.manager_main.upsert(items)
 
-        query = QueryBuilder().build().must().exists().field("main.id").get()
+        query = QueryBuilder().build().must().exists().field(MAIN_ID_FIELD).get()
         self.manager_segments.add_to_segment(filter_query=query, segment_uuid=segment_id)
 
         self.assertEqual([segment_id], self.manager_main.get(item_id_1)[0].segments.uuid)
@@ -101,7 +102,7 @@ class ESManagerSegmentsTestCase(TestCase):
         items = self.manager_main.get_or_create([item_id])
         self.manager_main.upsert(items)
 
-        query = QueryBuilder().build().must().term().field("main.id").value(item_id).get()
+        query = QueryBuilder().build().must().term().field(MAIN_ID_FIELD).value(item_id).get()
         self.manager_segments.remove_from_segment(filter_query=query, segment_uuid=segment_id)
 
         self.assertEqual([], self.manager_main.get(item_id)[0].uuid)
@@ -110,7 +111,7 @@ class ESManagerSegmentsTestCase(TestCase):
         item_id = generate_item_id()
         segment_id = generate_segment_id()
 
-        query = QueryBuilder().build().must().term().field("main.id").value(item_id).get()
+        query = QueryBuilder().build().must().term().field(MAIN_ID_FIELD).value(item_id).get()
         self.manager_segments.remove_from_segment(filter_query=query, segment_uuid=segment_id)
 
         self.assertEqual([], self.manager_main.get(item_id))
@@ -122,7 +123,7 @@ class ESManagerSegmentsTestCase(TestCase):
         item.populate_segments(uuid=[segment_id])
         self.manager_main.upsert([item])
 
-        query = QueryBuilder().build().must().term().field("main.id").value(item_id).get()
+        query = QueryBuilder().build().must().term().field(MAIN_ID_FIELD).value(item_id).get()
         self.manager_segments.remove_from_segment(filter_query=query, segment_uuid=segment_id)
 
         item = self.manager_segments.get([item_id])[0]
@@ -135,7 +136,7 @@ class ESManagerSegmentsTestCase(TestCase):
         item.populate_segments(uuid=[segment_id, segment_id])
         self.manager_main.upsert([item])
 
-        query = QueryBuilder().build().must().term().field("main.id").value(item_id).get()
+        query = QueryBuilder().build().must().term().field(MAIN_ID_FIELD).value(item_id).get()
         self.manager_segments.remove_from_segment(filter_query=query, segment_uuid=segment_id)
 
         item = self.manager_segments.get([item_id])[0]
@@ -150,7 +151,7 @@ class ESManagerSegmentsTestCase(TestCase):
         items[1].populate_segments(uuid=[segment_id])
         self.manager_main.upsert(items)
 
-        query = QueryBuilder().build().must().term().field("main.id").value(item_id_1).get()
+        query = QueryBuilder().build().must().term().field(MAIN_ID_FIELD).value(item_id_1).get()
         self.manager_segments.remove_from_segment(filter_query=query, segment_uuid=segment_id)
 
         self.assertEqual([], self.manager_main.get(item_id_1)[0].segments.uuid)
@@ -164,10 +165,20 @@ class ESManagerSegmentsTestCase(TestCase):
         item.populate_segments(uuid=[segment_id_1, segment_id_2])
         self.manager_segments.upsert([item])
 
-        query = QueryBuilder().build().must().term().field("main.id").value(item_id).get()
+        query = QueryBuilder().build().must().term().field(MAIN_ID_FIELD).value(item_id).get()
         self.manager_segments.remove_from_segment(filter_query=query, segment_uuid=segment_id_1)
 
         self.assertEqual([segment_id_2], self.manager_main.get(item_id)[0].segments.uuid)
+
+    def test_add_to_segment_by_ids(self):
+        item_id_1 = generate_item_id()
+        item_id_2 = generate_item_id()
+        segment_id = generate_segment_id()
+
+        self.manager_segments.add_to_segment_by_ids(ids=[item_id_1, item_id_2], segment_uuid=segment_id)
+
+        self.assertEqual([segment_id], self.manager_main.get(item_id_1)[0].segments.uuid)
+        self.assertEqual([segment_id], self.manager_main.get(item_id_2)[1].segments.uuid)
 
 
 class TestSegmentDoc(BaseDocument):

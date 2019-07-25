@@ -13,6 +13,7 @@ from es_components.constants import EsDictFields
 from es_components.constants import FORCED_FILTER_OUDATED_DAYS
 from es_components.constants import FilterIncludeEmpty
 from es_components.constants import MAIN_ID_FIELD
+from es_components.constants import SEGMENTS_UUID_FIELD
 from es_components.constants import Sections
 from es_components.constants import SortDirections
 from es_components.constants import TimestampFields
@@ -297,5 +298,21 @@ class BaseManager:
         """
         return QueryBuilder().build() \
             .must() \
-            .terms().field("segments.uuid") \
+            .terms().field(SEGMENTS_UUID_FIELD) \
             .value(segment_ids).get()
+
+    def add_to_segment(self, filter_query, segment_uuid):
+        raise NotImplementedError
+
+    def remove_from_segment(self, filter_query, segment_uuid):
+        raise NotImplementedError
+
+    def add_to_segment_by_ids(self, ids, segment_uuid):
+        items = self.get_or_create(ids)
+        self.upsert(items)
+        query = QueryBuilder().build() \
+            .must() \
+            .terms().field(MAIN_ID_FIELD) \
+            .value(ids) \
+            .get()
+        return self.add_to_segment(filter_query=query, segment_uuid=segment_uuid)
