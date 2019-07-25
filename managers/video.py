@@ -17,9 +17,6 @@ class VideoManager(BaseManager):
                           Sections.CAPTIONS_SCHEDULE)
     model = Video
 
-    def get_all_video_ids(self, channel_id):
-        return list(self.get_all_video_ids_generator(channel_id))
-
     def get_all_video_ids_generator(self, channel_id):
         _query = self.by_channel_ids_query(channel_id)
         videos_generator = self.model.search().source(Sections.MAIN).query(_query).scan()
