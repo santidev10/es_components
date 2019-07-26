@@ -8,6 +8,35 @@ from es_components.managers.base import BaseManager
 from es_components.models.video import Video
 from es_components.query_builder import QueryBuilder
 
+RANGE_AGGREGATION = (
+    "stats.views",
+    "stats.last_day_views",
+    "stats.channel_subscribers",
+    "ads_stats.video_view_rate",
+    "ads_stats.ctr_v",
+    "ads_stats.average_cpv",
+    "general_data.youtube_published_at"
+)
+
+COUNT_AGGREGATION = (
+    "general_data.country",
+    "general_data.category",
+    "general_data.language",
+    "analytics.cms_title"
+)
+
+COUNT_EXISTS_AGGREGATION = ("analytics", "flags",)
+COUNT_MISSING_AGGREGATION = ("analytics", "flags",)
+
+PERCENTILES_AGGREGATION = (
+    "stats.views",
+    "stats.last_day_views",
+    "stats.channel_subscribers",
+    "ads_stats.video_view_rate",
+    "ads_stats.ctr_v",
+    "ads_stats.average_cpv"
+)
+
 
 class VideoManager(BaseManager):
     allowed_sections = BaseManager.allowed_sections\
@@ -16,6 +45,11 @@ class VideoManager(BaseManager):
                           Sections.ADS_STATS, Sections.CMS, Sections.ANALYTICS_SCHEDULE,
                           Sections.CAPTIONS_SCHEDULE)
     model = Video
+    range_aggregation_fields = RANGE_AGGREGATION
+    count_aggregation_fields = COUNT_AGGREGATION
+    percentiles_aggregation_fields = PERCENTILES_AGGREGATION
+    count_exists_aggregation_fields = COUNT_EXISTS_AGGREGATION
+    count_missing_aggregation_fields = COUNT_MISSING_AGGREGATION
 
     def get_all_video_ids(self, channel_id):
         return list(self.get_all_video_ids_generator(channel_id))
@@ -105,3 +139,45 @@ class VideoManager(BaseManager):
         query = self.by_content_owner_ids_query(content_owner_id) if content_owner_id is not None else None
         records = self._search_nonexistent_section_records(query=query, limit=limit)
         return records
+
+    def get_percentiles_aggregation(self, search_query, size=0):
+        aggregations_result = {}
+        aggregations_search = []
+
+        percentiles_agg = self._get_percentiles_aggs()
+        for key, agg in list(percentiles_agg.items()):
+            search_dict = {
+                    "size": size,
+                    "aggs": {key: agg}
+            }
+            search_dict.update(search_query)
+            aggregations_search.append(
+                self._search().update_from_dict(search_dict)
+            )
+        for search_result in self.multi_search(aggregations_search):
+            percentiles_aggregations_result = search_result.aggregations.to_dict()
+            aggregations_result.update(percentiles_aggregations_result)
+        return aggregations_result
+
+    def get_aggregation(self, search=None, size=0):
+        if not search:
+            search = self._search()
+
+        search_query = search.to_dict()
+
+        aggregations = self._get_range_aggs()
+        aggregations.update(self._get_count_aggs())
+
+        aggregations_search = self._search().update_from_dict({
+            "size": size,
+            "aggs": aggregations
+        })
+        aggregations_search.update_from_dict(search_query)
+        aggregations_result = aggregations_search.execute().aggregations.to_dict()
+
+        aggregations_result.update(self.get_percentiles_aggregation(search_query))
+
+        count_exists_aggs_result = self._get_count_exists_aggs_result(search)
+        aggregations_result.update(count_exists_aggs_result)
+
+        return aggregations_result

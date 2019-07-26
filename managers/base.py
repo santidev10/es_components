@@ -29,6 +29,10 @@ from es_components.utils import chunks
 from es_components.query_builder import QueryBuilder
 
 
+AGGREGATION_COUNT_SIZE = 100000
+AGGREGATION_PERCENTS = tuple(range(10, 100, 10))
+
+
 class BaseManager:
     """
     allowed_sections - a tuple of allowed sections name
@@ -37,6 +41,11 @@ class BaseManager:
     allowed_sections = (Sections.MAIN, Sections.DELETED,)
     model: Type[BaseDocument] = None
     forced_filter_oudated_days = FORCED_FILTER_OUDATED_DAYS
+    range_aggregation_fields = ()
+    count_aggregation_fields = ()
+    percentiles_aggregation_fields = ()
+    count_exists_aggregation_fields = ()
+    count_missing_aggregation_fields = ()
 
     def __init__(self, sections=None, upsert_sections=None):
         """ Initialize manager.
@@ -294,3 +303,56 @@ class BaseManager:
         forced_filter = self.forced_filters()
 
         return self.search(filters=forced_filter).execute().hits
+
+
+    def _get_range_aggs(self):
+        range_aggs = {}
+
+        for field in self.range_aggregation_fields:
+            range_aggs["{}:min".format(field)] = {
+                "min": {"field": field}
+            }
+            range_aggs["{}:max".format(field)] = {
+                "max": {"field": field}
+            }
+        return range_aggs
+
+    def _get_count_aggs(self):
+        count_aggs = {}
+
+        for field in self.count_aggregation_fields:
+            count_aggs[field] = {
+                "terms": {
+                    "size": AGGREGATION_COUNT_SIZE,
+                    "field": field,
+                    "min_doc_count": 1,
+                }
+            }
+        return count_aggs
+
+    def _get_percentiles_aggs(self):
+        percentiles_aggs = {}
+
+        for field in self.percentiles_aggregation_fields:
+            percentiles_aggs["{}:percentiles".format(field)] = {
+                "percentiles": {
+                    "field": field,
+                    "percents": AGGREGATION_PERCENTS,
+                }
+            }
+        return percentiles_aggs
+
+    def _get_count_exists_aggs_result(self, search):
+        result = {}
+
+        for field in self.count_exists_aggregation_fields:
+            exists_filter = self._filter_existent_section(field)
+            exists_count = search.filter(exists_filter).count()
+            result[f"{field}:exists"] = exists_count
+
+        for field in self.count_missing_aggregation_fields:
+            missing_filter = self._filter_nonexistent_section(field)
+            missing_count = search.filter(missing_filter).count()
+            result[f"{field}:missing"] = missing_count
+
+        return result
