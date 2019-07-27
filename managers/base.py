@@ -7,7 +7,6 @@ from elasticsearch_dsl import MultiSearch
 from elasticsearch_dsl import Q
 
 from es_components.constants import EsDictFields
-from es_components.constants import FilterIncludeEmpty
 from es_components.constants import FORCED_FILTER_OUDATED_DAYS
 from es_components.constants import MAIN_ID_FIELD
 from es_components.constants import Sections
@@ -270,24 +269,12 @@ class BaseManager:
         ]
         return self.search(query=_query, filters=_filter_outdated, sort=_sort, limit=limit)
 
-    def get_outdated(self, outdated_at, include_empty=FilterIncludeEmpty.NO, ids=None, limit=10000):
-        if include_empty not in FilterIncludeEmpty.ALL:
-            raise ValueError
+    def get_never_updated(self, ids=None, limit=10000):
+        entries = self.search_nonexistent_section_records(ids=ids, limit=limit).execute().hits
+        return entries
 
-        entries = []
-        if include_empty == FilterIncludeEmpty.FIRST:
-            entries += self.search_nonexistent_section_records(ids=ids, limit=limit).execute().hits
-
-        limit_remaining = limit - len(entries)
-        if limit_remaining > 0:
-            entries += self.search_outdated_records(outdated_at, ids=ids, limit=limit_remaining)\
-                .execute().hits
-
-        limit_remaining = limit - len(entries)
-        if limit_remaining > 0 and include_empty == FilterIncludeEmpty.LAST:
-            entries += self.search_nonexistent_section_records(ids=ids, limit=limit_remaining)\
-                .execute().hits
-
+    def get_outdated(self, outdated_at, ids=None, limit=10000):
+        entries = self.search_outdated_records(outdated_at, ids=ids, limit=limit).execute().hits
         return entries
 
     def get_by_forced_filter(self):

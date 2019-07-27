@@ -38,16 +38,6 @@ class SortDirections:
     DESCENDING = "desc"
 
 
-class FilterIncludeEmpty:
-    FIRST = "first"
-    LAST = "last"
-    # pylint: disable=invalid-name
-    NO = "no"
-    # pylint: enable=invalid-name
-
-    ALL = (FIRST, LAST, NO)
-
-
 FORCED_FILTER_OUDATED_DAYS = 7
 MAIN_ID_FIELD = "main.id"
 VIDEO_CHANNEL_ID_FIELD = "channel.id"
