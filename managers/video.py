@@ -114,30 +114,6 @@ class VideoManager(BaseManager):
         total = result.hits.total
         return total
 
-    def _search_nonexistent_section_records(self, query, limit):
-        control_section = self._get_control_section()
-        field_updated_at = f"{control_section}.{TimestampFields.UPDATED_AT}"
-
-        filter_nonexistent_section = self._filter_nonexistent_section(control_section)
-
-        sort = [
-            {field_updated_at: {"order": SortDirections.ASCENDING}},
-            {MAIN_ID_FIELD: {"order": SortDirections.ASCENDING}},
-        ]
-
-        records = self.search(query=query, filters=filter_nonexistent_section, sort=sort, limit=limit)
-        return records
-
-    def search_nonexistent_section_records_by_channel_id(self, channel_id=None, limit=10000):
-        query = self.by_channel_ids_query(channel_id) if channel_id is not None else None
-        records = self._search_nonexistent_section_records(query=query, limit=limit)
-        return records
-
-    def search_nonexistent_section_records_by_content_owner_id(self, content_owner_id=None, limit=10000):
-        query = self.by_content_owner_ids_query(content_owner_id) if content_owner_id is not None else None
-        records = self._search_nonexistent_section_records(query=query, limit=limit)
-        return records
-
     def get_percentiles_aggregation(self, search_query, size=0):
         aggregations_result = {}
         aggregations_search = []
@@ -145,8 +121,8 @@ class VideoManager(BaseManager):
         percentiles_agg = self._get_percentiles_aggs()
         for key, agg in list(percentiles_agg.items()):
             search_dict = {
-                    "size": size,
-                    "aggs": {key: agg}
+                "size": size,
+                "aggs": {key: agg}
             }
             search_dict.update(search_query)
             aggregations_search.append(
