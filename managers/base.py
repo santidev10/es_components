@@ -2,31 +2,25 @@ from datetime import timedelta
 from typing import Type
 
 from elasticsearch.helpers import bulk
-from elasticsearch_dsl import connections
 from elasticsearch_dsl import MultiSearch
 from elasticsearch_dsl import Q
+from elasticsearch_dsl import connections
 
+from es_components.config import ES_BULK_REFRESH_OPTION
+from es_components.config import ES_CHUNK_SIZE
+from es_components.config import ES_REQUEST_LIMIT
 from es_components.constants import EsDictFields
 from es_components.constants import FORCED_FILTER_OUDATED_DAYS
 from es_components.constants import MAIN_ID_FIELD
 from es_components.constants import Sections
 from es_components.constants import SortDirections
 from es_components.constants import TimestampFields
-
-from es_components.config import ES_BULK_REFRESH_OPTION
-from es_components.config import ES_CHUNK_SIZE
-from es_components.config import ES_REQUEST_LIMIT
-
 from es_components.datetime_service import datetime_service
-
 from es_components.exceptions import DataModelNotSpecified
 from es_components.exceptions import SectionsNotAllowed
-
 from es_components.models.base import BaseDocument
-
-from es_components.utils import chunks
 from es_components.query_builder import QueryBuilder
-
+from es_components.utils import chunks
 
 AGGREGATION_COUNT_SIZE = 100000
 AGGREGATION_PERCENTS = tuple(range(10, 100, 10))
@@ -167,7 +161,6 @@ class BaseManager:
         # pylint: enable=protected-access
         return multi_search.execute()
 
-
     def _upsert_generator(self, entries):
         """ Generator to create a dict from entity for upsertion.
 
@@ -175,6 +168,7 @@ class BaseManager:
 
         :param entries: a list of model objects
         """
+
         def update_timestamp(_entry_dict, timestamp):
             """ Update datetime created_at(if it is None) and updated_at to passed timestamp. """
             if not _entry_dict:
@@ -182,7 +176,7 @@ class BaseManager:
 
             timestamp_created_at = _entry_dict.get(TimestampFields.CREATED_AT)
             _entry_dict[TimestampFields.CREATED_AT] = timestamp if timestamp_created_at is None \
-                                                                else datetime_service.localize(timestamp_created_at)
+                else datetime_service.localize(timestamp_created_at)
 
             _entry_dict[TimestampFields.UPDATED_AT] = timestamp
 
@@ -248,7 +242,7 @@ class BaseManager:
         updated_at = datetime_service.now() - timedelta(days=self.forced_filter_oudated_days)
 
         field_updated_at = f"{Sections.MAIN}.{TimestampFields.UPDATED_AT}"
-        filter_range = QueryBuilder().build().must().range().field(field_updated_at)\
+        filter_range = QueryBuilder().build().must().range().field(field_updated_at) \
             .gt(updated_at).get()
         return self.filter_alive() & filter_range
 
@@ -279,7 +273,7 @@ class BaseManager:
         control_section = self._get_control_section()
         field_updated_at = f"{control_section}.{TimestampFields.UPDATED_AT}"
 
-        _filter_outdated = QueryBuilder().build().must().range().field(field_updated_at)\
+        _filter_outdated = QueryBuilder().build().must().range().field(field_updated_at) \
             .lt(outdated_at).get()
 
         _query = None
@@ -331,7 +325,6 @@ class BaseManager:
 
         return self.search(filters=forced_filter).execute().hits
 
-
     def _get_range_aggs(self):
         range_aggs = {}
 
@@ -371,16 +364,21 @@ class BaseManager:
 
     def _get_count_exists_aggs_result(self, search, properties=None):
         properties = properties or self.count_exists_aggregation_fields + self.count_missing_aggregation_fields
-        result = {}
+        filters = {
+            **{
+                f"{field}:exists": self._filter_existent_section(field)
+                for field in self.count_exists_aggregation_fields
+            },
+            **{
+                f"{field}:missing": self._filter_nonexistent_section(field)
+                for field in self.count_missing_aggregation_fields
+            }
+        }
 
-        for field in filter(lambda i: i in properties, self.count_exists_aggregation_fields):
-            exists_filter = self._filter_existent_section(field)
-            exists_count = search.filter(exists_filter).count()
-            result[f"{field}:exists"] = exists_count
-
-        for field in filter(lambda i: i in properties, self.count_missing_aggregation_fields):
-            missing_filter = self._filter_nonexistent_section(field)
-            missing_count = search.filter(missing_filter).count()
-            result[f"{field}:missing"] = missing_count
+        result = {
+            key: search.filter(value).count()
+            for key, value in filters.items()
+            if key in properties
+        }
 
         return result
