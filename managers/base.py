@@ -369,15 +369,16 @@ class BaseManager:
             }
         return percentiles_aggs
 
-    def _get_count_exists_aggs_result(self, search):
+    def _get_count_exists_aggs_result(self, search, properties=None):
+        properties = properties or self.count_exists_aggregation_fields + self.count_missing_aggregation_fields
         result = {}
 
-        for field in self.count_exists_aggregation_fields:
+        for field in filter(lambda i: i in properties, self.count_exists_aggregation_fields):
             exists_filter = self._filter_existent_section(field)
             exists_count = search.filter(exists_filter).count()
             result[f"{field}:exists"] = exists_count
 
-        for field in self.count_missing_aggregation_fields:
+        for field in filter(lambda i: i in properties, self.count_missing_aggregation_fields):
             missing_filter = self._filter_nonexistent_section(field)
             missing_count = search.filter(missing_filter).count()
             result[f"{field}:missing"] = missing_count
