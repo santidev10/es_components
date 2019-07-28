@@ -29,12 +29,13 @@ COUNT_EXISTS_AGGREGATION = ("analytics", "flags",)
 COUNT_MISSING_AGGREGATION = ("analytics", "flags",)
 
 PERCENTILES_AGGREGATION = (
-    "stats.views",
-    "stats.last_day_views",
-    "stats.channel_subscribers",
-    "ads_stats.video_view_rate",
-    "ads_stats.ctr_v",
-    "ads_stats.average_cpv"
+# FIXME: Disabled because of overloading of ES by these aggregations
+#    "stats.views",
+#    "stats.last_day_views",
+#    "stats.channel_subscribers",
+#    "ads_stats.video_view_rate",
+#    "ads_stats.ctr_v",
+#    "ads_stats.average_cpv"
 )
 
 
