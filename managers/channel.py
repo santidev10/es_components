@@ -87,13 +87,25 @@ class ChannelManager(BaseManager):
         return super(ChannelManager, self).forced_filters() &\
                self._filter_existent_section(Sections.GENERAL_DATA)
 
-    def get_aggregation(self, search=None, size=0):
+    def __get_aggregation_dict(self, properties):
+        aggregation = {
+            **self._get_range_aggs(),
+            **self._get_count_aggs(),
+            **self._get_percentiles_aggs(),
+        }
+        return {
+            key: value
+            for key, value in aggregation.items()
+            if key in properties
+        }
+
+    def get_aggregation(self, search=None, size=0, properties=None):
+        if not properties:
+            return None
         if not search:
             search = self._search()
 
-        aggregation = self._get_range_aggs()
-        aggregation.update(self._get_count_aggs())
-        aggregation.update(self._get_percentiles_aggs())
+        aggregation = self.__get_aggregation_dict(properties)
 
         search.update_from_dict({
             "size": size,
@@ -101,7 +113,7 @@ class ChannelManager(BaseManager):
         })
         aggregations_result = search.execute().aggregations.to_dict()
 
-        count_exists_aggs_result = self._get_count_exists_aggs_result(search)
+        count_exists_aggs_result = self._get_count_exists_aggs_result(search, properties)
 
         aggregations_result.update(count_exists_aggs_result)
 
