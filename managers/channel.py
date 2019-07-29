@@ -45,11 +45,11 @@ COUNT_AGGREGATION = (
 )
 
 COUNT_EXISTS_AGGREGATION = (
-    "custom_properties.emails",
+    "general_data.emails",
     "ads_stats",
     "analytics"
 )
-COUNT_MISSING_AGGREGATION = ("custom_properties.emails", "analytics",)
+COUNT_MISSING_AGGREGATION = ("general_data.emails", "analytics",)
 
 PERCENTILES_AGGREGATION = (
     "stats.subscribers",
