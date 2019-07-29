@@ -67,6 +67,7 @@ class ChannelSectionStats(BaseInnerDocWithHistory):
     engage_rate_history = Double(index=False, multi=True)
     sentiment = Double()
     sentiment_history = Double(index=False, multi=True)
+    channel_group = Keyword()
 
     class History:
         all = (
