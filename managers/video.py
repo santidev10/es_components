@@ -1,9 +1,9 @@
-from es_components.constants import Sections
-from es_components.constants import VIDEO_CHANNEL_ID_FIELD
+from es_components.constants import CONTENT_OWNER_ID_FIELD
 from es_components.constants import MAIN_ID_FIELD
+from es_components.constants import Sections
 from es_components.constants import SortDirections
 from es_components.constants import TimestampFields
-from es_components.constants import CONTENT_OWNER_ID_FIELD
+from es_components.constants import VIDEO_CHANNEL_ID_FIELD
 from es_components.managers.base import BaseManager
 from es_components.models.video import Video
 from es_components.query_builder import QueryBuilder
@@ -29,13 +29,12 @@ COUNT_EXISTS_AGGREGATION = ("analytics", "flags",)
 COUNT_MISSING_AGGREGATION = ("analytics", "flags",)
 
 PERCENTILES_AGGREGATION = (
-    # FIXME: Disabled because of overloading of ES by these aggregations
-    #"stats.views",
-    #"stats.last_day_views",
-    #"stats.channel_subscribers",
-    #"ads_stats.video_view_rate",
-    #"ads_stats.ctr_v",
-    #"ads_stats.average_cpv"
+    "stats.views",
+    "stats.last_day_views",
+    "stats.channel_subscribers",
+    "ads_stats.video_view_rate",
+    "ads_stats.ctr_v",
+    "ads_stats.average_cpv"
 )
 
 
@@ -114,12 +113,14 @@ class VideoManager(BaseManager):
         total = result.hits.total
         return total
 
-    def get_percentiles_aggregation(self, search_query, size=0):
+    def get_percentiles_aggregation(self, search_query, size=0, properties=None):
         aggregations_result = {}
         aggregations_search = []
 
-        percentiles_agg = self._get_percentiles_aggs()
-        for key, agg in list(percentiles_agg.items()):
+        percentiles_agg = self._get_percentiles_aggs(properties=properties)
+        if not percentiles_agg:
+            return {}
+        for key, agg in percentiles_agg.items():
             search_dict = {
                 "size": size,
                 "aggs": {key: agg}
@@ -161,7 +162,7 @@ class VideoManager(BaseManager):
         aggregations_search.update_from_dict(search_query)
         aggregations_result = aggregations_search.execute().aggregations.to_dict()
 
-        aggregations_result.update(self.get_percentiles_aggregation(search_query))
+        aggregations_result.update(self.get_percentiles_aggregation(search_query, properties))
 
         count_exists_aggs_result = self._get_count_exists_aggs_result(search, properties)
         aggregations_result.update(count_exists_aggs_result)
