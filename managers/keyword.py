@@ -4,6 +4,7 @@ from es_components.models.keyword import Keyword
 
 
 class KeywordManager(BaseManager):
+    count_aggregation_fields = ("stats.top_category",)
     allowed_sections = BaseManager.allowed_sections + (Sections.STATS, Sections.STATS_SCHEDULE)
     model = Keyword
 
