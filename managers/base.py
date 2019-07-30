@@ -387,3 +387,25 @@ class BaseManager:
         }
 
         return result
+
+    def get_aggregation(self, search, size=0, properties=None):
+        aggregation_dict = {
+            **self._get_range_aggs(),
+            **self._get_count_aggs(),
+            **self._get_percentiles_aggs(),
+            # todo: add _get_count_exists_aggs_result
+        }
+        if properties is not None:
+            aggregation_dict = {
+                key: value
+                for key, value in aggregation_dict.items()
+                if key in properties
+            }
+
+        aggregations_search = self._search().update_from_dict({
+            "size": size,
+            "aggs": aggregation_dict
+        })
+        aggregations_search.update_from_dict(search.to_dict())
+        aggregations_result = aggregations_search.execute().aggregations.to_dict()
+        return aggregations_result
