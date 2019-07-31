@@ -350,7 +350,8 @@ class BaseManager:
             }
         return count_aggs
 
-    def _get_percentiles_aggs(self):
+    def _get_percentiles_aggs(self, properties=None):
+        properties = properties or self.percentiles_aggregation_fields
         percentiles_aggs = {}
 
         for field in self.percentiles_aggregation_fields:
@@ -360,7 +361,11 @@ class BaseManager:
                     "percents": AGGREGATION_PERCENTS,
                 }
             }
-        return percentiles_aggs
+        return {
+            key: value
+            for key, value in percentiles_aggs.items()
+            if key in properties
+        }
 
     def _get_count_exists_aggs_result(self, search, properties=None):
         properties = properties or self.count_exists_aggregation_fields + self.count_missing_aggregation_fields
@@ -382,3 +387,25 @@ class BaseManager:
         }
 
         return result
+
+    def get_aggregation(self, search, size=0, properties=None):
+        aggregation_dict = {
+            **self._get_range_aggs(),
+            **self._get_count_aggs(),
+            **self._get_percentiles_aggs(),
+            # todo: add _get_count_exists_aggs_result
+        }
+        if properties is not None:
+            aggregation_dict = {
+                key: value
+                for key, value in aggregation_dict.items()
+                if key in properties
+            }
+
+        aggregations_search = self._search().update_from_dict({
+            "size": size,
+            "aggs": aggregation_dict
+        })
+        aggregations_search.update_from_dict(search.to_dict())
+        aggregations_result = aggregations_search.execute().aggregations.to_dict()
+        return aggregations_result
