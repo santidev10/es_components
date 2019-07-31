@@ -30,6 +30,7 @@ class ChannelSectionGeneralData(BaseInnerDoc):
     top_category = Keyword()
     lang_codes = Keyword(index=False, multi=True)
     top_language = Keyword()
+    emails = Keyword(multi=True)
 
 
 class ChannelSectionStats(BaseInnerDocWithHistory):
@@ -67,6 +68,7 @@ class ChannelSectionStats(BaseInnerDocWithHistory):
     engage_rate_history = Double(index=False, multi=True)
     sentiment = Double()
     sentiment_history = Double(index=False, multi=True)
+    channel_group = Keyword()
 
     class History:
         all = (
