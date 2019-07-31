@@ -15,6 +15,7 @@ from es_components.models.base import Schedule
 
 class KeywordSectionStats(BaseInnerDocWithHistory):
     """ Nested statistics section for Keyword document """
+    fetched_at = Date(index=False)
     historydate = Date(index=False)
     video_count = Long()
     views = Long()
