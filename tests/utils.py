@@ -1,3 +1,4 @@
+import threading
 from unittest import TestCase
 from unittest.mock import PropertyMock
 from unittest.mock import patch
@@ -20,10 +21,17 @@ class ESTestCase(TestCase):
         if any(["prod" in host for host in hosts]):
             raise ConnectionError("Testing on prod env detected")
         for model_cls in BaseDocument.__subclasses__():
-            index_patch = patch.object(model_cls._index, "_name",
-                                       new_callable=PropertyMock(return_value="test_" + model_cls.Index.name))
+            index_mock = PropertyMock(return_value="test_" + model_cls.Index.name + "_" + threading.get_ident())
+            prefix_mock = PropertyMock(return_value="test_" + model_cls.Index.prefix)
+
+            index_patch = patch.object(model_cls._index, "_name", new_callable=index_mock)
+            prefix_patch = patch.object(model_cls.Index, "prefix", new_callable=prefix_mock)
+
             index_patch.__enter__()
+            prefix_patch.__enter__()
+
             cls._patches.append(index_patch)
+            cls._patches.append(prefix_patch)
 
     @classmethod
     def tearDownClass(cls):
