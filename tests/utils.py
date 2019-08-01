@@ -1,3 +1,4 @@
+import os
 import threading
 from unittest import TestCase
 from unittest.mock import PropertyMock
@@ -21,7 +22,7 @@ class ESTestCase(TestCase):
         if any(["prod" in host for host in hosts]):
             raise ConnectionError("Testing on prod env detected")
         for model_cls in BaseDocument.__subclasses__():
-            index_mock = PropertyMock(return_value="test_" + model_cls.Index.name + "_" + threading.get_ident())
+            index_mock = PropertyMock(return_value="test_" + model_cls.Index.name + "_" + str(threading.get_ident()))
             prefix_mock = PropertyMock(return_value="test_" + model_cls.Index.prefix)
 
             index_patch = patch.object(model_cls._index, "_name", new_callable=index_mock)
@@ -35,9 +36,16 @@ class ESTestCase(TestCase):
 
     @classmethod
     def tearDownClass(cls):
+        if os.getenv("KEEP_TEST_ES_INDEX", "0") != "1":
+            cls.__remove_indexes()
         for patch_item in cls._patches:
             patch_item.__exit__()
         del cls._patches[:]
+
+    @classmethod
+    def __remove_indexes(cls):
+        for model_cls in BaseDocument.__subclasses__():
+            model_cls._index.delete()
 
     def setUp(self):
         for manager_cls in BaseManager.__subclasses__():
