@@ -22,11 +22,13 @@ class ESTestCase(TestCase):
         if any(["prod" in host for host in hosts]):
             raise ConnectionError("Testing on prod env detected")
         for model_cls in BaseDocument.__subclasses__():
+            # pylint: disable=protected-access
             index_mock = PropertyMock(return_value="test_" + model_cls.Index.name + "_" + str(threading.get_ident()))
             prefix_mock = PropertyMock(return_value="test_" + model_cls.Index.prefix)
 
             index_patch = patch.object(model_cls._index, "_name", new_callable=index_mock)
             prefix_patch = patch.object(model_cls.Index, "prefix", new_callable=prefix_mock)
+            # pylint: enable=protected-access
 
             index_patch.__enter__()
             prefix_patch.__enter__()

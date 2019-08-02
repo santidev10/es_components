@@ -396,7 +396,6 @@ class BaseManager:
             **self._get_range_aggs(),
             **self._get_count_aggs(),
             **self._get_percentiles_aggs(),
-            # todo: add _get_count_exists_aggs_result
         }
         if properties is not None:
             aggregation_dict = {
