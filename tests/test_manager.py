@@ -30,6 +30,7 @@ class TestDoc(BaseDocument):
 
     class Index:
         name = "test_documents"
+        prefix = "test_documents_"
 
     class Meta:
         doc_type = "test_document"

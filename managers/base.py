@@ -154,6 +154,9 @@ class BaseManager:
             search = search.sort(*sort)
         return search[offset:limit]
 
+    def scan(self, filters, sort):
+        yield from self.search(filters=filters, sort=sort).scan()
+
     def multi_search(self, searches):
         # pylint: disable=protected-access
         multi_search = MultiSearch(index=self.model._index._name)
