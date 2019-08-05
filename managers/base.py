@@ -392,17 +392,20 @@ class BaseManager:
         return result
 
     def get_aggregation(self, search, size=0, properties=None):
+        if not properties:
+            return None
+
         aggregation_dict = {
             **self._get_range_aggs(),
             **self._get_count_aggs(),
             **self._get_percentiles_aggs(),
         }
-        if properties is not None:
-            aggregation_dict = {
-                key: value
-                for key, value in aggregation_dict.items()
-                if key in properties
-            }
+
+        aggregation_dict = {
+            key: value
+            for key, value in aggregation_dict.items()
+            if key in properties
+        }
 
         aggregations_search = self._search().update_from_dict({
             "size": size,
