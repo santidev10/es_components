@@ -154,6 +154,9 @@ class BaseManager:
             search = search.sort(*sort)
         return search[offset:limit]
 
+    def scan(self, filters, sort):
+        yield from self.search(filters=filters, sort=sort).scan()
+
     def multi_search(self, searches):
         # pylint: disable=protected-access
         multi_search = MultiSearch(index=self.model._index._name)
@@ -350,7 +353,8 @@ class BaseManager:
             }
         return count_aggs
 
-    def _get_percentiles_aggs(self):
+    def _get_percentiles_aggs(self, properties=None):
+        properties = properties or self.percentiles_aggregation_fields
         percentiles_aggs = {}
 
         for field in self.percentiles_aggregation_fields:
@@ -360,7 +364,11 @@ class BaseManager:
                     "percents": AGGREGATION_PERCENTS,
                 }
             }
-        return percentiles_aggs
+        return {
+            key: value
+            for key, value in percentiles_aggs.items()
+            if key in properties
+        }
 
     def _get_count_exists_aggs_result(self, search, properties=None):
         properties = properties or self.count_exists_aggregation_fields + self.count_missing_aggregation_fields
@@ -382,3 +390,51 @@ class BaseManager:
         }
 
         return result
+
+    def get_aggregation(self, search, size=0, properties=None):
+        aggregation_dict = {
+            **self._get_range_aggs(),
+            **self._get_count_aggs(),
+            **self._get_percentiles_aggs(),
+        }
+        if properties is not None:
+            aggregation_dict = {
+                key: value
+                for key, value in aggregation_dict.items()
+                if key in properties
+            }
+
+        aggregations_search = self._search().update_from_dict({
+            "size": size,
+            "aggs": aggregation_dict
+        })
+        aggregations_search.update_from_dict(search.to_dict())
+        aggregations_result = aggregations_search.execute().aggregations.to_dict()
+        return aggregations_result
+
+    def generate_distinct_values(self, field, pagesize=10000):
+        composite = {
+            "size": pagesize,
+            "sources": [{
+                field: {
+                    "terms": {
+                        "field": field
+                    }
+                }
+            }]
+        }
+        while True:
+            aggregations_search = self._search().update_from_dict({
+                "aggs": {
+                    "values": {
+                        "composite": composite
+                    }
+                }
+            })
+            result = aggregations_search.execute()
+            for aggregation in result["aggregations"]["values"]["buckets"]:
+                yield aggregation.key[field]
+            if "after_key" in result["aggregations"]["values"]:
+                composite["after"] = result["aggregations"]["values"]["after_key"]
+            else:
+                break

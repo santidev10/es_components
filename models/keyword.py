@@ -21,7 +21,6 @@ class KeywordSectionStats(BaseInnerDocWithHistory):
     views = Long()
     views_history = Long(index=False, multi=True)
     last_30day_views = Long()
-    top_language = KeywordField()
     category_views = Object(enabled=False)
     category_last_day_views = Object(enabled=False)
     category_last_7day_views = Object(enabled=False)

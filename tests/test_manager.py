@@ -1,15 +1,15 @@
-from unittest import TestCase
 from unittest.mock import patch
 
+from elasticsearch_dsl import Keyword
 from elasticsearch_dsl import Object
 
-from elasticsearch_dsl import Keyword
 from es_components.managers.base import BaseManager
 from es_components.models.base import BaseDocument
 from es_components.models.base import BaseInnerDoc
+from es_components.tests.utils import ESTestCase
 
 
-class ESManagerTestCase(TestCase):
+class ESManagerTestCase(ESTestCase):
     def test_dont_populate_field(self):
         test_id = "123"
         with patch("es_components.tests.test_manager.TestDoc.mget", return_value=[TestDoc(id=test_id)]):
@@ -30,6 +30,7 @@ class TestDoc(BaseDocument):
 
     class Index:
         name = "test_documents"
+        prefix = "test_documents_"
 
     class Meta:
         doc_type = "test_document"

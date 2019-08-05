@@ -15,6 +15,7 @@ PERCENTILES_AGGREGATION = (
 
 
 class KeywordManager(BaseManager):
+    count_aggregation_fields = ("stats.top_category",)
     allowed_sections = BaseManager.allowed_sections + (Sections.STATS, Sections.STATS_SCHEDULE)
     model = Keyword
     range_aggregation_fields = RANGE_AGGREGATION
