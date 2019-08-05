@@ -411,3 +411,30 @@ class BaseManager:
         aggregations_search.update_from_dict(search.to_dict())
         aggregations_result = aggregations_search.execute().aggregations.to_dict()
         return aggregations_result
+
+    def generate_distinct_values(self, field, pagesize=10000):
+        composite = {
+            "size": pagesize,
+            "sources": [{
+                field: {
+                    "terms": {
+                        "field": field
+                    }
+                }
+            }]
+        }
+        while True:
+            aggregations_search = self._search().update_from_dict({
+                "aggs": {
+                    "values": {
+                        "composite": composite
+                    }
+                }
+            })
+            result = aggregations_search.execute()
+            for aggregation in result["aggregations"]["values"]["buckets"]:
+                yield aggregation.key[field]
+            if "after_key" in result["aggregations"]["values"]:
+                composite["after"] = result["aggregations"]["values"]["after_key"]
+            else:
+                break
