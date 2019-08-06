@@ -91,7 +91,6 @@ class ChannelManager(BaseManager):
         aggregation = {
             **self._get_range_aggs(),
             **self._get_count_aggs(),
-            **self._get_percentiles_aggs(),
         }
         return {
             key: value
