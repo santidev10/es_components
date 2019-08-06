@@ -25,8 +25,8 @@ COUNT_AGGREGATION = (
     "analytics.cms_title"
 )
 
-COUNT_EXISTS_AGGREGATION = ("analytics", "flags",)
-COUNT_MISSING_AGGREGATION = ("analytics", "flags",)
+COUNT_EXISTS_AGGREGATION = ("analytics", "stats.flags",)
+COUNT_MISSING_AGGREGATION = ("analytics", "stats.flags",)
 
 PERCENTILES_AGGREGATION = (
     "stats.views",
