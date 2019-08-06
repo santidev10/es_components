@@ -1,4 +1,6 @@
+from collections import OrderedDict
 from datetime import timedelta
+import statistics
 from typing import Type
 
 from elasticsearch.helpers import bulk
@@ -423,3 +425,44 @@ class BaseManager:
                 composite["after"] = result["aggregations"]["values"]["after_key"]
             else:
                 break
+
+    @classmethod
+    def fetch_percentiles(cls, field):
+        # pylint: disable=protected-access
+        settings = cls.model._index.get_settings()
+        # pylint: enable=protected-access
+        number_of_shards = None
+        for _, index_settings in settings.items():
+            number_of_shards = int(index_settings["settings"]["index"]["number_of_shards"])
+            break
+
+        aggregations = {
+            "aggs": {
+                "percentiles": {
+                    "field": field,
+                    "percents": AGGREGATION_PERCENTS,
+                }
+            }
+        }
+
+        sharded_percentiles = []
+        for shard in range(number_of_shards):
+            result = cls.model.search() \
+                .params(preference=f"_shards:{shard}") \
+                .query() \
+                .update_from_dict({"aggs": aggregations, "size": 0}) \
+                .execute().aggregations.aggs["values"].to_dict()
+            sharded_percentiles.append(result)
+
+        def aggregate(func, shards, key):
+            value = func([_shard[key] for _shard in shards])
+            return value
+
+        result_keys = [str(float(key)) for key in AGGREGATION_PERCENTS]
+        percentiles = OrderedDict([
+            (key, aggregate(statistics.mean, sharded_percentiles, key))
+            for key in result_keys
+        ])
+
+        return percentiles
+
