@@ -353,23 +353,6 @@ class BaseManager:
             }
         return count_aggs
 
-    def _get_percentiles_aggs(self, properties=None):
-        properties = properties or self.percentiles_aggregation_fields
-        percentiles_aggs = {}
-
-        for field in self.percentiles_aggregation_fields:
-            percentiles_aggs["{}:percentiles".format(field)] = {
-                "percentiles": {
-                    "field": field,
-                    "percents": AGGREGATION_PERCENTS,
-                }
-            }
-        return {
-            key: value
-            for key, value in percentiles_aggs.items()
-            if key in properties
-        }
-
     def _get_count_exists_aggs_result(self, search, properties=None):
         properties = properties or self.count_exists_aggregation_fields + self.count_missing_aggregation_fields
         filters = {
@@ -395,7 +378,6 @@ class BaseManager:
         aggregation_dict = {
             **self._get_range_aggs(),
             **self._get_count_aggs(),
-            **self._get_percentiles_aggs(),
         }
         if properties is not None:
             aggregation_dict = {

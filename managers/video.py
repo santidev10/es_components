@@ -113,27 +113,6 @@ class VideoManager(BaseManager):
         total = result.hits.total
         return total
 
-    def get_percentiles_aggregation(self, search_query, size=0, properties=None):
-        aggregations_result = {}
-        aggregations_search = []
-
-        percentiles_agg = self._get_percentiles_aggs(properties=properties)
-        if not percentiles_agg:
-            return {}
-        for key, agg in percentiles_agg.items():
-            search_dict = {
-                "size": size,
-                "aggs": {key: agg}
-            }
-            search_dict.update(search_query)
-            aggregations_search.append(
-                self._search().update_from_dict(search_dict)
-            )
-        for search_result in self.multi_search(aggregations_search):
-            percentiles_aggregations_result = search_result.aggregations.to_dict()
-            aggregations_result.update(percentiles_aggregations_result)
-        return aggregations_result
-
     def __get_aggregation_dict(self, properties):
         aggregation = {
             **self._get_range_aggs(),
@@ -161,8 +140,6 @@ class VideoManager(BaseManager):
         })
         aggregations_search.update_from_dict(search_query)
         aggregations_result = aggregations_search.execute().aggregations.to_dict()
-
-        aggregations_result.update(self.get_percentiles_aggregation(search_query, properties))
 
         count_exists_aggs_result = self._get_count_exists_aggs_result(search, properties)
         aggregations_result.update(count_exists_aggs_result)
