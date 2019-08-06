@@ -427,10 +427,12 @@ class BaseManager:
                 break
 
     @classmethod
-    def fetch_percentiles(self, field):
-        settings = self.model._index.get_settings()
+    def fetch_percentiles(cls, field):
+        # pylint: disable=protected-access
+        settings = cls.model._index.get_settings()
+        # pylint: enable=protected-access
         number_of_shards = None
-        for index_name, index_settings in settings.items():
+        for _, index_settings in settings.items():
             number_of_shards = int(index_settings["settings"]["index"]["number_of_shards"])
             break
 
@@ -445,7 +447,7 @@ class BaseManager:
 
         sharded_percentiles = []
         for shard in range(number_of_shards):
-            result = self.model.search()\
+            result = cls.model.search() \
                 .params(preference=f"_shards:{shard}") \
                 .query() \
                 .update_from_dict({"aggs": aggregations, "size": 0}) \
@@ -463,3 +465,4 @@ class BaseManager:
         ])
 
         return percentiles
+
