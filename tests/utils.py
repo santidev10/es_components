@@ -23,11 +23,9 @@ class ESTestCase(TestCase):
             raise ConnectionError("Testing on prod env detected")
         for model_cls in BaseDocument.__subclasses__():
             # pylint: disable=protected-access
-            uniq_suffix = f"_{uuid.uuid4()}"
-            index_name = "test_" + model_cls.Index.name + uniq_suffix
-            prefix = "test_" + model_cls.Index.prefix + uniq_suffix
-            index_mock = PropertyMock(return_value=index_name)
-            prefix_mock = PropertyMock(return_value=prefix)
+            test_index_name = f"test_{model_cls.Index.name}_{uuid.uuid4()}"
+            index_mock = PropertyMock(return_value=test_index_name)
+            prefix_mock = PropertyMock(return_value=test_index_name)
 
             index_patch = patch.object(model_cls._index, "_name", new_callable=index_mock)
             prefix_patch = patch.object(model_cls.Index, "prefix", new_callable=prefix_mock)
