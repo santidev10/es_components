@@ -1,5 +1,5 @@
 import os
-import threading
+import uuid
 from unittest import TestCase
 from unittest.mock import PropertyMock
 from unittest.mock import patch
@@ -23,8 +23,11 @@ class ESTestCase(TestCase):
             raise ConnectionError("Testing on prod env detected")
         for model_cls in BaseDocument.__subclasses__():
             # pylint: disable=protected-access
-            index_mock = PropertyMock(return_value="test_" + model_cls.Index.name + "_" + str(threading.get_ident()))
-            prefix_mock = PropertyMock(return_value="test_" + model_cls.Index.prefix)
+            uniq_suffix = f"_{uuid.uuid4()}"
+            index_name = "test_" + model_cls.Index.name + uniq_suffix
+            prefix = "test_" + model_cls.Index.prefix + uniq_suffix
+            index_mock = PropertyMock(return_value=index_name)
+            prefix_mock = PropertyMock(return_value=prefix)
 
             index_patch = patch.object(model_cls._index, "_name", new_callable=index_mock)
             prefix_patch = patch.object(model_cls.Index, "prefix", new_callable=prefix_mock)
