@@ -71,7 +71,7 @@ class ChannelManager(BaseManager):
                        + (Sections.GENERAL_DATA, Sections.STATS, Sections.ANALYTICS,
                           Sections.MONETIZATION, Sections.SOCIAL, Sections.ADS_STATS, Sections.CMS,
                           Sections.CUSTOM_PROPERTIES, Sections.GENERAL_DATA_SCHEDULE,
-                          Sections.STATS_SCHEDULE, Sections.ANALYTICS_SCHEDULE)
+                          Sections.STATS_SCHEDULE, Sections.ANALYTICS_SCHEDULE, Sections.BRAND_SAFETY)
     model = Channel
     range_aggregation_fields = RANGE_AGGREGATION
     count_aggregation_fields = COUNT_AGGREGATION

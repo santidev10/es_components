@@ -121,6 +121,13 @@ class VideoSectionCMS(BaseInnerDoc):
     content_owner_id = Keyword()
 
 
+class VideoSectionBrandSafety(BaseInnerDoc):
+    """ Nested brand safety section for Video document """
+    overall_score = Long()
+    language = Keyword()
+    categories = Object()
+
+
 class Video(BaseDocument):
     general_data = Object(VideoSectionGeneralData)
     stats = Object(VideoSectionStats)
@@ -130,12 +137,14 @@ class Video(BaseDocument):
     ads_stats = Object(VideoSectionAdsStats)
     cms = Object(VideoSectionCMS)
     channel = Object(VideoSectionChannel)
+    brand_safety = Object(VideoSectionBrandSafety)
 
     analytics_schedule = Object(Schedule)
     captions_schedule = Object(Schedule)
 
     class Index:
-        name = VIDEO_INDEX_NAME
+        # name = VIDEO_INDEX_NAME
+        name = "videos_20190807"
         prefix = VIDEO_INDEX_PREFIX
         settings = dict(
             number_of_shards=24,
