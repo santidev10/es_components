@@ -143,8 +143,7 @@ class Video(BaseDocument):
     captions_schedule = Object(Schedule)
 
     class Index:
-        # name = VIDEO_INDEX_NAME
-        name = "videos_20190807"
+        name = VIDEO_INDEX_NAME
         prefix = VIDEO_INDEX_PREFIX
         settings = dict(
             number_of_shards=24,
