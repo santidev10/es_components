@@ -51,6 +51,9 @@ class Keyword(BaseDocument):
     class Index:
         name = KEYWORD_INDEX_NAME
         prefix = KEYWORD_INDEX_PREFIX
+        settings = dict(
+            number_of_shards=24,
+        )
 
     class Meta:
         doc_type = KEYWORD_DOC_TYPE

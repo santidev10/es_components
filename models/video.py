@@ -26,7 +26,7 @@ class VideoSectionGeneralData(BaseInnerDoc):
     thumbnail_image_url = Text(index=False)
     country = Keyword()
     tags = Keyword(multi=True)
-    youtube_published_at = Date(index=False)
+    youtube_published_at = Date()
     category = Keyword()
     lang_code = Keyword()
     language = Keyword()
@@ -137,6 +137,9 @@ class Video(BaseDocument):
     class Index:
         name = VIDEO_INDEX_NAME
         prefix = VIDEO_INDEX_PREFIX
+        settings = dict(
+            number_of_shards=24,
+        )
 
     class Meta:
         doc_type = VIDEO_DOC_TYPE

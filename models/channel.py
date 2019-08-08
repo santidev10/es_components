@@ -145,6 +145,9 @@ class Channel(BaseDocument):
     class Index:
         name = CHANNEL_INDEX_NAME
         prefix = CHANNEL_INDEX_PREFIX
+        settings = dict(
+            number_of_shards=24,
+        )
 
     class Meta:
         doc_type = CHANNEL_DOC_TYPE
