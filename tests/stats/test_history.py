@@ -95,11 +95,13 @@ class TestHistory(TestCase):
         self.assertEqual(0, len(section.subscribers_history))
 
         history = History(section, ["subscribers"])
+        history.DAYS_LIMIT = 31
         section.fetched_at = datetime_service.datetime(year=2020, month=1, day=13)
         history.update()
         self.assertEqual(10, len(section.subscribers_history))
 
         history = History(section, ["subscribers"])
+        history.DAYS_LIMIT = 31
         section.fetched_at = datetime_service.datetime(year=2021, month=1, day=13)
         history.update()
         self.assertEqual(max_retention_perod, len(section.subscribers_history))
