@@ -87,6 +87,7 @@ class TestHistory(TestCase):
         section.views = 1000
 
         history = History(section, ["subscribers"])
+        history.DAYS_LIMIT = 31
         section.subscribers = 301
         section.views = 3001
         section.fetched_at = datetime_service.datetime(year=2020, month=1, day=3)
@@ -151,6 +152,7 @@ class TestHistory(TestCase):
 
         # check missed all values
         history = History(section, ["subscribers"])
+        history.DAYS_LIMIT = 31
         section.fetched_at = datetime_service.datetime(year=2020, month=2, day=18, hour=12)
         section.subscribers = None
         section.views = None
