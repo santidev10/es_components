@@ -29,7 +29,7 @@ class History:
             stats_section.views_history = [...some previous values...]
     """
 
-    DAYS_LIMIT = 31
+    DAYS_LIMIT = None
 
     ONE_DAY = timedelta(days=1)
 
@@ -110,7 +110,8 @@ class History:
             date -= self.ONE_DAY
 
         values_history = new_values_history + list(values_history or [])
-        values_history = values_history[:self.DAYS_LIMIT]
+        if self.DAYS_LIMIT is not None:
+            values_history = values_history[:self.DAYS_LIMIT]
 
         if all([value is None for value in values_history]):
             values_history = []
