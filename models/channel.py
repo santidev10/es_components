@@ -50,7 +50,7 @@ class ChannelSectionStats(BaseInnerDocWithHistory):
     last_30day_observed_videos = Long(index=False)
     last_30day_published_videos = Long(index=False)
     last_365day_published_videos = Long(index=False)
-    views = Long(index=False)
+    views = Long()
     views_history = Long(index=False, multi=True)
     last_day_views = Long()
     last_7day_views = Long()
