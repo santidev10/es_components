@@ -21,6 +21,7 @@ class Sections:
     CMS = "cms"
     CHANNEL = "channel"
     CUSTOM_PROPERTIES = "custom_properties"
+    BRAND_SAFETY = "brand_safety"
 
     ANALYTICS_SCHEDULE = "analytics_schedule"
     GENERAL_DATA_SCHEDULE = "general_data_schedule"

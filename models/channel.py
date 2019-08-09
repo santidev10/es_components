@@ -128,6 +128,14 @@ class ChannelSectionCustomPropetries(BaseInnerDoc):
     channel_group = Keyword()
 
 
+class ChannelSectionBrandSafety(BaseInnerDoc):
+    """ Nested brand safety section for Channel document """
+    overall_score = Long()
+    videos_scored = Long()
+    language = Keyword()
+    categories = Object()
+
+
 class Channel(BaseDocument):
     general_data = Object(ChannelSectionGeneralData)
     stats = Object(ChannelSectionStats)
@@ -137,6 +145,7 @@ class Channel(BaseDocument):
     ads_stats = Object(ChannelSectionAdsStats)
     cms = Object(ChannelSectionCMS)
     custom_properties = Object(ChannelSectionCustomPropetries)
+    brand_safety = Object(ChannelSectionBrandSafety)
 
     general_data_schedule = Object(Schedule)
     stats_schedule = Object(Schedule)
