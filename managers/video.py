@@ -1,3 +1,6 @@
+from typing import List
+
+from collections import OrderedDict
 from es_components.constants import CONTENT_OWNER_ID_FIELD
 from es_components.constants import MAIN_ID_FIELD
 from es_components.constants import Sections
@@ -5,6 +8,7 @@ from es_components.constants import SortDirections
 from es_components.constants import TimestampFields
 from es_components.constants import VIDEO_CHANNEL_ID_FIELD
 from es_components.managers.base import BaseManager
+from es_components.models.channel import Channel
 from es_components.models.video import Video
 from es_components.query_builder import QueryBuilder
 
@@ -112,6 +116,35 @@ class VideoManager(BaseManager):
         result = search.execute()
         total = result.hits.total
         return total
+
+    def get_totals_by_channels(self, channels: List[Channel]):
+        channel_ids = [channel.main.id for channel in channels]
+        result = self.get_totals_by_channel_ids(channel_ids)
+        return result
+
+    def get_totals_by_channel_ids(self, channel_ids: List[str]):
+        query = {
+            "bool": {
+                "must": [
+                    {"terms": {"channel.id": channel_ids}}
+                ]
+            }
+        }
+        aggrenation_name = "count"
+        aggregations = {
+            aggrenation_name: {"terms": {"field": "channel.id"}}
+        }
+
+        result = self.search(query=query) \
+                     .update_from_dict({"aggs": aggregations, "size": 0}) \
+                     .execute()
+
+        aggregation_buckets = result["aggregations"][aggrenation_name]["buckets"]
+
+        aggregations_map = {bucket["key"]: bucket["doc_count"] for bucket in aggregation_buckets}
+        result = OrderedDict((channel_id, aggregations_map.get(channel_id, 0)) for channel_id in channel_ids)
+
+        return result
 
     def __get_aggregation_dict(self, properties):
         aggregation = {

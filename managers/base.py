@@ -11,6 +11,7 @@ from elasticsearch_dsl import connections
 from es_components.config import ES_BULK_REFRESH_OPTION
 from es_components.config import ES_CHUNK_SIZE
 from es_components.config import ES_REQUEST_LIMIT
+from es_components.connections import init_es_connection
 from es_components.constants import EsDictFields
 from es_components.constants import FORCED_FILTER_OUDATED_DAYS
 from es_components.constants import MAIN_ID_FIELD
@@ -57,6 +58,11 @@ class BaseManager:
         self.sections = self._init_sections(sections)
         self.upsert_sections = self._init_sections(upsert_sections or sections)
 
+        try:
+            connections.connections.get_connection()
+        except KeyError:
+            init_es_connection()
+
     def _init_sections(self, sections):
         if sections is None:
             sections = ()
@@ -90,23 +96,28 @@ class BaseManager:
 
         return entities
 
-    def get_or_create(self, ids):
+    def get_or_create(self, ids, only_new=False):
         """ Retrieve or create(if is not exists) model entities.
 
         :param ids: a list of ids
+        :param only_created: return new entries only
         :return: list of entities
         """
         if not ids:
             return []
 
         entries = self.get(ids)
-
+        new_ids = []
         for i, entry in enumerate(entries):
             if entry is None:
+                new_ids.append(i)
                 # false positive pylint error
                 # pylint: disable=not-callable
                 entries[i] = self.model(id=ids[i])
                 # pylint: enable=not-callable
+
+        if only_new:
+            entries = [entries[i] for i in new_ids]
 
         return entries
 
@@ -133,7 +144,6 @@ class BaseManager:
         """
 
         for _entries in chunks(entries, ES_REQUEST_LIMIT):
-
             bulk(
                 connections.get_connection(),
                 self._upsert_generator(_entries),
