@@ -184,3 +184,6 @@ class Channel(BaseDocument):
 
     def populate_custom_properties(self, **kwargs):
         self._populate_section(Sections.CUSTOM_PROPERTIES, **kwargs)
+
+    def populate_brand_safety(self, **kwargs):
+        self._populate_section(Sections.BRAND_SAFETY, **kwargs)
