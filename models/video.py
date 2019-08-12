@@ -175,3 +175,6 @@ class Video(BaseDocument):
 
     def populate_channel(self, **kwargs):
         self._populate_section(Sections.CHANNEL, **kwargs)
+
+    def populate_brand_safety(self, **kwargs):
+        self._populate_section(Sections.BRAND_SAFETY, **kwargs)
