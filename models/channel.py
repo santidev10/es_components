@@ -30,6 +30,7 @@ class ChannelSectionGeneralData(BaseInnerDoc):
     top_category = Keyword()
     lang_codes = Keyword(index=False, multi=True)
     top_language = Keyword()
+    emails = Keyword(multi=True)
 
 
 class ChannelSectionStats(BaseInnerDocWithHistory):
@@ -42,14 +43,14 @@ class ChannelSectionStats(BaseInnerDocWithHistory):
     last_day_subscribers = Long()
     last_7day_subscribers = Long()
     last_30day_subscribers = Long()
-    observed_videos_count = Long(index=False)
+    observed_videos_count = Long()
     observed_videos_count_history = Long(index=False, multi=True)
     total_videos_count = Long(index=False)
     total_videos_count_history = Long(index=False, multi=True)
     last_30day_observed_videos = Long(index=False)
     last_30day_published_videos = Long(index=False)
     last_365day_published_videos = Long(index=False)
-    views = Long(index=False)
+    views = Long()
     views_history = Long(index=False, multi=True)
     last_day_views = Long()
     last_7day_views = Long()
@@ -67,6 +68,7 @@ class ChannelSectionStats(BaseInnerDocWithHistory):
     engage_rate_history = Double(index=False, multi=True)
     sentiment = Double()
     sentiment_history = Double(index=False, multi=True)
+    channel_group = Keyword()
 
     class History:
         all = (
@@ -126,6 +128,14 @@ class ChannelSectionCustomPropetries(BaseInnerDoc):
     channel_group = Keyword()
 
 
+class ChannelSectionBrandSafety(BaseInnerDoc):
+    """ Nested brand safety section for Channel document """
+    overall_score = Long()
+    videos_scored = Long()
+    language = Keyword()
+    categories = Object()
+
+
 class Channel(BaseDocument):
     general_data = Object(ChannelSectionGeneralData)
     stats = Object(ChannelSectionStats)
@@ -135,6 +145,7 @@ class Channel(BaseDocument):
     ads_stats = Object(ChannelSectionAdsStats)
     cms = Object(ChannelSectionCMS)
     custom_properties = Object(ChannelSectionCustomPropetries)
+    brand_safety = Object(ChannelSectionBrandSafety)
 
     general_data_schedule = Object(Schedule)
     stats_schedule = Object(Schedule)
@@ -143,6 +154,9 @@ class Channel(BaseDocument):
     class Index:
         name = CHANNEL_INDEX_NAME
         prefix = CHANNEL_INDEX_PREFIX
+        settings = dict(
+            number_of_shards=24,
+        )
 
     class Meta:
         doc_type = CHANNEL_DOC_TYPE
@@ -170,3 +184,6 @@ class Channel(BaseDocument):
 
     def populate_custom_properties(self, **kwargs):
         self._populate_section(Sections.CUSTOM_PROPERTIES, **kwargs)
+
+    def populate_brand_safety(self, **kwargs):
+        self._populate_section(Sections.BRAND_SAFETY, **kwargs)

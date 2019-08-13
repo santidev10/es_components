@@ -21,6 +21,7 @@ class Sections:
     CMS = "cms"
     CHANNEL = "channel"
     CUSTOM_PROPERTIES = "custom_properties"
+    BRAND_SAFETY = "brand_safety"
 
     ANALYTICS_SCHEDULE = "analytics_schedule"
     GENERAL_DATA_SCHEDULE = "general_data_schedule"
@@ -38,16 +39,6 @@ class TimestampFields:
 class SortDirections:
     ASCENDING = "asc"
     DESCENDING = "desc"
-
-
-class FilterIncludeEmpty:
-    FIRST = "first"
-    LAST = "last"
-    # pylint: disable=invalid-name
-    NO = "no"
-    # pylint: enable=invalid-name
-
-    ALL = (FIRST, LAST, NO)
 
 
 FORCED_FILTER_OUDATED_DAYS = 7

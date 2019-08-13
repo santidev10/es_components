@@ -26,7 +26,7 @@ class VideoSectionGeneralData(BaseInnerDoc):
     thumbnail_image_url = Text(index=False)
     country = Keyword()
     tags = Keyword(multi=True)
-    youtube_published_at = Date(index=False)
+    youtube_published_at = Date()
     category = Keyword()
     lang_code = Keyword()
     language = Keyword()
@@ -121,6 +121,13 @@ class VideoSectionCMS(BaseInnerDoc):
     content_owner_id = Keyword()
 
 
+class VideoSectionBrandSafety(BaseInnerDoc):
+    """ Nested brand safety section for Video document """
+    overall_score = Long()
+    language = Keyword()
+    categories = Object()
+
+
 class Video(BaseDocument):
     general_data = Object(VideoSectionGeneralData)
     stats = Object(VideoSectionStats)
@@ -130,6 +137,7 @@ class Video(BaseDocument):
     ads_stats = Object(VideoSectionAdsStats)
     cms = Object(VideoSectionCMS)
     channel = Object(VideoSectionChannel)
+    brand_safety = Object(VideoSectionBrandSafety)
 
     analytics_schedule = Object(Schedule)
     captions_schedule = Object(Schedule)
@@ -137,6 +145,9 @@ class Video(BaseDocument):
     class Index:
         name = VIDEO_INDEX_NAME
         prefix = VIDEO_INDEX_PREFIX
+        settings = dict(
+            number_of_shards=24,
+        )
 
     class Meta:
         doc_type = VIDEO_DOC_TYPE
@@ -164,3 +175,6 @@ class Video(BaseDocument):
 
     def populate_channel(self, **kwargs):
         self._populate_section(Sections.CHANNEL, **kwargs)
+
+    def populate_brand_safety(self, **kwargs):
+        self._populate_section(Sections.BRAND_SAFETY, **kwargs)

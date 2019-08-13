@@ -1,12 +1,46 @@
-from es_components.constants import Sections
-from es_components.constants import VIDEO_CHANNEL_ID_FIELD
+from typing import List
+
+from collections import OrderedDict
+from es_components.config import ES_CHUNK_SIZE
+from es_components.constants import CONTENT_OWNER_ID_FIELD
 from es_components.constants import MAIN_ID_FIELD
+from es_components.constants import Sections
 from es_components.constants import SortDirections
 from es_components.constants import TimestampFields
-from es_components.constants import CONTENT_OWNER_ID_FIELD
+from es_components.constants import VIDEO_CHANNEL_ID_FIELD
 from es_components.managers.base import BaseManager
+from es_components.models.channel import Channel
 from es_components.models.video import Video
 from es_components.query_builder import QueryBuilder
+
+RANGE_AGGREGATION = (
+    "stats.views",
+    "stats.last_day_views",
+    "stats.channel_subscribers",
+    "ads_stats.video_view_rate",
+    "ads_stats.ctr_v",
+    "ads_stats.average_cpv",
+    "general_data.youtube_published_at"
+)
+
+COUNT_AGGREGATION = (
+    "general_data.country",
+    "general_data.category",
+    "general_data.language",
+    "analytics.cms_title"
+)
+
+COUNT_EXISTS_AGGREGATION = ("analytics", "stats.flags",)
+COUNT_MISSING_AGGREGATION = ("analytics", "stats.flags",)
+
+PERCENTILES_AGGREGATION = (
+    "stats.views",
+    "stats.last_day_views",
+    "stats.channel_subscribers",
+    "ads_stats.video_view_rate",
+    "ads_stats.ctr_v",
+    "ads_stats.average_cpv"
+)
 
 
 class VideoManager(BaseManager):
@@ -14,11 +48,13 @@ class VideoManager(BaseManager):
                        + (Sections.GENERAL_DATA, Sections.STATS, Sections.ANALYTICS,
                           Sections.CHANNEL, Sections.CAPTIONS, Sections.MONETIZATION,
                           Sections.ADS_STATS, Sections.CMS, Sections.ANALYTICS_SCHEDULE,
-                          Sections.CAPTIONS_SCHEDULE)
+                          Sections.CAPTIONS_SCHEDULE, Sections.BRAND_SAFETY)
     model = Video
-
-    def get_all_video_ids(self, channel_id):
-        return list(self.get_all_video_ids_generator(channel_id))
+    range_aggregation_fields = RANGE_AGGREGATION
+    count_aggregation_fields = COUNT_AGGREGATION
+    percentiles_aggregation_fields = PERCENTILES_AGGREGATION
+    count_exists_aggregation_fields = COUNT_EXISTS_AGGREGATION
+    count_missing_aggregation_fields = COUNT_MISSING_AGGREGATION
 
     def get_all_video_ids_generator(self, channel_id):
         _query = self.by_channel_ids_query(channel_id)
@@ -82,26 +118,69 @@ class VideoManager(BaseManager):
         total = result.hits.total
         return total
 
-    def _search_nonexistent_section_records(self, query, limit):
-        control_section = self._get_control_section()
-        field_updated_at = f"{control_section}.{TimestampFields.UPDATED_AT}"
+    def get_totals_by_channels(self, channels: List[Channel]):
+        channel_ids = [channel.main.id for channel in channels]
+        result = self.get_totals_by_channel_ids(channel_ids)
+        return result
 
-        filter_nonexistent_section = self._filter_nonexistent_section(control_section)
+    def get_totals_by_channel_ids(self, channel_ids: List[str]):
+        query = {
+            "bool": {
+                "must": [
+                    {"terms": {"channel.id": channel_ids}}
+                ]
+            }
+        }
+        aggrenation_name = "count"
+        aggregations = {
+            aggrenation_name: {
+                "terms": {
+                    "field": "channel.id",
+                    "size": ES_CHUNK_SIZE,
+                },
+            }
+        }
 
-        sort = [
-            {field_updated_at: {"order": SortDirections.ASCENDING}},
-            {MAIN_ID_FIELD: {"order": SortDirections.ASCENDING}},
-        ]
+        result = self.search(query=query) \
+                     .update_from_dict({"aggs": aggregations, "size": 0}) \
+                     .execute()
 
-        records = self.search(query=query, filters=filter_nonexistent_section, sort=sort, limit=limit)
-        return records
+        aggregation_buckets = result["aggregations"][aggrenation_name]["buckets"]
 
-    def search_nonexistent_section_records_by_channel_id(self, channel_id=None, limit=10000):
-        query = self.by_channel_ids_query(channel_id) if channel_id is not None else None
-        records = self._search_nonexistent_section_records(query=query, limit=limit)
-        return records
+        aggregations_map = {bucket["key"]: bucket["doc_count"] for bucket in aggregation_buckets}
+        result = OrderedDict((channel_id, aggregations_map.get(channel_id, 0)) for channel_id in channel_ids)
 
-    def search_nonexistent_section_records_by_content_owner_id(self, content_owner_id=None, limit=10000):
-        query = self.by_content_owner_ids_query(content_owner_id) if content_owner_id is not None else None
-        records = self._search_nonexistent_section_records(query=query, limit=limit)
-        return records
+        return result
+
+    def __get_aggregation_dict(self, properties):
+        aggregation = {
+            **self._get_range_aggs(),
+            **self._get_count_aggs(),
+        }
+        return {
+            key: value
+            for key, value in aggregation.items()
+            if key in properties
+        }
+
+    def get_aggregation(self, search=None, size=0, properties=None):
+        if not properties:
+            return None
+        if not search:
+            search = self._search()
+
+        search_query = search.to_dict()
+
+        aggregations = self.__get_aggregation_dict(properties)
+
+        aggregations_search = self._search().update_from_dict({
+            "size": size,
+            "aggs": aggregations
+        })
+        aggregations_search.update_from_dict(search_query)
+        aggregations_result = aggregations_search.execute().aggregations.to_dict()
+
+        count_exists_aggs_result = self._get_count_exists_aggs_result(search, properties)
+        aggregations_result.update(count_exists_aggs_result)
+
+        return aggregations_result
