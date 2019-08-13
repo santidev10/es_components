@@ -43,7 +43,7 @@ class ChannelSectionStats(BaseInnerDocWithHistory):
     last_day_subscribers = Long()
     last_7day_subscribers = Long()
     last_30day_subscribers = Long()
-    observed_videos_count = Long(index=False)
+    observed_videos_count = Long()
     observed_videos_count_history = Long(index=False, multi=True)
     total_videos_count = Long(index=False)
     total_videos_count_history = Long(index=False, multi=True)

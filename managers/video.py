@@ -1,6 +1,7 @@
 from typing import List
 
 from collections import OrderedDict
+from es_components.config import ES_CHUNK_SIZE
 from es_components.constants import CONTENT_OWNER_ID_FIELD
 from es_components.constants import MAIN_ID_FIELD
 from es_components.constants import Sections
@@ -132,7 +133,12 @@ class VideoManager(BaseManager):
         }
         aggrenation_name = "count"
         aggregations = {
-            aggrenation_name: {"terms": {"field": "channel.id"}}
+            aggrenation_name: {
+                "terms": {
+                    "field": "channel.id",
+                    "size": ES_CHUNK_SIZE,
+                },
+            }
         }
 
         result = self.search(query=query) \
