@@ -1,5 +1,8 @@
 from collections import OrderedDict
+import os
+import re
 import statistics
+from datetime import timedelta
 from typing import Type
 
 from elasticsearch.helpers import bulk
@@ -14,6 +17,7 @@ from es_components.connections import init_es_connection
 from es_components.constants import EsDictFields
 from es_components.constants import FORCED_FILTER_OUDATED_DAYS
 from es_components.constants import MAIN_ID_FIELD
+from es_components.constants import SEGMENTS_UUID_FIELD
 from es_components.constants import Sections
 from es_components.constants import SortDirections
 from es_components.constants import TimestampFields
@@ -437,6 +441,59 @@ class BaseManager:
             else:
                 break
 
+    def update(self, filter_query):
+        return self.model._index.updateByQuery().filter(filter_query)
+
+    def filter_items_related_to_segments(self, segment_ids):
+        """
+        :param segment_ids: List[<UUID>] - list of segments uuids
+        :return: query to filter items related to given kist of segments
+        """
+        return QueryBuilder().build() \
+            .must() \
+            .terms().field(SEGMENTS_UUID_FIELD) \
+            .value(segment_ids).get()
+
+    def add_to_segment(self, filter_query, segment_uuid):
+        if Sections.SEGMENTS not in self.upsert_sections:
+            raise BrokenPipeError(f"This manager can't update {Sections.SEGMENTS} section")
+        script = dict(
+            source=CachedScriptsReader.get_script("add_to_segment.painless"),
+            params=dict(
+                uuid=segment_uuid,
+                now=datetime_service.now().isoformat(),
+            )
+        )
+        return self.update(filter_query) \
+            .script(**script) \
+            .execute()
+
+    def add_to_segment_by_ids(self, ids, segment_uuid):
+        if Sections.SEGMENTS not in self.upsert_sections:
+            raise BrokenPipeError(f"This manager can't update {Sections.SEGMENTS} section")
+        items = [self.model(id=item_id) for item_id in ids]
+        self.upsert(items)
+        query = QueryBuilder().build() \
+            .must() \
+            .terms().field(MAIN_ID_FIELD) \
+            .value(ids) \
+            .get()
+        return self.add_to_segment(filter_query=query, segment_uuid=segment_uuid)
+
+    def remove_from_segment(self, filter_query, segment_uuid):
+        if Sections.SEGMENTS not in self.upsert_sections:
+            raise BrokenPipeError(f"This manager can't update {Sections.SEGMENTS} section")
+        script = dict(
+            source=CachedScriptsReader.get_script("remove_from_segment.painless"),
+            params=dict(
+                uuid=segment_uuid,
+                now=datetime_service.now().isoformat(),
+            )
+        )
+        return self.update(filter_query) \
+            .script(**script) \
+            .execute()
+
     @classmethod
     def fetch_percentiles(cls, field):
         number_of_shards = cls.get_number_of_shards()
@@ -479,3 +536,15 @@ class BaseManager:
             number_of_shards = int(index_settings["settings"]["index"]["number_of_shards"])
             break
         return number_of_shards
+
+
+class CachedScriptsReader:
+    _scripts_cache = {}
+    _scripts_dir = os.path.join(os.path.dirname(os.path.realpath(__file__)), "scripts")
+
+    @classmethod
+    def get_script(cls, script_name):
+        if script_name not in cls._scripts_cache:
+            with open(os.path.join(cls._scripts_dir, script_name), "r") as file:
+                cls._scripts_cache[script_name] = re.sub(r"[\n\s]+", " ", file.read())
+        return cls._scripts_cache[script_name]
