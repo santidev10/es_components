@@ -169,8 +169,8 @@ class BaseManager:
             search = search.sort(*sort)
         return search[offset:limit]
 
-    def scan(self, filters, sort):
-        yield from self.search(filters=filters, sort=sort).scan()
+    def scan(self, filters):
+        yield from self.search(filters=filters).scan()
 
     def multi_search(self, searches):
         # pylint: disable=protected-access
