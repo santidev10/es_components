@@ -64,6 +64,7 @@ PERCENTILES_AGGREGATION = (
     "ads_stats.ctr_v",
     "ads_stats.average_cpv",
 )
+FORCED_FILTER_MIN_VIDEO_COUNT = 0
 
 
 class ChannelManager(BaseManager):
@@ -73,6 +74,7 @@ class ChannelManager(BaseManager):
                           Sections.CUSTOM_PROPERTIES, Sections.GENERAL_DATA_SCHEDULE,
                           Sections.STATS_SCHEDULE, Sections.ANALYTICS_SCHEDULE, Sections.BRAND_SAFETY)
     model = Channel
+    forced_filter_section_oudated = Sections.GENERAL_DATA
     range_aggregation_fields = RANGE_AGGREGATION
     count_aggregation_fields = COUNT_AGGREGATION
     percentiles_aggregation_fields = PERCENTILES_AGGREGATION
@@ -85,7 +87,14 @@ class ChannelManager(BaseManager):
 
     def forced_filters(self):
         return super(ChannelManager, self).forced_filters() &\
-               self._filter_existent_section(Sections.GENERAL_DATA)
+               self._filter_existent_section(Sections.GENERAL_DATA) & \
+               (
+                   self._filter_existent_section(Sections.CMS) |
+                   self._filter_existent_section(Sections.AUTH) |
+                   QueryBuilder().build().must().range().field(f"{Sections.STATS}.total_videos_count")
+                   .gt(FORCED_FILTER_MIN_VIDEO_COUNT).get()
+
+               )
 
     def __get_aggregation_dict(self, properties):
         aggregation = {

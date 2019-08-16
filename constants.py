@@ -19,6 +19,7 @@ class Sections:
     STATS = "stats"
     CAPTIONS = "captions"
     CMS = "cms"
+    AUTH = "auth"
     CHANNEL = "channel"
     CUSTOM_PROPERTIES = "custom_properties"
     BRAND_SAFETY = "brand_safety"

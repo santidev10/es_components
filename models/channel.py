@@ -45,7 +45,7 @@ class ChannelSectionStats(BaseInnerDocWithHistory):
     last_30day_subscribers = Long()
     observed_videos_count = Long()
     observed_videos_count_history = Long(index=False, multi=True)
-    total_videos_count = Long(index=False)
+    total_videos_count = Long()
     total_videos_count_history = Long(index=False, multi=True)
     last_30day_observed_videos = Long(index=False)
     last_30day_published_videos = Long(index=False)
@@ -136,6 +136,10 @@ class ChannelSectionBrandSafety(BaseInnerDoc):
     categories = Object()
 
 
+class ChannelSectionAuth(BaseInnerDoc):
+    pass
+
+
 class Channel(BaseDocument):
     general_data = Object(ChannelSectionGeneralData)
     stats = Object(ChannelSectionStats)
@@ -146,6 +150,7 @@ class Channel(BaseDocument):
     cms = Object(ChannelSectionCMS)
     custom_properties = Object(ChannelSectionCustomPropetries)
     brand_safety = Object(ChannelSectionBrandSafety)
+    auth = Object(ChannelSectionAuth)
 
     general_data_schedule = Object(Schedule)
     stats_schedule = Object(Schedule)
@@ -181,6 +186,9 @@ class Channel(BaseDocument):
 
     def populate_cms(self, **kwargs):
         self._populate_section(Sections.CMS, **kwargs)
+
+    def populate_auth(self, **kwargs):
+        self._populate_section(Sections.AUTH, **kwargs)
 
     def populate_custom_properties(self, **kwargs):
         self._populate_section(Sections.CUSTOM_PROPERTIES, **kwargs)
