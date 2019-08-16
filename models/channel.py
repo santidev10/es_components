@@ -136,6 +136,10 @@ class ChannelSectionBrandSafety(BaseInnerDoc):
     categories = Object()
 
 
+class ChannelSectionAuth(BaseInnerDoc):
+    pass
+
+
 class Channel(BaseDocument):
     general_data = Object(ChannelSectionGeneralData)
     stats = Object(ChannelSectionStats)
@@ -146,6 +150,7 @@ class Channel(BaseDocument):
     cms = Object(ChannelSectionCMS)
     custom_properties = Object(ChannelSectionCustomPropetries)
     brand_safety = Object(ChannelSectionBrandSafety)
+    auth = Object(ChannelSectionAuth)
 
     general_data_schedule = Object(Schedule)
     stats_schedule = Object(Schedule)
@@ -181,6 +186,9 @@ class Channel(BaseDocument):
 
     def populate_cms(self, **kwargs):
         self._populate_section(Sections.CMS, **kwargs)
+
+    def populate_auth(self, **kwargs):
+        self._populate_section(Sections.AUTH, **kwargs)
 
     def populate_custom_properties(self, **kwargs):
         self._populate_section(Sections.CUSTOM_PROPERTIES, **kwargs)

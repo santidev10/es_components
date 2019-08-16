@@ -40,6 +40,7 @@ class BaseManager:
     allowed_sections = (Sections.MAIN, Sections.DELETED, Sections.SEGMENTS)
     model: Type[BaseDocument] = None
     forced_filter_oudated_days = FORCED_FILTER_OUDATED_DAYS
+    forced_filter_section_oudated = Sections.MAIN
     range_aggregation_fields = ()
     count_aggregation_fields = ()
     percentiles_aggregation_fields = ()
@@ -261,7 +262,7 @@ class BaseManager:
         # it avoids being tied to the current point in time and makes it possible to cache request/response
         outdated_seconds = self.forced_filter_oudated_days * 86400
         updated_at = f"now-{outdated_seconds}s/s"
-        field_updated_at = f"{Sections.MAIN}.{TimestampFields.UPDATED_AT}"
+        field_updated_at = f"{self.forced_filter_section_oudated}.{TimestampFields.UPDATED_AT}"
         filter_range = QueryBuilder().build().must().range().field(field_updated_at) \
             .gt(updated_at).get()
         return self.filter_alive() & filter_range

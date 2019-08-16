@@ -50,6 +50,7 @@ class VideoManager(BaseManager):
                           Sections.ADS_STATS, Sections.CMS, Sections.ANALYTICS_SCHEDULE,
                           Sections.CAPTIONS_SCHEDULE, Sections.BRAND_SAFETY)
     model = Video
+    forced_filter_section_oudated = Sections.GENERAL_DATA
     range_aggregation_fields = RANGE_AGGREGATION
     count_aggregation_fields = COUNT_AGGREGATION
     percentiles_aggregation_fields = PERCENTILES_AGGREGATION
