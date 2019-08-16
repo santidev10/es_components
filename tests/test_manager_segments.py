@@ -24,7 +24,10 @@ class ESManagerSegmentsBaseTestCase(TestCase):
         init_es_connection()
 
     def setUp(self):
-        TestSegmentManager().truncate()
+        try:
+            TestSegmentManager().truncate()
+        except:
+            pass
         TestSegmentDoc.init()
         self.manager_main = TestSegmentManager(sections=(Sections.MAIN,))
         self.manager_segments = TestSegmentManager(sections=(Sections.SEGMENTS,))
