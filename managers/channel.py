@@ -91,7 +91,7 @@ class ChannelManager(BaseManager):
                (
                    self._filter_existent_section(Sections.CMS) |
                    self._filter_existent_section(Sections.AUTH) |
-                   QueryBuilder().build().must().range().field(f"{Sections.STATS}.total_videos_count")
+                   QueryBuilder().build().must().range().field(f"{Sections.STATS}.observed_videos_count")
                    .gt(FORCED_FILTER_MIN_VIDEO_COUNT).get()
 
                )
