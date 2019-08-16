@@ -7,7 +7,6 @@ from unittest.mock import patch
 from elasticsearch_dsl import Keyword
 from elasticsearch_dsl import Object
 
-from es_components.connections import init_es_connection
 from es_components.constants import MAIN_ID_FIELD
 from es_components.constants import Sections
 from es_components.datetime_service import datetime_service
@@ -19,16 +18,9 @@ from es_components.tests.utils import ESTestCase
 
 
 class ESManagerSegmentsBaseTestCase(ESTestCase):
-    @classmethod
-    def setUpClass(cls):
-        init_es_connection()
 
     def setUp(self):
-        try:
-            TestSegmentManager().truncate()
-        except:
-            pass
-        TestSegmentDoc.init()
+        super(ESManagerSegmentsBaseTestCase, self).setUp()
         self.manager_main = TestSegmentManager(sections=(Sections.MAIN,))
         self.manager_segments = TestSegmentManager(sections=(Sections.SEGMENTS,))
 
