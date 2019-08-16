@@ -2,7 +2,6 @@ import itertools
 from contextlib import contextmanager
 from datetime import datetime
 from datetime import timedelta
-from unittest import TestCase
 from unittest.mock import patch
 
 from elasticsearch_dsl import Keyword
@@ -16,9 +15,10 @@ from es_components.managers.base import BaseManager
 from es_components.models.base import BaseDocument
 from es_components.models.base import BaseInnerDoc
 from es_components.query_builder import QueryBuilder
+from es_components.tests.utils import ESTestCase
 
 
-class ESManagerSegmentsBaseTestCase(TestCase):
+class ESManagerSegmentsBaseTestCase(ESTestCase):
     @classmethod
     def setUpClass(cls):
         init_es_connection()
