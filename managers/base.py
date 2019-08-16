@@ -2,7 +2,6 @@ from collections import OrderedDict
 import os
 import re
 import statistics
-from datetime import timedelta
 from typing import Type
 
 from elasticsearch.helpers import bulk
@@ -443,7 +442,9 @@ class BaseManager:
                 break
 
     def update(self, filter_query):
+        # pylint: disable=protected-access
         return self.model._index.updateByQuery().filter(filter_query)
+        # pylint: enable=protected-access
 
     def filter_items_related_to_segments(self, segment_ids):
         """
@@ -472,7 +473,9 @@ class BaseManager:
     def add_to_segment_by_ids(self, ids, segment_uuid):
         if Sections.SEGMENTS not in self.upsert_sections:
             raise BrokenPipeError(f"This manager can't update {Sections.SEGMENTS} section")
+        # pylint: disable=not-callable
         items = [self.model(id=item_id) for item_id in ids]
+        # pylint: enable=not-callable
         self.upsert(items)
         query = QueryBuilder().build() \
             .must() \

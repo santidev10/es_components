@@ -24,10 +24,12 @@ class ESManagerSegmentsBaseTestCase(ESTestCase):
         self.manager_main = TestSegmentManager(sections=(Sections.MAIN,))
         self.manager_segments = TestSegmentManager(sections=(Sections.SEGMENTS,))
 
+    # pylint: disable=invalid-name
     @contextmanager
     def patch_now(self, dt):
         with patch.object(datetime_service, "now", return_value=dt):
             yield
+    # pylint: enable=invalid-name
 
 
 class ESManagerSegmentsAddTestCase(ESManagerSegmentsBaseTestCase):
@@ -126,7 +128,9 @@ class ESManagerSegmentsAddTestCase(ESManagerSegmentsBaseTestCase):
             item.populate_segments(uuid=[])
         self.manager_segments.upsert(items)
 
+        # pylint: disable=no-member
         query = QueryBuilder().build().must().exists().field(MAIN_ID_FIELD).get()
+        # pylint: enable=no-member
         self.manager_segments.add_to_segment(filter_query=query, segment_uuid=segment_id)
 
         self.assertEqual([segment_id], self.manager_segments.get([item_id_1])[0].segments.uuid)
@@ -231,6 +235,7 @@ class ESManagerSegmentsAddByIdsTestCase(ESManagerSegmentsBaseTestCase):
         self.assertEqual([segment_id], self.manager_segments.get([item_id_1])[0].segments.uuid)
         self.assertEqual([segment_id], self.manager_segments.get([item_id_2])[0].segments.uuid)
 
+    # pylint: disable=invalid-name
     def test_add_to_segment_by_ids_does_not_replace_existing_sections(self):
         test_datetime = datetime(2020, 1, 2, 12, 2, 3)
         item_id = generate_item_id()
@@ -249,6 +254,7 @@ class ESManagerSegmentsAddByIdsTestCase(ESManagerSegmentsBaseTestCase):
         item = custom_manager.get([item_id])[0]
         self.assertEqual(test_property, item.custom_section.test_property)
         self.assertEqual(test_datetime, item.custom_section.created_at)
+    # pylint: enable=invalid-name
 
     def test_add_to_segment_by_ids_does_not_perform_get(self):
         item_id_1 = generate_item_id()
