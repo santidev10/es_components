@@ -281,6 +281,7 @@ class TestSegmentDoc(BaseDocument):
 
     class Index:
         name = "test_segment_documents"
+        prefix = "test_segment_documents_"
 
     class Meta:
         doc_type = "test_segment_document"
