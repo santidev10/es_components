@@ -85,16 +85,15 @@ class ChannelManager(BaseManager):
         return QueryBuilder().build().must().terms().field(CONTENT_OWNER_ID_FIELD)\
             .value(content_owner_ids).get()
 
-#DISABLED because a lot of failed tests
-#    def forced_filters(self):
-#        return super(ChannelManager, self).forced_filters() &\
-#               self._filter_existent_section(Sections.GENERAL_DATA) & \
-#               (
-#                   self._filter_existent_section(Sections.CMS) |
-#                   self._filter_existent_section(Sections.AUTH) |
-#                   QueryBuilder().build().must().range().field(f"{Sections.STATS}.observed_videos_count")
-#                   .gt(FORCED_FILTER_MIN_VIDEO_COUNT).get()
-#               )
+    def forced_filters(self):
+        return super(ChannelManager, self).forced_filters() & \
+               self._filter_existent_section(Sections.GENERAL_DATA) & \
+               (
+                   self._filter_existent_section(Sections.CMS) |
+                   self._filter_existent_section(Sections.AUTH) |
+                   QueryBuilder().build().must().range().field(f"{Sections.STATS}.observed_videos_count")
+                   .gt(FORCED_FILTER_MIN_VIDEO_COUNT).get()
+               )
 
     def __get_aggregation_dict(self, properties):
         aggregation = {
