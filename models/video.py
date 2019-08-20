@@ -119,6 +119,7 @@ class VideoSectionAdsStats(BaseInnerDoc):
 class VideoSectionCMS(BaseInnerDoc):
     """ Nested CMS section for Video document """
     content_owner_id = Keyword()
+    cms_title = Keyword()
 
 
 class VideoSectionBrandSafety(BaseInnerDoc):
