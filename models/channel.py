@@ -118,6 +118,7 @@ class ChannelSectionAdsStats(BaseInnerDoc):
 class ChannelSectionCMS(BaseInnerDoc):
     """ Nested CMS section for Channel document """
     content_owner_id = Keyword(multi=True)
+    cms_title = Keyword(multi=True)
 
 
 class ChannelSectionCustomPropetries(BaseInnerDoc):
