@@ -41,7 +41,7 @@ COUNT_AGGREGATION = (
     "analytics.is_auth",
     "analytics.is_cms",
     "custom_properties.preferred",
-    "analytics.cms_title"
+    "cms.cms_title"
 )
 
 COUNT_EXISTS_AGGREGATION = (
