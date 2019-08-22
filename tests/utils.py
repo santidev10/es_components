@@ -59,9 +59,12 @@ class ESTestCase(TestCase):
     @classmethod
     def __remove_indexes(cls):
         for model_cls in BaseDocument.__subclasses__():
-            # pylint: disable=protected-access
-            model_cls._index.delete()
-            # pylint: enable=protected-access
+            try:
+                # pylint: disable=protected-access
+                model_cls._index.delete()
+                # pylint: enable=protected-access
+            except:
+                pass
 
     def setUp(self):
         for manager_cls in BaseManager.__subclasses__():
