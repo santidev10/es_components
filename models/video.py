@@ -28,11 +28,11 @@ class VideoSectionGeneralData(BaseInnerDoc):
     tags = Keyword(multi=True)
     youtube_published_at = Date()
     category = Keyword()
-    lang_code = Keyword()
+    lang_code = Keyword(index=False)
     language = Keyword()
     duration = Long(index=False)
-    license = Keyword()
-    is_streaming = Boolean()
+    license = Keyword(index=False)  # unused
+    is_streaming = Boolean(index=False)
 
 
 class VideoSectionChannel(BaseInnerDoc):
@@ -54,16 +54,16 @@ class VideoSectionStats(BaseInnerDocWithHistory):
     views_per_day = Double()
     likes = Long()
     likes_history = Long(index=False, multi=True)
-    last_day_likes = Long()
-    last_7day_likes = Long()
-    last_30day_likes = Long()
+    last_day_likes = Long(index=False)
+    last_7day_likes = Long(index=False)
+    last_30day_likes = Long(index=False)
     dislikes = Long()
     dislikes_history = Long(index=False, multi=True)
     comments = Long()
     comments_history = Long(index=False, multi=True)
-    last_day_comments = Long()
-    last_7day_comments = Long()
-    last_30day_days_comments = Long()
+    last_day_comments = Long(index=False)
+    last_7day_comments = Long(index=False)
+    last_30day_days_comments = Long(index=False)
     engage_rate = Double()
     engage_rate_history = Double(index=False, multi=True)
     sentiment = Long()
@@ -85,14 +85,14 @@ class VideoCaptionsItem(InnerDoc):
 
 
 class VideoSectionCaptions(BaseInnerDoc):
-    items = Object(VideoCaptionsItem, multi=True)
+    items = Object(VideoCaptionsItem, multi=True, enabled=False)
 
 
 class VideoSectionMonetization(BaseInnerDoc):
     """ Nested monetization section for Video document """
     is_monetizable = Boolean()
     channel_preferred = Boolean()
-    ptk = Text()
+    ptk = Text(index=False)
 
 
 class VideoSectionAdsStats(BaseInnerDoc):
@@ -111,7 +111,7 @@ class VideoSectionAdsStats(BaseInnerDoc):
     impressions_spv_count = Long(index=False)
     impressions_spm_count = Long(index=False)
     video_view_rate = Double()
-    ctr = Double()
+    ctr = Double(index=False)
     ctr_v = Double()
     average_cpv = Double()
 
@@ -125,7 +125,7 @@ class VideoSectionCMS(BaseInnerDoc):
 class VideoSectionBrandSafety(BaseInnerDoc):
     """ Nested brand safety section for Video document """
     overall_score = Long()
-    language = Keyword()
+    language = Keyword(index=False)
     categories = Object()
 
 
