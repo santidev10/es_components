@@ -48,6 +48,8 @@ class ESTestCase(TestCase):
             cls._patches.append(index_patch)
             cls._patches.append(prefix_patch)
 
+            model_cls.init()
+
     @classmethod
     def tearDownClass(cls):
         if os.getenv("KEEP_TEST_ES_INDEX", "0") != "1":
@@ -59,12 +61,9 @@ class ESTestCase(TestCase):
     @classmethod
     def __remove_indexes(cls):
         for model_cls in BaseDocument.__subclasses__():
-            try:
-                # pylint: disable=protected-access
-                model_cls._index.delete()
-                # pylint: enable=protected-access
-            except:
-                pass
+            # pylint: disable=protected-access
+            model_cls._index.delete()
+            # pylint: enable=protected-access
 
     def setUp(self):
         for manager_cls in BaseManager.__subclasses__():
@@ -72,5 +71,4 @@ class ESTestCase(TestCase):
                 manager_cls().truncate()
             except NotFoundError:
                 pass
-        for model_cls in BaseDocument.__subclasses__():
-            model_cls.init()
+
