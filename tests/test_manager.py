@@ -1,5 +1,3 @@
-from unittest.mock import patch
-
 from elasticsearch_dsl import Keyword
 from elasticsearch_dsl import Object
 
@@ -12,10 +10,17 @@ from es_components.tests.utils import ESTestCase
 class ESManagerTestCase(ESTestCase):
     def test_dont_populate_field(self):
         test_id = "123"
-        with patch("es_components.tests.test_manager.TestDoc.mget", return_value=[TestDoc(id=test_id)]):
-            item = TestManager().get_or_create([test_id])[0]
+        item = TestManager().get_or_create([test_id])[0]
 
-            self.assertRaises(ValueError, item.populate_section, "section_1", a=1)
+        self.assertRaises(ValueError, item.populate_section, "section_1", a=1)
+
+    def test_dont_update_extra_fields(self):
+        item = TestDoc("123")
+
+        extra_field = "a"
+
+        self.assertRaises(ValueError, item.section_1.update, **{extra_field: None})
+        self.assertFalse(hasattr(item.section_1, extra_field))
 
 
 class TestSection1(BaseInnerDoc):
