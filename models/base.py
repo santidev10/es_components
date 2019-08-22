@@ -17,6 +17,12 @@ class BaseInnerDoc(InnerDoc):
     updated_at = Date()
 
     def update(self, **kwargs):
+        self_keys = set(self._doc_type.mapping)
+        update_keys = set(kwargs.keys())
+        extra_fields = update_keys - self_keys
+        if extra_fields:
+            raise ValueError(f"Extra fields: {extra_fields}")
+
         for key, value in kwargs.items():
             setattr(self, key, value)
 
