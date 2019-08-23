@@ -7,15 +7,15 @@ from elasticsearch_dsl import Long
 from elasticsearch_dsl import Object
 from elasticsearch_dsl import Text
 
+from es_components.config import CHANNEL_DOC_TYPE
 from es_components.config import CHANNEL_INDEX_NAME
 from es_components.config import CHANNEL_INDEX_PREFIX
-from es_components.config import CHANNEL_DOC_TYPE
 from es_components.constants import Sections
 from es_components.models.base import BaseDocument
 from es_components.models.base import BaseInnerDoc
-from es_components.models.base import Schedule
-from es_components.models.base import CommonSectionAnalytics
 from es_components.models.base import BaseInnerDocWithHistory
+from es_components.models.base import CommonSectionAnalytics
+from es_components.models.base import Schedule
 
 
 class ChannelSectionGeneralData(BaseInnerDoc):
@@ -24,7 +24,7 @@ class ChannelSectionGeneralData(BaseInnerDoc):
     description = Text(index=False)
     thumbnail_image_url = Text(index=False)
     country = Keyword()
-    country_original = Keyword()
+    country_original = Keyword(index=False)
     youtube_published_at = Date(index=False)
     video_tags = Keyword(index=False, multi=True)
     top_category = Keyword()
@@ -40,8 +40,8 @@ class ChannelSectionStats(BaseInnerDocWithHistory):
     last_video_published_at = Date(index=False)
     subscribers = Long()
     subscribers_history = Long(index=False, multi=True)
-    last_day_subscribers = Long()
-    last_7day_subscribers = Long()
+    last_day_subscribers = Long(index=False)  # unused
+    last_7day_subscribers = Long(index=False)  # unused
     last_30day_subscribers = Long()
     observed_videos_count = Long()
     observed_videos_count_history = Long(index=False, multi=True)
@@ -50,7 +50,7 @@ class ChannelSectionStats(BaseInnerDocWithHistory):
     last_30day_observed_videos = Long(index=False)
     last_30day_published_videos = Long(index=False)
     last_365day_published_videos = Long(index=False)
-    views = Long()
+    views = Long(index=False)
     views_history = Long(index=False, multi=True)
     last_day_views = Long()
     last_7day_views = Long()
@@ -79,8 +79,8 @@ class ChannelSectionStats(BaseInnerDocWithHistory):
 
 class ChannelSectionMonetization(BaseInnerDoc):
     """ Nested monetization section for Channel document """
-    rate = Double()
-    preferred = Boolean()
+    rate = Double(index=False)
+    preferred = Boolean(index=False)
 
 
 class ChannelSectionSocial(BaseInnerDoc):
@@ -88,7 +88,7 @@ class ChannelSectionSocial(BaseInnerDoc):
     facebook_link = Text(index=False)
     facebook_likes = Long()
     twitter_link = Text(index=False)
-    twitter_tweets = Long()
+    twitter_tweets = Long(index=False)  # unused
     twitter_followers = Long()
     instagram_link = Text(index=False)
     instagram_followers = Long()
@@ -110,7 +110,7 @@ class ChannelSectionAdsStats(BaseInnerDoc):
     impressions_spv_count = Long(index=False)
     impressions_spm_count = Long(index=False)
     video_view_rate = Double()
-    ctr = Double()
+    ctr = Double(index=False)
     ctr_v = Double()
     average_cpv = Double()
 
@@ -122,18 +122,18 @@ class ChannelSectionCMS(BaseInnerDoc):
 
 
 class ChannelSectionCustomPropetries(BaseInnerDoc):
-    emails = Keyword(multi=True)
+    emails = Keyword(multi=True, index=False)  # unused
     country = Keyword(index=False)
     preferred = Boolean()
     social_links = Object(enabled=False)
-    channel_group = Keyword()
+    channel_group = Keyword(index=False)  # unused. copy of stats.channel_group?
 
 
 class ChannelSectionBrandSafety(BaseInnerDoc):
     """ Nested brand safety section for Channel document """
     overall_score = Long()
-    videos_scored = Long()
-    language = Keyword()
+    videos_scored = Long(index=False)
+    language = Keyword(index=False)
     categories = Object()
 
 

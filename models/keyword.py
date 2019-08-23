@@ -5,9 +5,9 @@ from elasticsearch_dsl import Keyword as KeywordField
 from elasticsearch_dsl import Long
 from elasticsearch_dsl import Object
 
+from es_components.config import KEYWORD_DOC_TYPE
 from es_components.config import KEYWORD_INDEX_NAME
 from es_components.config import KEYWORD_INDEX_PREFIX
-from es_components.config import KEYWORD_DOC_TYPE
 from es_components.models.base import BaseDocument
 from es_components.models.base import BaseInnerDocWithHistory
 from es_components.models.base import Schedule
@@ -17,8 +17,8 @@ class KeywordSectionStats(BaseInnerDocWithHistory):
     """ Nested statistics section for Keyword document """
     fetched_at = Date(index=False)
     historydate = Date(index=False)
-    video_count = Long()
-    views = Long()
+    video_count = Long(index=False)
+    views = Long(index=False)
     views_history = Long(index=False, multi=True)
     last_30day_views = Long()
     category_views = Object(enabled=False)
@@ -35,18 +35,18 @@ class KeywordSectionStats(BaseInnerDocWithHistory):
     average_cpc = Double()
     interests = Long(index=False, multi=True)
     is_viral = Boolean()
-    is_aw_keyword = Boolean()
-
+    is_aw_keyword = Boolean(index=False)  # unused
 
     class History:
         all = (
             "views",
         )
 
+
 class Keyword(BaseDocument):
     stats = Object(KeywordSectionStats)
 
-    stats_schedule = Object(Schedule)
+    stats_schedule = Object(Schedule, enabled=False)
 
     class Index:
         name = KEYWORD_INDEX_NAME
