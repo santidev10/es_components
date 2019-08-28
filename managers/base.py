@@ -267,11 +267,15 @@ class BaseManager:
         return self.filter_alive() & filter_range
 
     def search_nonexistent_section_records(self, ids=None, id_field=MAIN_ID_FIELD,
-                                           exclude_ids=None, exclude_id_field=None, limit=10000):
+                                           exclude_ids=None, exclude_id_field=None, ignore_deleted=None, limit=10000):
         control_section = self._get_control_section()
         field_updated_at = f"{control_section}.{TimestampFields.UPDATED_AT}"
 
         _filter_nonexistent_section = self._filter_nonexistent_section(control_section)
+
+        _filters = _filter_nonexistent_section & self.filter_alive() \
+            if ignore_deleted is True else \
+            _filter_nonexistent_section
 
         _query = None
         if ids or exclude_ids:
@@ -286,16 +290,20 @@ class BaseManager:
             {field_updated_at: {"order": SortDirections.ASCENDING}},
             {MAIN_ID_FIELD: {"order": SortDirections.ASCENDING}},
         ]
-        return self.search(query=_query, filters=_filter_nonexistent_section, sort=_sort, limit=limit)
+        return self.search(query=_query, filters=_filters, sort=_sort, limit=limit)
 
     def search_outdated_records(self, outdated_at, ids=None, id_field=MAIN_ID_FIELD,
-                                exclude_ids=None, exclude_id_field=None, limit=10000):
+                                exclude_ids=None, exclude_id_field=None, ignore_deleted=None, limit=10000):
         control_section = self._get_control_section()
         field_updated_at = f"{control_section}.{TimestampFields.UPDATED_AT}"
 
         _filter_outdated = QueryBuilder().build().must().range().field(field_updated_at) \
             .lt(outdated_at).get()
 
+        _filters = _filter_outdated & self.filter_alive() \
+            if ignore_deleted is True else \
+            _filter_outdated
+
         _query = None
         if ids or exclude_ids:
             _query = self.ids_query(
@@ -309,15 +317,16 @@ class BaseManager:
             {field_updated_at: {"order": SortDirections.ASCENDING}},
             {MAIN_ID_FIELD: {"order": SortDirections.ASCENDING}},
         ]
-        return self.search(query=_query, filters=_filter_outdated, sort=_sort, limit=limit)
+        return self.search(query=_query, filters=_filters, sort=_sort, limit=limit)
 
     def get_never_updated(self, ids=None, id_field=MAIN_ID_FIELD, exclude_ids=None, exclude_id_field=None,
-                          limit=10000, extract_hits=True):
+                          limit=10000, extract_hits=True, ignore_deleted=True):
         search = self.search_nonexistent_section_records(
             ids=ids,
             id_field=id_field,
             exclude_ids=exclude_ids,
             exclude_id_field=exclude_id_field,
+            ignore_deleted=ignore_deleted,
             limit=limit,
         )
         if not extract_hits:
@@ -326,13 +335,14 @@ class BaseManager:
         return entries
 
     def get_outdated(self, outdated_at, ids=None, id_field=MAIN_ID_FIELD, exclude_ids=None, exclude_id_field=None,
-                     limit=10000, extract_hits=True):
+                     limit=10000, extract_hits=True, ignore_deleted=True):
         search = self.search_outdated_records(
             outdated_at,
             ids=ids,
             id_field=id_field,
             exclude_ids=exclude_ids,
             exclude_id_field=exclude_id_field,
+            ignore_deleted=ignore_deleted,
             limit=limit,
         )
         if not extract_hits:
