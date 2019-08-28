@@ -140,7 +140,8 @@ class BaseManager:
         for _ids in chunks(ids, ES_REQUEST_LIMIT):
             self.model.search().query("ids", values=list(_ids)).delete()
 
-    def upsert(self, entries, ignore_updating_timestamp=False):
+
+    def upsert(self, entries):
         """ Upsert a list of entries.
 
         :param entries: a list of model objects
@@ -149,7 +150,7 @@ class BaseManager:
         for _entries in chunks(entries, ES_REQUEST_LIMIT):
             bulk(
                 connections.get_connection(),
-                self._upsert_generator(_entries, ignore_updating_timestamp=ignore_updating_timestamp),
+                self._upsert_generator(_entries),
                 chunk_size=ES_CHUNK_SIZE,
                 refresh=ES_BULK_REFRESH_OPTION
             )
@@ -179,7 +180,7 @@ class BaseManager:
         # pylint: enable=protected-access
         return multi_search.execute()
 
-    def _upsert_generator(self, entries, ignore_updating_timestamp=None):
+    def _upsert_generator(self, entries):
         """ Generator to create a dict from entity for upsertion.
 
         Controls that only sections field will be upserted.
@@ -200,25 +201,19 @@ class BaseManager:
 
             return _entry_dict
 
-        def get(_entry_dict, *args, **kwargs):
-            return _entry_dict
-
         now = datetime_service.now()
-
-        transform_method = get if ignore_updating_timestamp is True else update_timestamp
 
         for entry in entries:
             entry_dict = entry.to_dict(include_meta=True, skip_empty=False)
             entry_dict[EsDictFields.DOC] = {}
 
             for section in self.upsert_sections:
-                entry_dict[EsDictFields.DOC][section] = transform_method(
+                entry_dict[EsDictFields.DOC][section] = update_timestamp(
                     entry_dict[EsDictFields.SOURCE].get(section),
                     now
                 )
 
-                if entry_dict[EsDictFields.DOC][section] is not None:
-                    self._drop_invalid_field_from_section_dict(entry, entry_dict, section)
+                self._drop_invalid_field_from_section_dict(entry, entry_dict, section)
 
             entry_dict[EsDictFields.OP_TYPE] = "update"
             entry_dict[EsDictFields.DOC_AS_UPSERT] = True
@@ -473,6 +468,20 @@ class BaseManager:
             .must() \
             .terms().field(SEGMENTS_UUID_FIELD) \
             .value(segment_ids).get()
+
+    def remove_sections(self, filter_query, sections):
+        if not set(sections).issubset(set(self.allowed_sections)):
+            raise SectionsNotAllowed("Cannot find such section in Data Model sections")
+
+        script = dict(
+            source=CachedScriptsReader.get_script("remove_sections.painless"),
+            params=dict(
+                sections=sections
+            )
+        )
+        return self.update(filter_query) \
+            .script(**script) \
+            .execute()
 
     def add_to_segment(self, filter_query, segment_uuid):
         if Sections.SEGMENTS not in self.upsert_sections:
