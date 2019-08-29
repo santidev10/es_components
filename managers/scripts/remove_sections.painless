@@ -1,0 +1,3 @@
+for (def section: params.sections) {
+    ctx._source.remove(section);
+}
