@@ -274,11 +274,10 @@ class BaseManager:
         control_section = self._get_control_section()
         field_updated_at = f"{control_section}.{TimestampFields.UPDATED_AT}"
 
-        _filter_nonexistent_section = self._filter_nonexistent_section(control_section)
+        _filters = [self._filter_nonexistent_section(control_section)]
 
-        _filters = _filter_nonexistent_section & self.filter_alive() \
-            if ignore_deleted is True else \
-            _filter_nonexistent_section
+        if ignore_deleted is True:
+            _filters.append(self.filter_alive())
 
         _query = None
         if ids or exclude_ids:
@@ -300,12 +299,11 @@ class BaseManager:
         control_section = self._get_control_section()
         field_updated_at = f"{control_section}.{TimestampFields.UPDATED_AT}"
 
-        _filter_outdated = QueryBuilder().build().must().range().field(field_updated_at) \
-            .lt(outdated_at).get()
+        _filters = [QueryBuilder().build().must().range().field(field_updated_at) \
+            .lt(outdated_at).get()]
 
-        _filters = _filter_outdated & self.filter_alive() \
-            if ignore_deleted is True else \
-            _filter_outdated
+        if ignore_deleted is True:
+            _filters.append(self.filter_alive())
 
         _query = None
         if ids or exclude_ids:
