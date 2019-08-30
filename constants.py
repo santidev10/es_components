@@ -30,6 +30,7 @@ class Sections:
     CAPTIONS_SCHEDULE = "captions_schedule"
 
     SEGMENTS = "segments"
+    SIMILAR_CHANNELS = "similar_channels"
 
 
 class TimestampFields:
