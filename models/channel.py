@@ -141,6 +141,13 @@ class ChannelSectionAuth(BaseInnerDoc):
     pass
 
 
+class ChannelSectionSimilar(BaseInnerDoc):
+    no_cluster = Keyword(multi=True, index=False)
+    above = Keyword(multi=True, index=False)
+    below = Keyword(multi=True, index=False)
+    default = Keyword(multi=True, index=False)
+
+
 class Channel(BaseDocument):
     general_data = Object(ChannelSectionGeneralData)
     stats = Object(ChannelSectionStats)
@@ -152,6 +159,7 @@ class Channel(BaseDocument):
     custom_properties = Object(ChannelSectionCustomPropetries)
     brand_safety = Object(ChannelSectionBrandSafety)
     auth = Object(ChannelSectionAuth)
+    similar_channels = Object(ChannelSectionSimilar)
 
     general_data_schedule = Object(Schedule)
     stats_schedule = Object(Schedule)
@@ -196,3 +204,6 @@ class Channel(BaseDocument):
 
     def populate_brand_safety(self, **kwargs):
         self._populate_section(Sections.BRAND_SAFETY, **kwargs)
+
+    def populate_similar_channels(self, **kwargs):
+        self._populate_section(Sections.SIMILAR_CHANNELS, **kwargs)
