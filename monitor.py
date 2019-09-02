@@ -6,8 +6,8 @@ from es_components.constants import Sections
 from es_components.query_builder import QueryBuilder
 from es_components.utils import safe_div
 
-PERCENTAGE_DECIMALS_ROUND = 1
 
+PERCENTAGE_DECIMALS_ROUND = 1
 
 
 class BaseMonitor:

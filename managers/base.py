@@ -67,7 +67,6 @@ class BaseManager:
         except KeyError:
             init_es_connection()
 
-
     def _init_sections(self, sections):
         if sections is None:
             sections = ()
