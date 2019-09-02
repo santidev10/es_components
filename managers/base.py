@@ -24,6 +24,7 @@ from es_components.datetime_service import datetime_service
 from es_components.exceptions import DataModelNotSpecified
 from es_components.exceptions import SectionsNotAllowed
 from es_components.models.base import BaseDocument
+from es_components.monitor import Monitor
 from es_components.query_builder import QueryBuilder
 from es_components.utils import chunks
 
@@ -65,6 +66,7 @@ class BaseManager:
             connections.connections.get_connection()
         except KeyError:
             init_es_connection()
+
 
     def _init_sections(self, sections):
         if sections is None:
@@ -565,6 +567,12 @@ class BaseManager:
             number_of_shards = int(index_settings["settings"]["index"]["number_of_shards"])
             break
         return number_of_shards
+
+    def get_monitoring_info(self):
+        # pylint: disable=protected-access
+        monitor = Monitor(self.model._index._name)
+        # pylint: enable=protected-access
+        return monitor.get_cluster_name(), monitor.get_info(self.sections)
 
 
 class CachedScriptsReader:
