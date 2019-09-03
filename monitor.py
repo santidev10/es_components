@@ -27,9 +27,10 @@ class MonitoringIndex(BaseMonitor):
     INFO_TABLE_FIELDS = ("index", "health", "pri", "rep", "docs.count", "docs.deleted", "store.size", "pri.store.size")
 
     def get_info(self, *args):
-        return self.connection.cat.indices(format="json",
+        info = self.connection.cat.indices(format="json",
                                            index=self.index_name,
                                            h=",".join(self.INFO_TABLE_FIELDS))
+        return info.pop() if info else {}
 
 
 class MonitoringPerformance(BaseMonitor):
@@ -40,34 +41,24 @@ class MonitoringPerformance(BaseMonitor):
 
         def __init__(self, total, filled, missed, missed_by_days, updated_by_days, created_by_days):
             self.total = total
-            self.filled = (filled, self.get_representing_in_percsentage(total, filled))
-            self.missed = (missed, self.get_representing_in_percsentage(total, missed))
+            self.filled = (filled, self.get_representing_in_percentage(total, filled))
+            self.missed = (missed, self.get_representing_in_percentage(total, missed))
             self.missed_by_days = [
-                (_missed, self.get_representing_in_percsentage(total, _missed))
+                (_missed, self.get_representing_in_percentage(total, _missed))
                 for _missed in missed_by_days
             ]
 
             self.updated_by_days = [
-                (_updated, self.get_representing_in_percsentage(total, _updated))
+                (_updated, self.get_representing_in_percentage(total, _updated))
                 for _updated in updated_by_days
             ]
             self.created_by_days = [
-                (_created, self.get_representing_in_percsentage(total, _created))
+                (_created, self.get_representing_in_percentage(total, _created))
                 for _created in created_by_days
             ]
 
-        def get_representing_in_percsentage(self, total, part):
+        def get_representing_in_percentage(self, total, part):
             return round(safe_div(part * 100, total), PERCENTAGE_DECIMALS_ROUND)
-
-        def to_dict(self):
-            result = OrderedDict((
-                ("total", self.total),
-                ("filled/missed", (self.filled, self.missed)),
-                ("missed(1d/3d/7d/30d/365d)", self.missed_by_days),
-                ("updated(1d/3d/7d/30d/365d)", self.updated_by_days),
-                ("created(1d/3d/7d/30d/365d)", self.created_by_days),
-            ))
-            return result
 
     def __get_count(self, query=None):
         body = {}
@@ -114,7 +105,7 @@ class MonitoringPerformance(BaseMonitor):
         total_count = self.__get_count()
         for section in sections:
             results.update({
-                section: self.get_section_info(section, total_count).to_dict()
+                section: self.get_section_info(section, total_count)
             })
         return results
 
@@ -129,9 +120,9 @@ class Monitor(BaseMonitor):
         return name
 
     def get_info(self, *args):
-        results = []
+        results = {}
         for monitor in self.monitors:
-            results.append({monitor.name: monitor(self.index_name).get_info(*args)})
+            results[monitor.name] = monitor(self.index_name).get_info(*args)
         return results
 
 
