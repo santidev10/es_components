@@ -1,5 +1,3 @@
-from collections import OrderedDict
-
 from es_components.connections import connections
 from es_components.constants import TimestampFields
 from es_components.constants import Sections
@@ -26,11 +24,13 @@ class MonitoringIndex(BaseMonitor):
     name = "index"
     INFO_TABLE_FIELDS = ("index", "health", "pri", "rep", "docs.count", "docs.deleted", "store.size", "pri.store.size")
 
+    # pylint: disable=arguments-differ
     def get_info(self, *args):
         info = self.connection.cat.indices(format="json",
                                            index=self.index_name,
                                            h=",".join(self.INFO_TABLE_FIELDS))
         return info.pop() if info else {}
+    # pylint: enable=arguments-differ
 
 
 class MonitoringPerformance(BaseMonitor):
@@ -100,6 +100,7 @@ class MonitoringPerformance(BaseMonitor):
                            updated_by_days=updated_by_days,
                            created_by_days=created_by_days)
 
+    # pylint: disable=arguments-differ
     def get_info(self, sections, *args):
         results = {}
         total_count = self.__get_count()
@@ -108,7 +109,7 @@ class MonitoringPerformance(BaseMonitor):
                 section: self.get_section_info(section, total_count)
             })
         return results
-
+    # pylint: enable=arguments-differ
 
 
 class Monitor(BaseMonitor):
@@ -119,15 +120,11 @@ class Monitor(BaseMonitor):
         name = name.split(":")[-1]
         return name
 
+    # pylint: disable=arguments-differ
     def get_info(self, *args):
         results = {}
         for monitor in self.monitors:
             results[monitor.name] = monitor(self.index_name).get_info(*args)
         return results
-
-
-
-
-
-
+    # pylint: enable=arguments-differ
 
