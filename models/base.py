@@ -88,6 +88,16 @@ class CommonSectionAnalytics(BaseInnerDoc):
     # traffic_source
     traffic_source = Object(enabled=False)
 
+    # revenue
+    estimated_revenue = Object(enabled=False)
+    estimated_ad_revenue = Object(enabled=False)
+    gross_revenue = Object(enabled=False)
+    estimated_red_partner_revenue = Object(enabled=False)
+    monetized_playbacks = Object(enabled=False)
+    playback_based_cpm = Object(enabled=False)
+    ad_impressions = Object(enabled=False)
+    cpm = Object(enabled=False)
+
 
 class Deleted(BaseInnerDoc):
     initiator = Text(index=False)
