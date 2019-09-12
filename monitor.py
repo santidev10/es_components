@@ -77,14 +77,15 @@ class MonitoringPerformance(BaseMonitor):
         ("last_30_days", 30),
         ("last_365_days", 365),
     )
+    WARNINGS_CHECK_DAYS = 3
 
     def __init__(self, *args, **kwargs):
-        self.__warnings_check_func = {
+        super(MonitoringPerformance, self).__init__(*args, **kwargs)
+        self._warnings_check_func = {
             Warnings.MainSectionNotFilled.name: self.__check_main_section_not_filled,
             Warnings.FewRecordsUpdated.name: self.__check_few_records_updated,
             Warnings.NoNewSections.name: self.__check_no_new_section
         }
-        super(MonitoringPerformance, self).__init__(*args, **kwargs)
 
 
     def __get_count(self, query=None):
@@ -141,7 +142,7 @@ class MonitoringPerformance(BaseMonitor):
     def get_warnings(self, warnings, *args):
         warning_messages = []
         for warning in warnings:
-            check_func = self.__warnings_check_func.get(warning.name)
+            check_func = self._warnings_check_func.get(warning.name)
 
             if check_func and check_func(*warning.params):
                 warning_messages.append(warning.message)
@@ -161,12 +162,12 @@ class MonitoringPerformance(BaseMonitor):
             queries.append(
                 QueryBuilder().build().must().range()\
                 .field(f"{section}.{TimestampFields.CREATED_AT}")\
-                .gt(f"now-{86400 * 3}s/s")\
+                .gt(f"now-{86400 * self.WARNINGS_CHECK_DAYS}s/s")\
                 .get()
             )
 
         count = self.__get_count(query=Q("bool", filter=queries))
-        return count > 0
+        return count == 0
 
     def __check_few_records_updated(self, sections):
         queries = []
@@ -174,19 +175,23 @@ class MonitoringPerformance(BaseMonitor):
             queries.append(
                 QueryBuilder().build().must().range() \
                     .field(f"{section}.{TimestampFields.UPDATED_AT}") \
-                    .gt(f"now-{86400 * 3}s/s") \
+                    .gt(f"now-{86400 * self.WARNINGS_CHECK_DAYS}s/s") \
                     .get()
             )
 
         count = self.__get_count(query=Q("bool", filter=queries))
         control_count = self.__get_count() / 2
-        return count < control_count
+        return count > control_count
 
 
 
 
 class Monitor(BaseMonitor):
     monitors = [MonitoringIndex, MonitoringPerformance]
+
+    def __init__(self, *args, **kwargs):
+        super(Monitor, self).__init__(*args, **kwargs)
+        self.__monitors = [monitor(self.index_name) for monitor in self.monitors]
 
     def get_cluster_name(self):
         name = self.connection.cluster.stats(format="json").get("cluster_name")
@@ -196,16 +201,16 @@ class Monitor(BaseMonitor):
     # pylint: disable=arguments-differ
     def get_info(self, *args):
         results = {}
-        for monitor in self.monitors:
-            results[monitor.name] = monitor(self.index_name).get_info(*args)
+        for monitor in self.__monitors:
+            results[monitor.name] = monitor.get_info(*args)
         return results
     # pylint: enable=arguments-differ
 
 
     def get_warnings(self, *args):
         results = []
-        for monitor in self.monitors:
-            results += monitor(self.index_name).get_warnings(*args)
+        for monitor in self.__monitors:
+            results += monitor.get_warnings(*args)
         return results
 
 
