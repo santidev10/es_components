@@ -12,6 +12,8 @@ from es_components.managers.base import BaseManager
 from es_components.models.channel import Channel
 from es_components.models.video import Video
 from es_components.query_builder import QueryBuilder
+from es_components.monitor import Warnings
+
 
 RANGE_AGGREGATION = (
     "stats.views",
@@ -185,3 +187,9 @@ class VideoManager(BaseManager):
         aggregations_result.update(count_exists_aggs_result)
 
         return aggregations_result
+
+    def _get_enabled_monitoring_warnings(self):
+        return super(VideoManager, self)._get_enabled_monitoring_warnings() + (
+            Warnings.NoNewSections(self.sections),
+            Warnings.FewRecordsUpdated((Sections.STATS, Sections.GENERAL_DATA,)),
+        )
