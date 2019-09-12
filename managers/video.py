@@ -20,7 +20,8 @@ RANGE_AGGREGATION = (
     "ads_stats.video_view_rate",
     "ads_stats.ctr_v",
     "ads_stats.average_cpv",
-    "general_data.youtube_published_at"
+    "general_data.youtube_published_at",
+    "brand_safety.overall_score"
 )
 
 COUNT_AGGREGATION = (
@@ -39,7 +40,8 @@ PERCENTILES_AGGREGATION = (
     "stats.channel_subscribers",
     "ads_stats.video_view_rate",
     "ads_stats.ctr_v",
-    "ads_stats.average_cpv"
+    "ads_stats.average_cpv",
+    "brand_safety.overall_score"
 )
 
 
