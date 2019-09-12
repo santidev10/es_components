@@ -3,6 +3,7 @@ from es_components.models.channel import Channel
 from es_components.constants import Sections
 from es_components.constants import CONTENT_OWNER_ID_FIELD
 from es_components.query_builder import QueryBuilder
+from es_components.monitor import Warnings
 
 
 AGGREGATION_COUNT_SIZE = 100000
@@ -127,3 +128,10 @@ class ChannelManager(BaseManager):
         aggregations_result.update(count_exists_aggs_result)
 
         return aggregations_result
+
+
+    def _get_enabled_monitoring_warnings(self):
+        return super(ChannelManager, self)._get_enabled_monitoring_warnings() + (
+            Warnings.NoNewSections(self.sections),
+            Warnings.FewRecordsUpdated((Sections.STATS, Sections.GENERAL_DATA,)),
+        )

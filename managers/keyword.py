@@ -1,6 +1,8 @@
 from es_components.constants import Sections
 from es_components.managers.base import BaseManager
 from es_components.models.keyword import Keyword
+from es_components.monitor import Warnings
+
 
 RANGE_AGGREGATION = (
     "stats.search_volume",
@@ -25,3 +27,8 @@ class KeywordManager(BaseManager):
     def forced_filters(self):
         return super(KeywordManager, self).forced_filters() &\
                self._filter_existent_section(Sections.STATS)
+
+    def _get_enabled_monitoring_warnings(self):
+        return super(KeywordManager, self)._get_enabled_monitoring_warnings() + (
+            Warnings.FewRecordsUpdated((Sections.STATS,)),
+        )

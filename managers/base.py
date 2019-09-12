@@ -25,6 +25,7 @@ from es_components.exceptions import DataModelNotSpecified
 from es_components.exceptions import SectionsNotAllowed
 from es_components.models.base import BaseDocument
 from es_components.monitor import Monitor
+from es_components.monitor import Warnings
 from es_components.query_builder import QueryBuilder
 from es_components.utils import chunks
 
@@ -567,11 +568,20 @@ class BaseManager:
             break
         return number_of_shards
 
-    def get_monitoring_info(self):
+
+    def _get_enabled_monitoring_warnings(self):
+        return (Warnings.MainSectionNotFilled(),)
+
+    def get_monitoring_data(self):
         # pylint: disable=protected-access
         monitor = Monitor(self.model._index._name)
         # pylint: enable=protected-access
-        return monitor.get_cluster_name(), monitor.get_info(self.sections)
+        data = dict(
+            cluster_name=monitor.get_cluster_name(),
+            warnings=monitor.get_warnings(self._get_enabled_monitoring_warnings()),
+            info=monitor.get_info(self.sections),
+        )
+        return data
 
 
 class CachedScriptsReader:
