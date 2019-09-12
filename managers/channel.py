@@ -33,6 +33,7 @@ RANGE_AGGREGATION = (
     "ads_stats.ctr",
     "ads_stats.ctr_v",
     "ads_stats.average_cpv",
+    "brand_safety.overall_score"
 )
 
 COUNT_AGGREGATION = (
@@ -64,6 +65,7 @@ PERCENTILES_AGGREGATION = (
     "ads_stats.ctr",
     "ads_stats.ctr_v",
     "ads_stats.average_cpv",
+    "brand_safety.overall_score"
 )
 FORCED_FILTER_MIN_VIDEO_COUNT = 0
 
