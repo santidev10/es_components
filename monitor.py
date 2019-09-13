@@ -18,7 +18,11 @@ class Warnings:
 
     class NoNewSections(BaseWarning):
         name = "NoNewSections"
-        message = "No new sections in the last 3 days"
+
+        @property
+        def message(self):
+            sections = ','.join(self.params)
+            return f"No new {sections} sections in the last 3 days"
 
 
     class FewRecordsUpdated(BaseWarning):

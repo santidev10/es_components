@@ -131,7 +131,7 @@ class ChannelManager(BaseManager):
 
 
     def _get_enabled_monitoring_warnings(self):
-        return super(ChannelManager, self)._get_enabled_monitoring_warnings() + (
-            Warnings.NoNewSections(self.sections),
-            Warnings.FewRecordsUpdated((Sections.STATS, Sections.GENERAL_DATA,)),
-        )
+        warning_no_new_sections = tuple([Warnings.NoNewSections(section) for section in self.sections])
+        return super(ChannelManager, self)._get_enabled_monitoring_warnings() + \
+               warning_no_new_sections +\
+               (Warnings.FewRecordsUpdated((Sections.STATS, Sections.GENERAL_DATA,)),)
