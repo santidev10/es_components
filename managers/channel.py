@@ -129,6 +129,7 @@ class ChannelManager(BaseManager):
         aggregations_result.update(count_exists_aggs_result)
 
         aggregations_result = add_brand_safety_labels(aggregations_result)
+        aggregations_result = self.adapt_channel_group(aggregations_result)
 
         return aggregations_result
 
