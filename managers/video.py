@@ -190,11 +190,41 @@ class VideoManager(BaseManager):
         aggregations_result.update(count_exists_aggs_result)
 
         aggregations_result = add_brand_safety_labels(aggregations_result)
-
+        aggregations_result = self.adapt_flags_aggregation(aggregations_result)
         return aggregations_result
+
+    def adapt_flags_aggregation(self, aggregations):
+        flags_buckets = []
+        all_count = 0
+        for bucket in aggregations["stats.flags"]["buckets"]:
+            key = bucket["key"]
+            if key == "viral":
+                bucket["key"] = "Viral"
+                all_count += bucket["doc_count"]
+                flags_buckets.append(bucket)
+            elif key == "most_liked":
+                bucket["key"] = "Most Liked"
+                all_count += bucket["doc_count"]
+                flags_buckets.append(bucket)
+            elif key == "most_watched":
+                bucket["key"] = "Most Watched"
+                all_count += bucket["doc_count"]
+                flags_buckets.append(bucket)
+        flags_buckets.append(
+            {
+                "key": "All",
+                "doc_count": all_count
+            }
+        )
+
+        aggregations["stats.flags"]["buckets"] = flags_buckets
+        return aggregations
 
     def _get_enabled_monitoring_warnings(self):
         warning_no_new_sections = tuple([Warnings.NoNewSections(section) for section in self.sections])
         return super(VideoManager, self)._get_enabled_monitoring_warnings() + \
                warning_no_new_sections +\
                (Warnings.FewRecordsUpdated((Sections.STATS, Sections.GENERAL_DATA,)),)
+
+    def clean_flags_aggregations(self):
+        pass

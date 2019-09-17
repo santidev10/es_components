@@ -437,7 +437,18 @@ class BaseManager:
         })
         aggregations_search.update_from_dict(search.to_dict())
         aggregations_result = aggregations_search.execute().aggregations.to_dict()
+        aggregations_result = self.adapt_is_viral_aggregation(aggregations_result)
         return aggregations_result
+
+    def adapt_is_viral_aggregation(self, aggregations):
+        if "stats.is_viral" in aggregations:
+            aggregations["stats.is_viral"]["buckets"][0]["key"] = "All"
+            aggregations["stats.is_viral"]["buckets"][0]["doc_count"] += \
+                aggregations["stats.is_viral"]["buckets"][1]["doc_count"]
+            aggregations["stats.is_viral"]["buckets"][0].pop("key_as_string")
+            aggregations["stats.is_viral"]["buckets"][1]["key"] = "Viral"
+            aggregations["stats.is_viral"]["buckets"][1].pop("key_as_string")
+        return aggregations
 
     def generate_distinct_values(self, field, pagesize=10000):
         composite = {
