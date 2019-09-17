@@ -190,8 +190,25 @@ class VideoManager(BaseManager):
         aggregations_result.update(count_exists_aggs_result)
 
         aggregations_result = add_brand_safety_labels(aggregations_result)
-
+        aggregations_result = self.adapt_flags_aggregation(aggregations_result)
         return aggregations_result
+
+    def adapt_flags_aggregation(self, aggregations):
+        if "stats.flags" in aggregations:
+            flags_buckets = []
+            for bucket in aggregations["stats.flags"]["buckets"]:
+                key = bucket["key"]
+                if key == "viral":
+                    bucket["key"] = "Viral"
+                    flags_buckets.append(bucket)
+                elif key == "most_liked":
+                    bucket["key"] = "Most Liked"
+                    flags_buckets.append(bucket)
+                elif key == "most_watched":
+                    bucket["key"] = "Most Watched"
+                    flags_buckets.append(bucket)
+            aggregations["stats.flags"]["buckets"] = flags_buckets
+        return aggregations
 
     def _get_enabled_monitoring_warnings(self):
         warning_no_new_sections = tuple([Warnings.NoNewSections(section) for section in self.sections])
