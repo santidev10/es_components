@@ -135,7 +135,7 @@ class ChannelManager(BaseManager):
 
     def adapt_channel_group(self, aggregations):
         channel_group_buckets = []
-        for bucket in aggregations["stats.flags"]["buckets"]:
+        for bucket in aggregations["stats.channel_group"]["buckets"]:
             key = bucket["key"]
             if key == "influencers":
                 bucket["key"] = "Influencers"
@@ -147,7 +147,7 @@ class ChannelManager(BaseManager):
                 bucket["key"] = "Media & Entertainment"
                 channel_group_buckets.append(bucket)
 
-        aggregations["stats.flags"]["buckets"] = channel_group_buckets
+        aggregations["stats.channel_group"]["buckets"] = channel_group_buckets
         return aggregations
 
 

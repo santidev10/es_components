@@ -195,7 +195,7 @@ class VideoManager(BaseManager):
 
     def adapt_flags_aggregation(self, aggregations):
         flags_buckets = []
-        for bucket in aggregations["stats.channel_group"]["buckets"]:
+        for bucket in aggregations["stats.flags"]["buckets"]:
             key = bucket["key"]
             if key == "viral":
                 bucket["key"] = "Viral"
@@ -207,7 +207,7 @@ class VideoManager(BaseManager):
                 bucket["key"] = "Most Watched"
                 flags_buckets.append(bucket)
 
-        aggregations["stats.channel_group"]["buckets"] = flags_buckets
+        aggregations["stats.flags"]["buckets"] = flags_buckets
         return aggregations
 
     def _get_enabled_monitoring_warnings(self):
