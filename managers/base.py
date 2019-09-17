@@ -381,6 +381,18 @@ class BaseManager:
                     "min_doc_count": 1,
                 }
             }
+
+        count_aggs["brand_safety"] = {
+            "range": {
+                "field": "brand_safety.overall_score",
+                "ranges": [
+                    {"from": 0, "to": 69},
+                    {"from": 70, "to": 79},
+                    {"from": 80, "to": 89},
+                    {"from": 90, "to": 100},
+                ]
+            }
+        }
         return count_aggs
 
     def _get_count_exists_aggs_result(self, search, properties=None):

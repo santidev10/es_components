@@ -22,15 +22,15 @@ RANGE_AGGREGATION = (
     "ads_stats.video_view_rate",
     "ads_stats.ctr_v",
     "ads_stats.average_cpv",
-    "general_data.youtube_published_at",
-    "brand_safety.overall_score"
+    "general_data.youtube_published_at"
 )
 
 COUNT_AGGREGATION = (
     "general_data.country",
     "general_data.category",
     "general_data.language",
-    "cms.cms_title"
+    "cms.cms_title",
+    "brand_safety"
 )
 
 COUNT_EXISTS_AGGREGATION = ("analytics", "stats.flags",)
@@ -42,8 +42,7 @@ PERCENTILES_AGGREGATION = (
     "stats.channel_subscribers",
     "ads_stats.video_view_rate",
     "ads_stats.ctr_v",
-    "ads_stats.average_cpv",
-    "brand_safety.overall_score"
+    "ads_stats.average_cpv"
 )
 
 

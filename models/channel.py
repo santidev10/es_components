@@ -25,7 +25,7 @@ class ChannelSectionGeneralData(BaseInnerDoc):
     thumbnail_image_url = Text(index=False)
     country = Keyword()
     country_original = Keyword(index=False)
-    youtube_published_at = Date(index=False)
+    youtube_published_at = Date(index=True)
     video_tags = Keyword(index=False, multi=True)
     top_category = Keyword()
     lang_codes = Keyword(index=False, multi=True)
