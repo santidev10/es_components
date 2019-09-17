@@ -132,6 +132,23 @@ class ChannelManager(BaseManager):
 
         return aggregations_result
 
+    def adapt_channel_group(self, aggregations):
+        channel_group_buckets = []
+        for bucket in aggregations["stats.flags"]["buckets"]:
+            key = bucket["key"]
+            if key == "influencers":
+                bucket["key"] = "Influencers"
+                channel_group_buckets.append(bucket)
+            elif key == "brands":
+                bucket["key"] = "Brands"
+                channel_group_buckets.append(bucket)
+            elif key == "media":
+                bucket["key"] = "Media & Entertainment"
+                channel_group_buckets.append(bucket)
+
+        aggregations["stats.flags"]["buckets"] = channel_group_buckets
+        return aggregations
+
 
     def _get_enabled_monitoring_warnings(self):
         warning_no_new_sections = tuple([Warnings.NoNewSections(section) for section in self.sections])

@@ -195,27 +195,17 @@ class VideoManager(BaseManager):
 
     def adapt_flags_aggregation(self, aggregations):
         flags_buckets = []
-        all_count = 0
         for bucket in aggregations["stats.flags"]["buckets"]:
             key = bucket["key"]
             if key == "viral":
                 bucket["key"] = "Viral"
-                all_count += bucket["doc_count"]
                 flags_buckets.append(bucket)
             elif key == "most_liked":
                 bucket["key"] = "Most Liked"
-                all_count += bucket["doc_count"]
                 flags_buckets.append(bucket)
             elif key == "most_watched":
                 bucket["key"] = "Most Watched"
-                all_count += bucket["doc_count"]
                 flags_buckets.append(bucket)
-        flags_buckets.append(
-            {
-                "key": "All",
-                "doc_count": all_count
-            }
-        )
 
         aggregations["stats.flags"]["buckets"] = flags_buckets
         return aggregations
