@@ -64,8 +64,7 @@ PERCENTILES_AGGREGATION = (
     "ads_stats.video_view_rate",
     "ads_stats.ctr",
     "ads_stats.ctr_v",
-    "ads_stats.average_cpv",
-    "brand_safety.overall_score"
+    "ads_stats.average_cpv"
 )
 FORCED_FILTER_MIN_VIDEO_COUNT = 0
 

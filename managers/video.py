@@ -43,8 +43,7 @@ PERCENTILES_AGGREGATION = (
     "stats.channel_subscribers",
     "ads_stats.video_view_rate",
     "ads_stats.ctr_v",
-    "ads_stats.average_cpv",
-    "brand_safety.overall_score"
+    "ads_stats.average_cpv"
 )
 
 
