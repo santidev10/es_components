@@ -21,7 +21,7 @@ class KeywordManager(BaseManager):
     forced_filter_section_oudated = Sections.STATS
     range_aggregation_fields = RANGE_AGGREGATION
     percentiles_aggregation_fields = PERCENTILES_AGGREGATION
-    count_aggregation_fields = ("stats.top_category",)
+    count_aggregation_fields = ("stats.top_category", "stats.is_viral")
     allowed_sections = BaseManager.allowed_sections + (Sections.STATS, Sections.STATS_SCHEDULE)
 
     def forced_filters(self):

@@ -44,7 +44,8 @@ COUNT_AGGREGATION = (
     "analytics.is_cms",
     "custom_properties.preferred",
     "cms.cms_title",
-    "brand_safety"
+    "brand_safety",
+    "stats.channel_group"
 )
 
 COUNT_EXISTS_AGGREGATION = (
