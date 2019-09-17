@@ -22,8 +22,7 @@ RANGE_AGGREGATION = (
     "ads_stats.video_view_rate",
     "ads_stats.ctr_v",
     "ads_stats.average_cpv",
-    "general_data.youtube_published_at",
-    "brand_safety.overall_score"
+    "general_data.youtube_published_at"
 )
 
 COUNT_AGGREGATION = (
