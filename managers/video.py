@@ -215,6 +215,3 @@ class VideoManager(BaseManager):
         return super(VideoManager, self)._get_enabled_monitoring_warnings() + \
                warning_no_new_sections +\
                (Warnings.FewRecordsUpdated((Sections.STATS, Sections.GENERAL_DATA,)),)
-
-    def clean_flags_aggregations(self):
-        pass
