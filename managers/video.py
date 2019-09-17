@@ -30,7 +30,8 @@ COUNT_AGGREGATION = (
     "general_data.country",
     "general_data.category",
     "general_data.language",
-    "cms.cms_title"
+    "cms.cms_title",
+    "brand_safety"
 )
 
 COUNT_EXISTS_AGGREGATION = ("analytics", "stats.flags",)

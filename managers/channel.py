@@ -32,8 +32,7 @@ RANGE_AGGREGATION = (
     "ads_stats.video_view_rate",
     "ads_stats.ctr",
     "ads_stats.ctr_v",
-    "ads_stats.average_cpv",
-    "brand_safety.overall_score"
+    "ads_stats.average_cpv"
 )
 
 COUNT_AGGREGATION = (
@@ -43,7 +42,8 @@ COUNT_AGGREGATION = (
     "analytics.is_auth",
     "analytics.is_cms",
     "custom_properties.preferred",
-    "cms.cms_title"
+    "cms.cms_title",
+    "brand_safety"
 )
 
 COUNT_EXISTS_AGGREGATION = (
