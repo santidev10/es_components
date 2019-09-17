@@ -194,20 +194,20 @@ class VideoManager(BaseManager):
         return aggregations_result
 
     def adapt_flags_aggregation(self, aggregations):
-        flags_buckets = []
-        for bucket in aggregations["stats.flags"]["buckets"]:
-            key = bucket["key"]
-            if key == "viral":
-                bucket["key"] = "Viral"
-                flags_buckets.append(bucket)
-            elif key == "most_liked":
-                bucket["key"] = "Most Liked"
-                flags_buckets.append(bucket)
-            elif key == "most_watched":
-                bucket["key"] = "Most Watched"
-                flags_buckets.append(bucket)
-
-        aggregations["stats.flags"]["buckets"] = flags_buckets
+        if "stats.flags" in aggregations:
+            flags_buckets = []
+            for bucket in aggregations["stats.flags"]["buckets"]:
+                key = bucket["key"]
+                if key == "viral":
+                    bucket["key"] = "Viral"
+                    flags_buckets.append(bucket)
+                elif key == "most_liked":
+                    bucket["key"] = "Most Liked"
+                    flags_buckets.append(bucket)
+                elif key == "most_watched":
+                    bucket["key"] = "Most Watched"
+                    flags_buckets.append(bucket)
+            aggregations["stats.flags"]["buckets"] = flags_buckets
         return aggregations
 
     def _get_enabled_monitoring_warnings(self):

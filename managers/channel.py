@@ -134,20 +134,20 @@ class ChannelManager(BaseManager):
         return aggregations_result
 
     def adapt_channel_group(self, aggregations):
-        channel_group_buckets = []
-        for bucket in aggregations["stats.channel_group"]["buckets"]:
-            key = bucket["key"]
-            if key == "influencers":
-                bucket["key"] = "Influencers"
-                channel_group_buckets.append(bucket)
-            elif key == "brands":
-                bucket["key"] = "Brands"
-                channel_group_buckets.append(bucket)
-            elif key == "media":
-                bucket["key"] = "Media & Entertainment"
-                channel_group_buckets.append(bucket)
-
-        aggregations["stats.channel_group"]["buckets"] = channel_group_buckets
+        if "stats.channel_group" in aggregations:
+            channel_group_buckets = []
+            for bucket in aggregations["stats.channel_group"]["buckets"]:
+                key = bucket["key"]
+                if key == "influencers":
+                    bucket["key"] = "Influencers"
+                    channel_group_buckets.append(bucket)
+                elif key == "brands":
+                    bucket["key"] = "Brands"
+                    channel_group_buckets.append(bucket)
+                elif key == "media":
+                    bucket["key"] = "Media & Entertainment"
+                    channel_group_buckets.append(bucket)
+            aggregations["stats.channel_group"]["buckets"] = channel_group_buckets
         return aggregations
 
 
