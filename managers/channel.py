@@ -4,6 +4,7 @@ from es_components.constants import Sections
 from es_components.constants import CONTENT_OWNER_ID_FIELD
 from es_components.query_builder import QueryBuilder
 from es_components.monitor import Warnings
+from es_components.utils import add_brand_safety_labels
 
 
 AGGREGATION_COUNT_SIZE = 100000
@@ -125,6 +126,8 @@ class ChannelManager(BaseManager):
         count_exists_aggs_result = self._get_count_exists_aggs_result(search, properties)
 
         aggregations_result.update(count_exists_aggs_result)
+
+        aggregations_result = add_brand_safety_labels(aggregations_result)
 
         return aggregations_result
 

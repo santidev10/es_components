@@ -13,3 +13,12 @@ def safe_div(numerator, denominator):
         return numerator / denominator
     except ZeroDivisionError:
         return None
+
+
+def add_brand_safety_labels(aggregations):
+    if "brand_safety" in aggregations:
+        aggregations["brand_safety"]["buckets"][0]["key"] = "High Risk"
+        aggregations["brand_safety"]["buckets"][1]["key"] = "Risky"
+        aggregations["brand_safety"]["buckets"][2]["key"] = "Low Risk"
+        aggregations["brand_safety"]["buckets"][3]["key"] = "Safe"
+    return aggregations
