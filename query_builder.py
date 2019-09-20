@@ -48,6 +48,10 @@ class Condition:
         self.__query.set_condition("must_not")
         return Rule(self.__query)
 
+    def should(self):
+        self.__query.set_condition("should")
+        return Rule(self.__query)
+
 
 class Rule:
     def __init__(self, query):
