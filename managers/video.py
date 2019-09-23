@@ -208,6 +208,7 @@ class VideoManager(BaseManager):
                     bucket["key"] = "Most Watched"
                     flags_buckets.append(bucket)
             aggregations["stats.flags"]["buckets"] = flags_buckets
+            aggregations["flags"] = aggregations.pop("stats.flags")
         return aggregations
 
     def _get_enabled_monitoring_warnings(self):
