@@ -47,7 +47,7 @@ class KeywordSectionStats(BaseInnerDocWithHistory):
 class Keyword(BaseDocument):
     stats = Object(KeywordSectionStats)
 
-    stats_schedule = Object(Schedule, enabled=False)
+    stats_schedule = Object(Schedule)
 
     class Index:
         name = KEYWORD_INDEX_NAME
