@@ -143,6 +143,7 @@ class MonitoringPerformance(BaseMonitor):
         return results
     # pylint: enable=arguments-differ
 
+    # pylint: disable=arguments-differ
     def get_warnings(self, warnings, *args):
         warning_messages = []
         for warning in warnings:
@@ -152,13 +153,16 @@ class MonitoringPerformance(BaseMonitor):
                 warning_messages.append(warning.message)
 
         return warning_messages
+    # pylint: enable=arguments-differ
 
-
+    # pylint: disable=unused-argument
     def __check_main_section_not_filled(self, *args):
+        # pylint: disable=no-member
         count = self.__get_count(query=QueryBuilder().build().must().exists().field("main").get())
+        # pylint: enable=no-member
         total_count = self.__get_count()
         return count < total_count
-
+    # pylint: enable=unused-argument
 
     def __check_no_new_section(self, sections):
         queries = []
@@ -210,11 +214,11 @@ class Monitor(BaseMonitor):
         return results
     # pylint: enable=arguments-differ
 
-
+    # pylint: disable=arguments-differ
     def get_warnings(self, *args):
         results = []
         for monitor in self.__monitors:
             results += monitor.get_warnings(*args)
         return results
-
+    # pylint: enable=arguments-differ
 
