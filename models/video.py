@@ -88,6 +88,11 @@ class VideoSectionCaptions(BaseInnerDoc):
     items = Object(VideoCaptionsItem, multi=True, enabled=False)
 
 
+class VideoCustomTranscript(BaseInnerDoc):
+    transcript_checked = Boolean()
+    transcript = Text(index=False)
+
+
 class VideoSectionMonetization(BaseInnerDoc):
     """ Nested monetization section for Video document """
     is_monetizable = Boolean()
@@ -139,6 +144,7 @@ class Video(BaseDocument):
     cms = Object(VideoSectionCMS)
     channel = Object(VideoSectionChannel)
     brand_safety = Object(VideoSectionBrandSafety)
+    custom_transcript = Object(VideoCustomTranscript)
 
     analytics_schedule = Object(Schedule)
     captions_schedule = Object(Schedule)
