@@ -32,7 +32,7 @@ class Sections:
     SEGMENTS = "segments"
     SIMILAR_CHANNELS = "similar_channels"
 
-    CUSTOM_TRANSCRIPTS = "custom_transcripts"
+    CUSTOM_TRANSCRIPT = "custom_transcript"
 
 
 class TimestampFields:
