@@ -192,4 +192,4 @@ class Video(BaseDocument):
         self._populate_section(Sections.BRAND_SAFETY, **kwargs)
 
     def populate_custom_transcripts(self, **kwargs):
-        self._populate_section(Sections.CUSTOM_TRANSCRIPT, **kwargs)
+        self._populate_section(Sections.CUSTOM_TRANSCRIPTS, **kwargs)
