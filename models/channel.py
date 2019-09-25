@@ -133,7 +133,7 @@ class ChannelSectionBrandSafety(BaseInnerDoc):
     """ Nested brand safety section for Channel document """
     overall_score = Long()
     videos_scored = Long(index=False)
-    language = Keyword(index=False)
+    language = Keyword()
     categories = Object()
 
 
