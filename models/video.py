@@ -89,7 +89,7 @@ class VideoSectionCaptions(BaseInnerDoc):
 
 
 class VideoCustomTranscript(BaseInnerDoc):
-    transcripts_checked = Boolean()
+    transcript_checked = Boolean()
     text = Text(index=False)
     language_code = Text(index=False)
 
