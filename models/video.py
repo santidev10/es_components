@@ -88,6 +88,16 @@ class VideoSectionCaptions(BaseInnerDoc):
     items = Object(VideoCaptionsItem, multi=True, enabled=False)
 
 
+class VideoCustomTranscriptItem(BaseInnerDoc):
+    text = Text(index=False)
+    language_code = Text(index=False)
+
+
+class VideoSectionCustomTranscript(BaseInnerDoc):
+    transcripts_checked = Boolean()
+    transcripts = Object(VideoCustomTranscriptItem, multi=True, enabled=False)
+
+
 class VideoSectionMonetization(BaseInnerDoc):
     """ Nested monetization section for Video document """
     is_monetizable = Boolean()
@@ -139,6 +149,7 @@ class Video(BaseDocument):
     cms = Object(VideoSectionCMS)
     channel = Object(VideoSectionChannel)
     brand_safety = Object(VideoSectionBrandSafety)
+    custom_transcripts = Object(VideoSectionCustomTranscript)
 
     analytics_schedule = Object(Schedule)
     captions_schedule = Object(Schedule)
@@ -179,3 +190,6 @@ class Video(BaseDocument):
 
     def populate_brand_safety(self, **kwargs):
         self._populate_section(Sections.BRAND_SAFETY, **kwargs)
+
+    def populate_custom_transcripts(self, **kwargs):
+        self._populate_section(Sections.CUSTOM_TRANSCRIPTS, **kwargs)

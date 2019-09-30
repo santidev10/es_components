@@ -32,6 +32,8 @@ class Sections:
     SEGMENTS = "segments"
     SIMILAR_CHANNELS = "similar_channels"
 
+    CUSTOM_TRANSCRIPTS = "custom_transcripts"
+
 
 class TimestampFields:
     CREATED_AT = "created_at"
