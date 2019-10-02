@@ -21,7 +21,7 @@ from es_components.models.base import Schedule
 class ChannelSectionGeneralData(BaseInnerDoc):
     """ Nested general data section for Channel document """
     title = Text()
-    description = Text(index=False)
+    description = Text()
     thumbnail_image_url = Text(index=False)
     country = Keyword()
     country_original = Keyword(index=False)

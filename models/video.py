@@ -22,7 +22,7 @@ from es_components.models.base import CommonSectionAnalytics
 class VideoSectionGeneralData(BaseInnerDoc):
     """ Nested general data section for Video document """
     title = Text()
-    description = Text(index=False)
+    description = Text()
     thumbnail_image_url = Text(index=False)
     country = Keyword()
     tags = Keyword(multi=True)

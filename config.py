@@ -1,15 +1,19 @@
 import os
 
+from .datetime_service import datetime_service
 
-CHANNEL_INDEX_NAME = "channels"
+
+date = datetime_service.now().strftime("%Y%m%d")
+
+CHANNEL_INDEX_NAME = f"channels_{date}"
 CHANNEL_INDEX_PREFIX = "channels_"
 CHANNEL_DOC_TYPE = "channel"
 
-VIDEO_INDEX_NAME = "videos"
+VIDEO_INDEX_NAME = f"videos_{date}"
 VIDEO_INDEX_PREFIX = "videos_"
 VIDEO_DOC_TYPE = "video"
 
-KEYWORD_INDEX_NAME = "keywords"
+KEYWORD_INDEX_NAME = f"keywords_{date}"
 KEYWORD_INDEX_PREFIX = "keywords_"
 KEYWORD_DOC_TYPE = "keyword"
 
