@@ -95,7 +95,7 @@ class VideoCustomTranscriptItem(BaseInnerDoc):
 
 class VideoSectionCustomTranscript(BaseInnerDoc):
     transcripts_checked = Boolean()
-    transcripts = Object(VideoCustomTranscriptItem, multi=True, enabled=False)
+    transcripts = Object(VideoCustomTranscriptItem, multi=True, enabled=True)
 
 
 class VideoSectionMonetization(BaseInnerDoc):
