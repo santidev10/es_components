@@ -90,7 +90,7 @@ class VideoSectionCaptions(BaseInnerDoc):
 
 class VideoCustomTranscriptItem(BaseInnerDoc):
     text = Text(index=False)
-    language_code = Text(index=False)
+    language_code = Text()
 
 
 class VideoSectionCustomTranscript(BaseInnerDoc):
