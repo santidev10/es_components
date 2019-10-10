@@ -1,16 +1,21 @@
 from elasticsearch_dsl import connections
 from es_components.models.base import BaseDocument
 from .connections import init_es_connection
+from .datetime_service import datetime_service
+
+date = datetime_service.now().strftime("%Y%m%d")
 
 ALL_MODELS = BaseDocument.__subclasses__()
+
+for model in ALL_MODELS:
+    model.Index.name = f"{model.Index.prefix}{date}"
+
 init_es_connection()
 connection = connections.get_connection()
-
 
 def init_mapping():
     for model in ALL_MODELS:
         model.init()
-
 
 def reindex():
     for model in ALL_MODELS:
