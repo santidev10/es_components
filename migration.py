@@ -7,15 +7,18 @@ date = datetime_service.now().strftime("%Y%m%d")
 
 ALL_MODELS = BaseDocument.__subclasses__()
 
-for model in ALL_MODELS:
-    model.Index.name = f"{model.Index.prefix}{date}"
+# pylint: enable=redefined-outer-name
+for _model in ALL_MODELS:
+    _model.Index.name = f"{_model.Index.prefix}{date}"
+# pylint: enable=redefined-outer-name
 
 init_es_connection()
 connection = connections.get_connection()
 
+
 def init_mapping():
-    for model in ALL_MODELS:
-        model.init()
+    for _model in ALL_MODELS:
+        _model.init()
 
 def reindex():
     for model in ALL_MODELS:
