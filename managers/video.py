@@ -35,8 +35,8 @@ COUNT_AGGREGATION = (
     "stats.flags"
 )
 
-COUNT_EXISTS_AGGREGATION = ("analytics", "stats.flags",)
-COUNT_MISSING_AGGREGATION = ("analytics", "stats.flags",)
+COUNT_EXISTS_AGGREGATION = ("analytics", "stats.flags", "custom_captions.items", "captions",)
+COUNT_MISSING_AGGREGATION = ("analytics", "stats.flags", "custom_captions.items", "captions",)
 
 PERCENTILES_AGGREGATION = (
     "stats.views",
@@ -191,6 +191,7 @@ class VideoManager(BaseManager):
 
         aggregations_result = add_brand_safety_labels(aggregations_result)
         aggregations_result = self.adapt_flags_aggregation(aggregations_result)
+        aggregations_result = self.adapt_transcripts_aggregation(aggregations_result)
         return aggregations_result
 
     def adapt_flags_aggregation(self, aggregations):
@@ -209,6 +210,21 @@ class VideoManager(BaseManager):
                     flags_buckets.append(bucket)
             aggregations["stats.flags"]["buckets"] = flags_buckets
             aggregations["flags"] = aggregations.pop("stats.flags")
+        return aggregations
+
+    def adapt_transcripts_aggregation(self, aggregations):
+        transcripts_count = 0
+        no_transcripts_count = 0
+        if "custom_captions.items:exists" in aggregations and "captions:exists" in aggregations:
+            transcripts_count += aggregations["custom_captions.items:exists"] + aggregations["captions:exists"]
+        if "captions:missing" in aggregations:
+            no_transcripts_count = aggregations["captions:missing"] - aggregations["custom_captions.items:exists"]
+        aggregations["transcripts:exists"] = transcripts_count
+        aggregations["transcripts:missing"] = no_transcripts_count
+        aggregations.pop("custom_captions.items:exists")
+        aggregations.pop("captions:exists")
+        aggregations.pop("custom_captions.items:missing")
+        aggregations.pop("captions:missing")
         return aggregations
 
     def _get_enabled_monitoring_warnings(self):
