@@ -1,4 +1,4 @@
-from elasticsearch_dsl import Q
+from collections import defaultdict
 
 from es_components.connections import connections
 from es_components.constants import TimestampFields
@@ -160,12 +160,12 @@ class MonitoringPerformance(BaseMonitor):
     # pylint: disable=arguments-differ
     def get_warnings(self, warnings, *args):
         warning_messages = []
-        available_warning = {}
+        available_warning = defaultdict(list)
         for warning in warnings:
             check_func = self._warnings_check_func.get(warning.name)
 
             if check_func and check_func(*warning.params):
-                available_warning[warning.name] = (available_warning.get(warning.name) or []) + [warning]
+                available_warning[warning.name].append(warning)
 
         for name, warnings in available_warning.items():
             prepare_messages = self._warnings_prepare_message.get(name)
