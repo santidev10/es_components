@@ -1,4 +1,4 @@
-from elasticsearch_dsl import Q
+from collections import defaultdict
 
 from es_components.connections import connections
 from es_components.constants import TimestampFields
@@ -27,7 +27,15 @@ class Warnings:
 
     class FewRecordsUpdated(BaseWarning):
         name = "FewRecordsUpdated"
-        message = "Less than 50% of records has been updated in the last 3 days"
+
+        def __init__(self, section, control_percentage):
+            super(Warnings.FewRecordsUpdated, self).__init__(section, control_percentage)
+            self.section = section
+            self.control_percentage = control_percentage
+
+        @property
+        def message(self):
+            return f"Less than {self.control_percentage}% of {self.section} data has been updated during the last day"
 
 
 class BaseMonitor:
@@ -82,6 +90,7 @@ class MonitoringPerformance(BaseMonitor):
         ("last_365_days", 365),
     )
     WARNINGS_CHECK_DAYS = 3
+    WARNINGS_FEW_UPDATES_CHECK_DAYS = 1
 
     def __init__(self, *args, **kwargs):
         super(MonitoringPerformance, self).__init__(*args, **kwargs)
@@ -89,6 +98,11 @@ class MonitoringPerformance(BaseMonitor):
             Warnings.MainSectionNotFilled.name: self.__check_main_section_not_filled,
             Warnings.FewRecordsUpdated.name: self.__check_few_records_updated,
             Warnings.NoNewSections.name: self.__check_no_new_section
+        }
+        self._warnings_prepare_message = {
+            Warnings.MainSectionNotFilled.name: self.__prepare_messages,
+            Warnings.FewRecordsUpdated.name: self.__prepare_messages,
+            Warnings.NoNewSections.name: self.__prepare_messages_no_new_sections
         }
 
 
@@ -146,11 +160,16 @@ class MonitoringPerformance(BaseMonitor):
     # pylint: disable=arguments-differ
     def get_warnings(self, warnings, *args):
         warning_messages = []
+        available_warning = defaultdict(list)
         for warning in warnings:
             check_func = self._warnings_check_func.get(warning.name)
 
             if check_func and check_func(*warning.params):
-                warning_messages.append(warning.message)
+                available_warning[warning.name].append(warning)
+
+        for name, warnings in available_warning.items():
+            prepare_messages = self._warnings_prepare_message.get(name)
+            warning_messages +=  prepare_messages(warnings)
 
         return warning_messages
     # pylint: enable=arguments-differ
@@ -164,34 +183,42 @@ class MonitoringPerformance(BaseMonitor):
         return count < total_count
     # pylint: enable=unused-argument
 
-    def __check_no_new_section(self, sections):
-        queries = []
-        for section in sections:
-            queries.append(
-                QueryBuilder().build().must().range()\
+    def __check_no_new_section(self, section):
+        count = self.__get_count(
+            query=QueryBuilder().build().must().range()\
                 .field(f"{section}.{TimestampFields.CREATED_AT}")\
                 .gt(f"now-{86400 * self.WARNINGS_CHECK_DAYS}s/s")\
                 .get()
-            )
-
-        count = self.__get_count(query=Q("bool", filter=queries))
+        )
         return count == 0
 
-    def __check_few_records_updated(self, sections):
-        queries = []
-        for section in sections:
-            queries.append(
-                QueryBuilder().build().must().range() \
-                    .field(f"{section}.{TimestampFields.UPDATED_AT}") \
-                    .gt(f"now-{86400 * self.WARNINGS_CHECK_DAYS}s/s") \
-                    .get()
-            )
+    def __check_few_records_updated(self, section, control_percentage=0):
 
-        count = self.__get_count(query=Q("bool", filter=queries))
-        control_count = self.__get_count() / 2
-        return count > control_count
+        count = self.__get_count(query=QueryBuilder().build().must().range()\
+            .field(f"{section}.{TimestampFields.UPDATED_AT}") \
+            .gt(f"now-{86400 * self.WARNINGS_FEW_UPDATES_CHECK_DAYS}s/s") \
+            .get())
+        total = self.__get_count(query=QueryBuilder().build().must().exists().field(section).get())
 
+        try:
+            updated_percentage = count/total * 100
+        except ZeroDivisionError:
+            updated_percentage = control_percentage
 
+        return updated_percentage < control_percentage
+
+    def __prepare_messages(self, warnings):
+        messages = []
+        for warning in warnings:
+            messages.append(warning.message)
+        return messages
+
+    def __prepare_messages_no_new_sections(self, warnings):
+        if warnings:
+            sections = [warning.params[0] for warning in warnings]
+            merge_warning = warnings[0].__class__(*sections)
+            return [merge_warning.message]
+        return []
 
 
 class Monitor(BaseMonitor):

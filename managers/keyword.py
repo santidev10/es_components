@@ -29,6 +29,5 @@ class KeywordManager(BaseManager):
                self._filter_existent_section(Sections.STATS)
 
     def _get_enabled_monitoring_warnings(self):
-        return super(KeywordManager, self)._get_enabled_monitoring_warnings() + (
-            Warnings.FewRecordsUpdated((Sections.STATS,)),
-        )
+        return (Warnings.FewRecordsUpdated(Sections.STATS, 10),) + \
+               super(KeywordManager, self)._get_enabled_monitoring_warnings()
