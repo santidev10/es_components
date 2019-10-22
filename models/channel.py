@@ -148,6 +148,14 @@ class ChannelSectionSimilar(BaseInnerDoc):
     default = Keyword(multi=True, index=False)
 
 
+class ChannelSectionTaskUsData(BaseInnerDoc):
+    """ Nested TaskUs Data Section for Channel document """
+    categories = Keyword(multi=True)
+    monetized = Boolean()
+    scalability = Keyword()
+    language = Keyword()
+
+
 class Channel(BaseDocument):
     general_data = Object(ChannelSectionGeneralData)
     stats = Object(ChannelSectionStats)
@@ -164,6 +172,8 @@ class Channel(BaseDocument):
     general_data_schedule = Object(Schedule)
     stats_schedule = Object(Schedule)
     analytics_schedule = Object(Schedule)
+
+    task_us_data = Object(ChannelSectionTaskUsData)
 
     class Index:
         name = CHANNEL_INDEX_NAME
