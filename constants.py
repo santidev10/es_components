@@ -33,6 +33,7 @@ class Sections:
     SIMILAR_CHANNELS = "similar_channels"
 
     CUSTOM_CAPTIONS = "custom_captions"
+    TASK_US_DATA = "task_us_data"
 
 
 class TimestampFields:

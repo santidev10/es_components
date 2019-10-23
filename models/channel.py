@@ -217,3 +217,6 @@ class Channel(BaseDocument):
 
     def populate_similar_channels(self, **kwargs):
         self._populate_section(Sections.SIMILAR_CHANNELS, **kwargs)
+
+    def populate_task_us_data(self, **kwargs):
+        self._populate_section(Sections.TASK_US_DATA, **kwargs)
