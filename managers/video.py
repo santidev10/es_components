@@ -12,6 +12,7 @@ from es_components.managers.base import BaseManager
 from es_components.models.channel import Channel
 from es_components.models.video import Video
 from es_components.query_builder import QueryBuilder
+from es_components.monitor import Emergency
 from es_components.monitor import Warnings
 from es_components.utils import add_brand_safety_labels
 
@@ -233,3 +234,8 @@ class VideoManager(BaseManager):
         )
         return warning_few_records_updated + warning_no_new_sections + \
                super(VideoManager, self)._get_enabled_monitoring_warnings()
+
+
+    def _get_enabled_monitoring_alerts(self):
+        return (Emergency.NoneRecordsUpdated((Sections.GENERAL_DATA, Sections.STATS), 1),) + \
+               super(VideoManager, self)._get_enabled_monitoring_alerts()
