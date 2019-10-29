@@ -10,6 +10,21 @@ class BaseWarning:
     def __init__(self, *params):
         self.params = params
 
+
+class Emergency:
+    class NoneRecordsUpdated(BaseWarning):
+        name = "NoneRecordsUpdated"
+
+        def __init__(self, sections, control_percentage):
+            super(Emergency.NoneRecordsUpdated, self).__init__(sections, control_percentage)
+            self.sections = sections
+            self.control_percentage = control_percentage
+
+        @property
+        def message(self):
+            sections = ', '.join(self.sections)
+            return f"Less than {self.control_percentage}% of {sections} data has been updated during the last day"
+
 class Warnings:
     class MainSectionNotFilled(BaseWarning):
         name = "MainSectionNotFilled"
@@ -79,6 +94,9 @@ class MonitoringIndex(BaseMonitor):
     def get_warnings(self, *args, **kwargs):
         return []
 
+    def get_alerts(self,  *args, **kwargs):
+        return []
+
 
 class MonitoringPerformance(BaseMonitor):
     name = "performance"
@@ -91,6 +109,8 @@ class MonitoringPerformance(BaseMonitor):
     )
     WARNINGS_CHECK_DAYS = 3
     WARNINGS_FEW_UPDATES_CHECK_DAYS = 1
+    EMERGENCY_NONE_RECORDS_UPDATED_CHECK_DAYS = 1
+
 
     def __init__(self, *args, **kwargs):
         super(MonitoringPerformance, self).__init__(*args, **kwargs)
@@ -103,6 +123,10 @@ class MonitoringPerformance(BaseMonitor):
             Warnings.MainSectionNotFilled.name: self.__prepare_messages,
             Warnings.FewRecordsUpdated.name: self.__prepare_messages,
             Warnings.NoNewSections.name: self.__prepare_messages_no_new_sections
+        }
+
+        self._emergency_check_func = {
+            Emergency.NoneRecordsUpdated.name: self.__check_none_records_updated
         }
 
 
@@ -175,6 +199,19 @@ class MonitoringPerformance(BaseMonitor):
     # pylint: enable=arguments-differ
 
     # pylint: disable=unused-argument
+    def get_alerts(self, emergencies, *args):
+        alert_messages = []
+        for emergency in emergencies:
+            check_func = self._emergency_check_func.get(emergency.name)
+
+            if check_func and check_func(*emergency.params):
+                alert_messages.append(emergency.message)
+
+
+        return alert_messages
+    # pylint: enable=unused-argument
+
+    # pylint: disable=unused-argument
     def __check_main_section_not_filled(self, *args):
         # pylint: disable=no-member
         count = self.__get_count(query=QueryBuilder().build().must().exists().field("main").get())
@@ -192,18 +229,20 @@ class MonitoringPerformance(BaseMonitor):
         )
         return count == 0
 
-    def __check_few_records_updated(self, section, control_percentage=0):
+    def __check_few_records_updated(self, section, control_percentage=0, check_days=None):
+
+        check_days = check_days or self.WARNINGS_FEW_UPDATES_CHECK_DAYS
 
         count = self.__get_count(query=QueryBuilder().build().must().range()\
             .field(f"{section}.{TimestampFields.UPDATED_AT}") \
-            .gt(f"now-{86400 * self.WARNINGS_FEW_UPDATES_CHECK_DAYS}s/s") \
+            .gt(f"now-{86400 * check_days}s/s") \
             .get())
         total = self.__get_count(query=QueryBuilder().build().must().exists().field(section).get())
 
         try:
             updated_percentage = count/total * 100
         except ZeroDivisionError:
-            updated_percentage = control_percentage
+            updated_percentage = 0
 
         return updated_percentage < control_percentage
 
@@ -219,6 +258,15 @@ class MonitoringPerformance(BaseMonitor):
             merge_warning = warnings[0].__class__(*sections)
             return [merge_warning.message]
         return []
+
+    def __check_none_records_updated(self, sections, control_percentage):
+        # pylint: disable=no-member
+        checks = [
+            self.__check_few_records_updated(section, control_percentage, self.EMERGENCY_NONE_RECORDS_UPDATED_CHECK_DAYS)
+            for section in sections
+        ]
+        # pylint: enable=no-member
+        return all(checks)
 
 
 class Monitor(BaseMonitor):
@@ -246,6 +294,14 @@ class Monitor(BaseMonitor):
         results = []
         for monitor in self.__monitors:
             results += monitor.get_warnings(*args)
+        return results
+    # pylint: enable=arguments-differ
+
+    # pylint: disable=arguments-differ
+    def get_alerts(self, *args):
+        results = []
+        for monitor in self.__monitors:
+            results += monitor.get_alerts(*args)
         return results
     # pylint: enable=arguments-differ
 
