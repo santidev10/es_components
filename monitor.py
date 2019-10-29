@@ -53,7 +53,6 @@ class Warnings:
             return f"Less than {self.control_percentage}% of {self.section} data has been updated during the last day"
 
 
-
 class BaseMonitor:
     name = None
 
