@@ -278,6 +278,9 @@ class BaseManager:
 
         _filters = [self._filter_nonexistent_section(control_section)]
 
+        # to ignore items without main id field
+        _filters.append(self._filter_existent_section(MAIN_ID_FIELD))
+
         if ignore_deleted is True:
             _filters.append(self.filter_alive())
 
@@ -303,6 +306,9 @@ class BaseManager:
 
         _filters = [QueryBuilder().build().must().range().field(field_updated_at) \
             .lt(outdated_at).get()]
+
+        # to ignore items without main id field
+        _filters.append(self._filter_existent_section(MAIN_ID_FIELD))
 
         if ignore_deleted is True:
             _filters.append(self.filter_alive())
