@@ -91,11 +91,13 @@ class MonitoringIndex(BaseMonitor):
         )
     # pylint: enable=arguments-differ
 
+    # pylint: disable=unused-argument
     def get_warnings(self, *args, **kwargs):
         return []
 
-    def get_alerts(self,  *args, **kwargs):
+    def get_alerts(self, *args, **kwargs):
         return []
+    # pylint: enable=unused-argument
 
 
 class MonitoringPerformance(BaseMonitor):
@@ -193,7 +195,7 @@ class MonitoringPerformance(BaseMonitor):
 
         for name, warnings in available_warning.items():
             prepare_messages = self._warnings_prepare_message.get(name)
-            warning_messages +=  prepare_messages(warnings)
+            warning_messages += prepare_messages(warnings)
 
         return warning_messages
     # pylint: enable=arguments-differ
@@ -262,7 +264,9 @@ class MonitoringPerformance(BaseMonitor):
     def __check_none_records_updated(self, sections, control_percentage):
         # pylint: disable=no-member
         checks = [
-            self.__check_few_records_updated(section, control_percentage, self.EMERGENCY_NONE_RECORDS_UPDATED_CHECK_DAYS)
+            self.__check_few_records_updated(
+                section, control_percentage, self.EMERGENCY_NONE_RECORDS_UPDATED_CHECK_DAYS
+            )
             for section in sections
         ]
         # pylint: enable=no-member
