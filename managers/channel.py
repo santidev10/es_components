@@ -77,7 +77,8 @@ class ChannelManager(BaseManager):
                        + (Sections.GENERAL_DATA, Sections.STATS, Sections.ANALYTICS, Sections.AUTH,
                           Sections.MONETIZATION, Sections.SOCIAL, Sections.ADS_STATS, Sections.CMS,
                           Sections.CUSTOM_PROPERTIES, Sections.GENERAL_DATA_SCHEDULE, Sections.SIMILAR_CHANNELS,
-                          Sections.STATS_SCHEDULE, Sections.ANALYTICS_SCHEDULE, Sections.BRAND_SAFETY)
+                          Sections.STATS_SCHEDULE, Sections.ANALYTICS_SCHEDULE, Sections.BRAND_SAFETY,
+                          Sections.TASK_US_DATA)
     model = Channel
     forced_filter_section_oudated = Sections.GENERAL_DATA
     range_aggregation_fields = RANGE_AGGREGATION
