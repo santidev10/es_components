@@ -152,7 +152,7 @@ class ChannelSectionTaskUsData(BaseInnerDoc):
     """ Nested TaskUs Data Section for Channel document """
     categories = Keyword(multi=True)
     is_safe = Boolean()
-    is_user_generated = Boolean()
+    is_user_generated_content = Boolean()
     monetized = Boolean()
     scalable = Boolean()
     language = Keyword()
