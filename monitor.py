@@ -187,6 +187,7 @@ class MonitoringPerformance(BaseMonitor):
     def get_warnings(self, warnings, *args):
         warning_messages = []
         available_warning = defaultdict(list)
+        # pylint: disable=redefined-argument-from-local
         for warning in warnings:
             check_func = self._warnings_check_func.get(warning.name)
 
@@ -196,7 +197,7 @@ class MonitoringPerformance(BaseMonitor):
         for name, warnings in available_warning.items():
             prepare_messages = self._warnings_prepare_message.get(name)
             warning_messages += prepare_messages(warnings)
-
+        # pylint: enable=redefined-argument-from-local
         return warning_messages
     # pylint: enable=arguments-differ
 
