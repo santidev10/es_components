@@ -15,10 +15,11 @@ class Emergency:
     class NoneRecordsUpdated(BaseWarning):
         name = "NoneRecordsUpdated"
 
-        def __init__(self, sections, control_percentage):
-            super(Emergency.NoneRecordsUpdated, self).__init__(sections, control_percentage)
+        def __init__(self, sections, control_percentage, ignore_deleted=False):
+            super(Emergency.NoneRecordsUpdated, self).__init__(sections, control_percentage, ignore_deleted)
             self.sections = sections
             self.control_percentage = control_percentage
+            self.ignore_deleted = ignore_deleted
 
         @property
         def message(self):
@@ -43,10 +44,11 @@ class Warnings:
     class FewRecordsUpdated(BaseWarning):
         name = "FewRecordsUpdated"
 
-        def __init__(self, section, control_percentage):
-            super(Warnings.FewRecordsUpdated, self).__init__(section, control_percentage)
+        def __init__(self, section, control_percentage, ignore_deleted=False):
+            super(Warnings.FewRecordsUpdated, self).__init__(section, control_percentage, ignore_deleted)
             self.section = section
             self.control_percentage = control_percentage
+            self.ignore_deleted = ignore_deleted
 
         @property
         def message(self):
@@ -146,14 +148,22 @@ class MonitoringPerformance(BaseMonitor):
                 .gt(f"now-{86400 * days}s/s")\
                 .get()
 
-    def get_section_info(self, section):
-        filled = self.__get_count(query=QueryBuilder().build().must().exists().field(section).get())
-        missed = self.__get_count(query=QueryBuilder().build().must_not().exists().field(section).get())
+    def get_section_info(self, section, ignore_deleted=False):
+        deleted = None
 
-        missed_by_days = {
-            key: self.__get_count(query=query & QueryBuilder().build().must_not().exists().field(section).get())
-            for key, query in self.__timestamp_query_generator()
-        }
+        filled_query = QueryBuilder().build().must().exists().field(section).get()
+        missed_query = QueryBuilder().build().must_not().exists().field(section).get()
+
+        if ignore_deleted is True:
+            ignore_deleted_query = QueryBuilder().build().must_not().exists().field(Sections.DELETED).get()
+            filled_query = filled_query & ignore_deleted_query
+            missed_query = missed_query & ignore_deleted_query
+
+            deleted = self.__get_count(query=QueryBuilder().build().must().exists().field(Sections.DELETED).get())
+
+        filled = self.__get_count(query=filled_query)
+        missed = self.__get_count(query=missed_query)
+
 
         updated_by_days = {
             key: self.__get_count(query=query)
@@ -168,7 +178,7 @@ class MonitoringPerformance(BaseMonitor):
         return dict(
             filled=filled,
             missed=missed,
-            missed_by_days=missed_by_days,
+            deleted=deleted,
             updated_by_days=updated_by_days,
             created_by_days=created_by_days
         )
@@ -178,7 +188,7 @@ class MonitoringPerformance(BaseMonitor):
         results = {}
         for section in sections:
             results.update({
-                section: self.get_section_info(section)
+                section: self.get_section_info(section, *args)
             })
         return results
     # pylint: enable=arguments-differ
@@ -232,18 +242,23 @@ class MonitoringPerformance(BaseMonitor):
         )
         return count == 0
 
-    def __check_few_records_updated(self, section, control_percentage=0, check_days=None):
+    def __check_few_records_updated(self, section, control_percentage=0, ignore_deleted=False, check_days=None):
 
         check_days = check_days or self.WARNINGS_FEW_UPDATES_CHECK_DAYS
 
-        count = self.__get_count(query=QueryBuilder().build().must().range()\
-            .field(f"{section}.{TimestampFields.UPDATED_AT}") \
-            .gt(f"now-{86400 * check_days}s/s") \
-            .get())
-        total = self.__get_count(query=QueryBuilder().build().must().exists().field(section).get())
+        count = self.__get_count(query=QueryBuilder().build().must().range() \
+                                 .field(f"{section}.{TimestampFields.UPDATED_AT}") \
+                                 .gt(f"now-{86400 * check_days}s/s") \
+                                 .get())
+
+        total_query = QueryBuilder().build().must().exists().field(section).get()
+
+        if ignore_deleted is True:
+            total_query = total_query & QueryBuilder().build().must_not().exists().field(Sections.DELETED).get()
+        total = self.__get_count(query=total_query)
 
         try:
-            updated_percentage = count/total * 100
+            updated_percentage = count / total * 100
         except ZeroDivisionError:
             updated_percentage = 0
 
@@ -262,11 +277,11 @@ class MonitoringPerformance(BaseMonitor):
             return [merge_warning.message]
         return []
 
-    def __check_none_records_updated(self, sections, control_percentage):
+    def __check_none_records_updated(self, sections, control_percentage, ignore_deleted=False):
         # pylint: disable=no-member
         checks = [
             self.__check_few_records_updated(
-                section, control_percentage, self.EMERGENCY_NONE_RECORDS_UPDATED_CHECK_DAYS
+                section, control_percentage, ignore_deleted, self.EMERGENCY_NONE_RECORDS_UPDATED_CHECK_DAYS
             )
             for section in sections
         ]

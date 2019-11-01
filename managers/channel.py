@@ -156,15 +156,18 @@ class ChannelManager(BaseManager):
     def _get_enabled_monitoring_warnings(self):
         warning_no_new_sections = tuple([Warnings.NoNewSections(section) for section in self.sections])
         warning_few_records_updated = (
-            Warnings.FewRecordsUpdated(Sections.GENERAL_DATA, 15),
-            Warnings.FewRecordsUpdated(Sections.STATS, 30),
-            Warnings.FewRecordsUpdated(Sections.ANALYTICS, 90),
-            Warnings.FewRecordsUpdated(Sections.ADS_STATS, 0),
+            Warnings.FewRecordsUpdated(Sections.GENERAL_DATA, 15, True),
+            Warnings.FewRecordsUpdated(Sections.STATS, 30, True),
+            Warnings.FewRecordsUpdated(Sections.ANALYTICS, 90, True),
+            Warnings.FewRecordsUpdated(Sections.ADS_STATS, 0, True),
         )
         return warning_few_records_updated + warning_no_new_sections + \
                super(ChannelManager, self)._get_enabled_monitoring_warnings()
 
     def _get_enabled_monitoring_alerts(self):
-        return (Emergency.NoneRecordsUpdated((Sections.GENERAL_DATA, Sections.STATS), 1),) + \
+        return (Emergency.NoneRecordsUpdated((Sections.GENERAL_DATA, Sections.STATS), 1, True),) + \
                super(ChannelManager, self)._get_enabled_monitoring_alerts()
+
+    def _get_enabled_monitoring_params_info(self):
+        return super(ChannelManager, self)._get_enabled_monitoring_params_info() + (True,)
 
