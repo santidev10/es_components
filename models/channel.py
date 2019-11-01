@@ -31,6 +31,7 @@ class ChannelSectionGeneralData(BaseInnerDoc):
     lang_codes = Keyword(index=False, multi=True)
     top_language = Keyword()
     emails = Keyword(multi=True)
+    iab_categories = Keyword(multi=True)
 
 
 class ChannelSectionStats(BaseInnerDocWithHistory):
@@ -150,7 +151,6 @@ class ChannelSectionSimilar(BaseInnerDoc):
 
 class ChannelSectionTaskUsData(BaseInnerDoc):
     """ Nested TaskUs Data Section for Channel document """
-    categories = Keyword(multi=True)
     is_safe = Boolean()
     is_user_generated_content = Boolean()
     monetized = Boolean()

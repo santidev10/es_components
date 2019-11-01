@@ -33,6 +33,7 @@ class VideoSectionGeneralData(BaseInnerDoc):
     duration = Long(index=False)
     license = Keyword(index=False)  # unused
     is_streaming = Boolean(index=False)
+    iab_categories = Keyword(multi=True)
 
 
 class VideoSectionChannel(BaseInnerDoc):
