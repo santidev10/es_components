@@ -601,6 +601,10 @@ class BaseManager:
     def _get_enabled_monitoring_alerts(self):
         return ()
 
+    def _get_enabled_monitoring_params_info(self):
+        return self.sections,
+
+
     def get_monitoring_data(self):
         # pylint: disable=protected-access
         monitor = Monitor(self.model._index._name)
@@ -608,7 +612,7 @@ class BaseManager:
         data = dict(
             cluster_name=monitor.get_cluster_name(),
             warnings=monitor.get_warnings(self._get_enabled_monitoring_warnings()),
-            info=monitor.get_info(self.sections),
+            info=monitor.get_info(*self._get_enabled_monitoring_params_info()),
             alerts=monitor.get_alerts(self._get_enabled_monitoring_alerts())
         )
         return data
