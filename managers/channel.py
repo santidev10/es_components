@@ -169,5 +169,6 @@ class ChannelManager(BaseManager):
                super(ChannelManager, self)._get_enabled_monitoring_alerts()
 
     def _get_enabled_monitoring_params_info(self):
-        return super(ChannelManager, self)._get_enabled_monitoring_params_info() + (True,)
+        skipped_sections = (Sections.GENERAL_DATA,)
+        return self.sections, skipped_sections, True,
 

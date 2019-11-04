@@ -31,3 +31,7 @@ class KeywordManager(BaseManager):
     def _get_enabled_monitoring_warnings(self):
         return (Warnings.FewRecordsUpdated(Sections.STATS, 10),) + \
                super(KeywordManager, self)._get_enabled_monitoring_warnings()
+
+    def _get_enabled_monitoring_params_info(self):
+        skipped_sections = (Sections.STATS,)
+        return self.sections, skipped_sections, True,
