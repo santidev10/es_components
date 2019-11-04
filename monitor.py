@@ -55,6 +55,18 @@ class Warnings:
             return f"Less than {self.control_percentage}% of {self.section} data has been updated during the last day"
 
 
+    class SkippedRecords(BaseWarning):
+        name = "SkippedRecords"
+
+        def __init__(self, section, section_schedule):
+            super(Warnings.FewRecordsUpdated, self).__init__(section, section_schedule)
+            self.section = section
+
+        @property
+        def message(self):
+            return f"Less than {self.control_percentage}% of {self.section} data has been updated during the last day"
+
+
 class BaseMonitor:
     name = None
 
@@ -114,6 +126,8 @@ class MonitoringPerformance(BaseMonitor):
     WARNINGS_CHECK_DAYS = 3
     WARNINGS_FEW_UPDATES_CHECK_DAYS = 1
     EMERGENCY_NONE_RECORDS_UPDATED_CHECK_DAYS = 1
+    SKIPPED_SECTION_CHECK_DAYS = 7
+    UPDATER_TASK_EXPIRE_DAYS = 2
 
 
     def __init__(self, *args, **kwargs):
@@ -149,8 +163,6 @@ class MonitoringPerformance(BaseMonitor):
                 .get()
 
     def get_section_info(self, section, ignore_deleted=False):
-        deleted = None
-
         filled_query = QueryBuilder().build().must().exists().field(section).get()
         missed_query = QueryBuilder().build().must_not().exists().field(section).get()
 
@@ -159,11 +171,8 @@ class MonitoringPerformance(BaseMonitor):
             filled_query = filled_query & ignore_deleted_query
             missed_query = missed_query & ignore_deleted_query
 
-            deleted = self.__get_count(query=QueryBuilder().build().must().exists().field(Sections.DELETED).get())
-
         filled = self.__get_count(query=filled_query)
         missed = self.__get_count(query=missed_query)
-
 
         updated_by_days = {
             key: self.__get_count(query=query)
@@ -178,19 +187,49 @@ class MonitoringPerformance(BaseMonitor):
         return dict(
             filled=filled,
             missed=missed,
-            deleted=deleted,
             updated_by_days=updated_by_days,
             created_by_days=created_by_days
         )
 
+    def __get_skipped(self, skipped_sections):
+        queries = None
+
+        for section in skipped_sections:
+            __queries =  (
+                    QueryBuilder().build().must_not().range()
+                    .field(f"{section}.{TimestampFields.UPDATED_AT}")
+                    .gt(f"now-{86400 * self.SKIPPED_SECTION_CHECK_DAYS}s/s")
+                    .get() &
+
+                    QueryBuilder().build().must().range()
+                    .field(f"{section}_schedule.{TimestampFields.UPDATED_AT}")
+                    .gt(f"now-{86400 * self.SKIPPED_SECTION_CHECK_DAYS}s/s")
+                    .get() &
+
+                    QueryBuilder().build().must().range()
+                    .field(f"{section}_schedule.{TimestampFields.CREATED_AT}")
+                    .lt(f"now-{86400}s/s").get()
+            )
+
+            queries = queries | __queries if queries is not None else __queries
+
+        return self.__get_count(query=queries) if queries else None
+
+    def __get_deleted(self):
+        return self.__get_count(query=QueryBuilder().build().must().exists().field(Sections.DELETED).get())
+
     # pylint: disable=arguments-differ
-    def get_info(self, sections, *args):
-        results = {}
+    def get_info(self, sections, skipped_sections, *args):
+        info_by_sections = {}
         for section in sections:
-            results.update({
+            info_by_sections.update({
                 section: self.get_section_info(section, *args)
             })
-        return results
+        general = {
+            "deleted": self.__get_deleted(),
+            "skipped": self.__get_skipped(skipped_sections)
+        }
+        return dict(info_by_sections=info_by_sections, general=general)
     # pylint: enable=arguments-differ
 
     # pylint: disable=arguments-differ
