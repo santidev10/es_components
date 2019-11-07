@@ -151,6 +151,7 @@ class MonitoringPerformance(BaseMonitor):
                 .get()
 
     def get_section_info(self, section, ignore_deleted=False):
+        # pylint: disable=no-member
         filled_query = QueryBuilder().build().must().exists().field(section).get()
         missed_query = QueryBuilder().build().must_not().exists().field(section).get()
 
@@ -171,6 +172,7 @@ class MonitoringPerformance(BaseMonitor):
             key: self.__get_count(query=query)
             for key, query in self.__timestamp_query_generator(section, timestamp_field=TimestampFields.CREATED_AT)
         }
+        # pylint: enable=no-member
 
         return dict(
             filled=filled,
@@ -195,8 +197,10 @@ class MonitoringPerformance(BaseMonitor):
 
         return self.__get_count(query=queries) if queries else None
 
+    # pylint: disable=no-member
     def __get_deleted(self):
         return self.__get_count(query=QueryBuilder().build().must().exists().field(Sections.DELETED).get())
+    # pylint: enable=no-member
 
     # pylint: disable=arguments-differ
     def get_info(self, sections, skipped_sections, *args):
@@ -262,7 +266,7 @@ class MonitoringPerformance(BaseMonitor):
         return count == 0
 
     def __check_few_records_updated(self, section, control_percentage=0, ignore_deleted=False, check_days=None):
-
+        # pylint: disable=no-member
         check_days = check_days or self.WARNINGS_FEW_UPDATES_CHECK_DAYS
 
         count = self.__get_count(query=QueryBuilder().build().must().range() \
@@ -275,7 +279,7 @@ class MonitoringPerformance(BaseMonitor):
         if ignore_deleted is True:
             total_query = total_query & QueryBuilder().build().must_not().exists().field(Sections.DELETED).get()
         total = self.__get_count(query=total_query)
-
+        # pylint: enable=no-member
         try:
             updated_percentage = count / total * 100
         except ZeroDivisionError:
