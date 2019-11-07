@@ -55,18 +55,6 @@ class Warnings:
             return f"Less than {self.control_percentage}% of {self.section} data has been updated during the last day"
 
 
-    class SkippedRecords(BaseWarning):
-        name = "SkippedRecords"
-
-        def __init__(self, section, section_schedule):
-            super(Warnings.FewRecordsUpdated, self).__init__(section, section_schedule)
-            self.section = section
-
-        @property
-        def message(self):
-            return f"Less than {self.control_percentage}% of {self.section} data has been updated during the last day"
-
-
 class BaseMonitor:
     name = None
 
