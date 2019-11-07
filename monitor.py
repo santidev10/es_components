@@ -183,21 +183,13 @@ class MonitoringPerformance(BaseMonitor):
         queries = None
 
         for section in skipped_sections:
-            __queries =  (
-                    QueryBuilder().build().must_not().range()
-                    .field(f"{section}.{TimestampFields.UPDATED_AT}")
-                    .gt(f"now-{86400 * self.SKIPPED_SECTION_CHECK_DAYS}s/s")
-                    .get() &
-
-                    QueryBuilder().build().must().range()
-                    .field(f"{section}_schedule.{TimestampFields.UPDATED_AT}")
-                    .gt(f"now-{86400 * self.SKIPPED_SECTION_CHECK_DAYS}s/s")
-                    .get() &
-
-                    QueryBuilder().build().must().range()
-                    .field(f"{section}_schedule.{TimestampFields.CREATED_AT}")
+            __queries = \
+                QueryBuilder().build().must_not().range().field(f"{section}.{TimestampFields.UPDATED_AT}")\
+                    .gt(f"now-{86400 * self.SKIPPED_SECTION_CHECK_DAYS}s/s").get() & \
+                QueryBuilder().build().must().range().field(f"{section}_schedule.{TimestampFields.UPDATED_AT}")\
+                    .gt(f"now-{86400 * self.SKIPPED_SECTION_CHECK_DAYS}s/s").get() & \
+                QueryBuilder().build().must().range().field(f"{section}_schedule.{TimestampFields.CREATED_AT}")\
                     .lt(f"now-{86400}s/s").get()
-            )
 
             queries = queries | __queries if queries is not None else __queries
 
