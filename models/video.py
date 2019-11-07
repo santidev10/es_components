@@ -125,6 +125,15 @@ class VideoSectionAdsStats(BaseInnerDoc):
     ctr = Double(index=False)
     ctr_v = Double()
     average_cpv = Double()
+    video_quartile_25_rate = Double(index=False)
+    video_quartile_50_rate = Double(index=False)
+    video_quartile_75_rate = Double(index=False)
+    video_quartile_100_rate = Double(index=False)
+    all_conversions = Double(index=False)
+    conversions = Double(index=False)
+    view_through_conversions = Long(index=False)
+    cpc_bid = Float(index=False)
+    cpm_bid = Float(index=False)
 
 
 class VideoSectionCMS(BaseInnerDoc):
