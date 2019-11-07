@@ -602,7 +602,7 @@ class BaseManager:
         return ()
 
     def _get_enabled_monitoring_params_info(self):
-        return self.sections, (),
+        return self.sections, ()
 
 
     def get_monitoring_data(self):
