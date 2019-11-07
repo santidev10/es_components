@@ -132,7 +132,9 @@ class VideoSectionAdsStats(BaseInnerDoc):
     all_conversions = Double(index=False)
     conversions = Double(index=False)
     view_through_conversions = Long(index=False)
+    # max cpc bid value
     cpc_bid = Float(index=False)
+    # max cpm bid value
     cpm_bid = Float(index=False)
 
 
