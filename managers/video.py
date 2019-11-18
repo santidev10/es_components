@@ -31,6 +31,7 @@ COUNT_AGGREGATION = (
     "general_data.country",
     "general_data.category",
     "general_data.language",
+    "general_data.iab_categories",
     "cms.cms_title",
     "brand_safety",
     "stats.flags"
