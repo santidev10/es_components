@@ -17,8 +17,6 @@ from es_components.monitor import Warnings
 from es_components.utils import add_brand_safety_labels
 
 
-
-
 RANGE_AGGREGATION = (
     "stats.views",
     "stats.last_day_views",
