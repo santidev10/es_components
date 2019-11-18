@@ -55,18 +55,6 @@ class Warnings:
             return f"Less than {self.control_percentage}% of {self.section} data has been updated during the last day"
 
 
-    class SkippedRecords(BaseWarning):
-        name = "SkippedRecords"
-
-        def __init__(self, section, section_schedule):
-            super(Warnings.FewRecordsUpdated, self).__init__(section, section_schedule)
-            self.section = section
-
-        @property
-        def message(self):
-            return f"Less than {self.control_percentage}% of {self.section} data has been updated during the last day"
-
-
 class BaseMonitor:
     name = None
 
@@ -163,6 +151,7 @@ class MonitoringPerformance(BaseMonitor):
                 .get()
 
     def get_section_info(self, section, ignore_deleted=False):
+        # pylint: disable=no-member
         filled_query = QueryBuilder().build().must().exists().field(section).get()
         missed_query = QueryBuilder().build().must_not().exists().field(section).get()
 
@@ -183,6 +172,7 @@ class MonitoringPerformance(BaseMonitor):
             key: self.__get_count(query=query)
             for key, query in self.__timestamp_query_generator(section, timestamp_field=TimestampFields.CREATED_AT)
         }
+        # pylint: enable=no-member
 
         return dict(
             filled=filled,
@@ -195,28 +185,22 @@ class MonitoringPerformance(BaseMonitor):
         queries = None
 
         for section in skipped_sections:
-            __queries =  (
-                    QueryBuilder().build().must_not().range()
-                    .field(f"{section}.{TimestampFields.UPDATED_AT}")
-                    .gt(f"now-{86400 * self.SKIPPED_SECTION_CHECK_DAYS}s/s")
-                    .get() &
-
-                    QueryBuilder().build().must().range()
-                    .field(f"{section}_schedule.{TimestampFields.UPDATED_AT}")
-                    .gt(f"now-{86400 * self.SKIPPED_SECTION_CHECK_DAYS}s/s")
-                    .get() &
-
-                    QueryBuilder().build().must().range()
-                    .field(f"{section}_schedule.{TimestampFields.CREATED_AT}")
+            __queries = \
+                QueryBuilder().build().must_not().range().field(f"{section}.{TimestampFields.UPDATED_AT}")\
+                    .gt(f"now-{86400 * self.SKIPPED_SECTION_CHECK_DAYS}s/s").get() & \
+                QueryBuilder().build().must().range().field(f"{section}_schedule.{TimestampFields.UPDATED_AT}")\
+                    .gt(f"now-{86400 * self.SKIPPED_SECTION_CHECK_DAYS}s/s").get() & \
+                QueryBuilder().build().must().range().field(f"{section}_schedule.{TimestampFields.CREATED_AT}")\
                     .lt(f"now-{86400}s/s").get()
-            )
 
             queries = queries | __queries if queries is not None else __queries
 
         return self.__get_count(query=queries) if queries else None
 
+    # pylint: disable=no-member
     def __get_deleted(self):
         return self.__get_count(query=QueryBuilder().build().must().exists().field(Sections.DELETED).get())
+    # pylint: enable=no-member
 
     # pylint: disable=arguments-differ
     def get_info(self, sections, skipped_sections, *args):
@@ -282,7 +266,7 @@ class MonitoringPerformance(BaseMonitor):
         return count == 0
 
     def __check_few_records_updated(self, section, control_percentage=0, ignore_deleted=False, check_days=None):
-
+        # pylint: disable=no-member
         check_days = check_days or self.WARNINGS_FEW_UPDATES_CHECK_DAYS
 
         count = self.__get_count(query=QueryBuilder().build().must().range() \
@@ -295,7 +279,7 @@ class MonitoringPerformance(BaseMonitor):
         if ignore_deleted is True:
             total_query = total_query & QueryBuilder().build().must_not().exists().field(Sections.DELETED).get()
         total = self.__get_count(query=total_query)
-
+        # pylint: enable=no-member
         try:
             updated_percentage = count / total * 100
         except ZeroDivisionError:
