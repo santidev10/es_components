@@ -17,6 +17,8 @@ from es_components.monitor import Warnings
 from es_components.utils import add_brand_safety_labels
 
 
+
+
 RANGE_AGGREGATION = (
     "stats.views",
     "stats.last_day_views",
@@ -194,6 +196,7 @@ class VideoManager(BaseManager):
         aggregations_result = add_brand_safety_labels(aggregations_result)
         aggregations_result = self.adapt_flags_aggregation(aggregations_result)
         aggregations_result = self.adapt_transcripts_aggregation(aggregations_result)
+        aggregations_result = self.adapt_iab_categories_aggregation(aggregations_result)
         return aggregations_result
 
     def adapt_flags_aggregation(self, aggregations):

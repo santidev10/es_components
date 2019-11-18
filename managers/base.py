@@ -453,6 +453,11 @@ class BaseManager:
             del aggregations["stats.is_viral"]["buckets"][0]
         return aggregations
 
+    def adapt_iab_categories_aggregation(self, aggregations):
+        if "general_data.iab_categories" in aggregations:
+            pass
+        return aggregations
+
     def generate_distinct_values(self, field, pagesize=10000):
         composite = {
             "size": pagesize,

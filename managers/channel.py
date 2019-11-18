@@ -133,6 +133,7 @@ class ChannelManager(BaseManager):
 
         aggregations_result = add_brand_safety_labels(aggregations_result)
         aggregations_result = self.adapt_channel_group(aggregations_result)
+        aggregations_result = self.adapt_iab_categories_aggregation(aggregations_result)
 
         return aggregations_result
 
