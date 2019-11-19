@@ -23,6 +23,7 @@ from es_components.constants import TimestampFields
 from es_components.datetime_service import datetime_service
 from es_components.exceptions import DataModelNotSpecified
 from es_components.exceptions import SectionsNotAllowed
+from es_components.iab_categories import TOP_LEVEL_CATEGORIES
 from es_components.models.base import BaseDocument
 from es_components.monitor import Monitor
 from es_components.monitor import Warnings
@@ -451,6 +452,16 @@ class BaseManager:
             aggregations["stats.is_viral"]["buckets"][1]["key"] = "Viral"
             aggregations["stats.is_viral"]["buckets"][1].pop("key_as_string")
             del aggregations["stats.is_viral"]["buckets"][0]
+        return aggregations
+
+    def adapt_iab_categories_aggregation(self, aggregations):
+        if "general_data.iab_categories" in aggregations:
+            top_level_buckets = []
+            buckets = aggregations["general_data.iab_categories"]["buckets"]
+            for bucket in buckets:
+                if bucket['key'].lower().replace(" and ", " & ") in TOP_LEVEL_CATEGORIES:
+                    top_level_buckets.append(bucket)
+            aggregations["general_data.iab_categories"]["buckets"] = top_level_buckets
         return aggregations
 
     def generate_distinct_values(self, field, pagesize=10000):

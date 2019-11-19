@@ -32,6 +32,7 @@ COUNT_AGGREGATION = (
     "general_data.country",
     "general_data.category",
     "general_data.language",
+    "general_data.iab_categories",
     "cms.cms_title",
     "brand_safety",
     "stats.flags"
@@ -195,6 +196,7 @@ class VideoManager(BaseManager):
         aggregations_result = add_brand_safety_labels(aggregations_result)
         aggregations_result = self.adapt_flags_aggregation(aggregations_result)
         aggregations_result = self.adapt_transcripts_aggregation(aggregations_result)
+        aggregations_result = self.adapt_iab_categories_aggregation(aggregations_result)
         return aggregations_result
 
     def adapt_flags_aggregation(self, aggregations):

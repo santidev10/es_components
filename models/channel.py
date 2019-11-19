@@ -80,6 +80,7 @@ class ChannelSectionStats(BaseInnerDocWithHistory):
 
 class ChannelSectionMonetization(BaseInnerDoc):
     """ Nested monetization section for Channel document """
+    is_monetizable = Boolean()
     rate = Double(index=False)
     preferred = Boolean(index=False)
 
@@ -182,7 +183,6 @@ class ChannelSectionTaskUsData(BaseInnerDoc):
     """ Nested TaskUs Data Section for Channel document """
     is_safe = Boolean()
     is_user_generated_content = Boolean()
-    monetized = Boolean()
     scalable = Boolean()
     language = Keyword()
 
