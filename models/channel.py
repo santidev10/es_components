@@ -58,7 +58,7 @@ class ChannelSectionStats(BaseInnerDocWithHistory):
     last_30day_views = Long()
     views_per_video = Double()
     views_per_video_history = Double(index=False, multi=True)
-    observed_videos_views = Long(index=False)
+    observed_videos_views = Long()
     observed_videos_views_history = Long(index=False, multi=True)
     observed_videos_likes = Long(index=False)
     observed_videos_likes_history = Long(index=False, multi=True)
@@ -158,6 +158,7 @@ class ChannelSectionCustomPropetries(BaseInnerDoc):
     preferred = Boolean()
     social_links = Object(enabled=False)
     channel_group = Keyword(index=False)  # unused. copy of stats.channel_group?
+    is_tracked = Boolean()
 
 
 class ChannelSectionBrandSafety(BaseInnerDoc):
