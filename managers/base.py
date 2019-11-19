@@ -459,8 +459,7 @@ class BaseManager:
             top_level_buckets = []
             buckets = aggregations["general_data.iab_categories"]["buckets"]
             for bucket in buckets:
-                bucket['key'] = bucket['key'].replace(" and ", " & ")
-                if bucket['key'].lower() in TOP_LEVEL_CATEGORIES:
+                if bucket['key'].lower().replace(" and ", " & ") in TOP_LEVEL_CATEGORIES:
                     top_level_buckets.append(bucket)
             aggregations["general_data.iab_categories"]["buckets"] = top_level_buckets
         return aggregations
