@@ -17,8 +17,8 @@ def safe_div(numerator, denominator):
 
 def add_brand_safety_labels(aggregations):
     if "brand_safety" in aggregations:
-        aggregations["brand_safety"]["buckets"][0]["key"] = "High Risk"
-        aggregations["brand_safety"]["buckets"][1]["key"] = "Risky"
-        aggregations["brand_safety"]["buckets"][2]["key"] = "Low Risk"
-        aggregations["brand_safety"]["buckets"][3]["key"] = "Safe"
+        aggregations["brand_safety"]["buckets"][0]["key"] = "Unsuitable"
+        aggregations["brand_safety"]["buckets"][1]["key"] = "Low Suitability"
+        aggregations["brand_safety"]["buckets"][2]["key"] = "Medium Suitability"
+        aggregations["brand_safety"]["buckets"][3]["key"] = "Suitable"
     return aggregations
