@@ -53,7 +53,8 @@ COUNT_AGGREGATION = (
 COUNT_EXISTS_AGGREGATION = (
     "general_data.emails",
     "ads_stats",
-    "analytics"
+    "analytics",
+    "monetization.is_monetizable"
 )
 COUNT_MISSING_AGGREGATION = ("general_data.emails", "analytics",)
 
