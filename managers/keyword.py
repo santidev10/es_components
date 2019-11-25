@@ -29,7 +29,7 @@ class KeywordManager(BaseManager):
                self._filter_existent_section(Sections.STATS)
 
     def _get_enabled_monitoring_warnings(self):
-        return (Warnings.FewRecordsUpdated(Sections.STATS, 10),) + \
+        return (Warnings.FewRecordsUpdated(Sections.STATS, 1),) + \
                super(KeywordManager, self)._get_enabled_monitoring_warnings()
 
     def _get_enabled_monitoring_params_info(self):
