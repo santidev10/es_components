@@ -44,7 +44,7 @@ IAB_TO_YOUTUBE_CATEGORIES_MAPPING = {
     "pop culture": "entertainment",
     "sports": "sports",
     "style & fashion": "howto & style",
-    "technology & computing": "science and technology",
+    "technology & computing": "science & technology",
     "travel": "travel & events",
     "video gaming": "gaming",
     "comedy": "comedy",
