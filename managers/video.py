@@ -231,12 +231,11 @@ class VideoManager(BaseManager):
         return aggregations
 
     def _get_enabled_monitoring_warnings(self):
-        warning_no_new_sections = tuple([Warnings.NoNewSections(section) for section in self.sections])
         warning_few_records_updated = (
             Warnings.FewRecordsUpdated(Sections.GENERAL_DATA, 15, True),
             Warnings.FewRecordsUpdated(Sections.STATS, 30, True),
         )
-        return warning_few_records_updated + warning_no_new_sections + \
+        return warning_few_records_updated + \
                super(VideoManager, self)._get_enabled_monitoring_warnings()
 
 
