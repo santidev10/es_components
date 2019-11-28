@@ -598,7 +598,7 @@ class BaseManager:
 
         return percentiles
 
-    @classmethodscan
+    @classmethod
     def get_number_of_shards(cls):
         # pylint: disable=protected-access
         settings = cls.model._index.get_settings()
