@@ -4,6 +4,7 @@ import re
 import statistics
 from typing import Type
 
+from elasticsearch import NotFoundError
 from elasticsearch.helpers import bulk
 from elasticsearch_dsl import MultiSearch
 from elasticsearch_dsl import Q
@@ -130,7 +131,10 @@ class BaseManager:
     def truncate(self):
         """ Recreate index with deleting all documents. """
         # pylint: disable=protected-access
-        self.model._index.delete()
+        try:
+            self.model._index.delete()
+        except NotFoundError:
+            pass
         # pylint: enable=protected-access
         self.model.init()
 
