@@ -13,6 +13,7 @@ from elasticsearch_dsl import connections
 from es_components.config import ES_BULK_REFRESH_OPTION
 from es_components.config import ES_CHUNK_SIZE
 from es_components.config import ES_REQUEST_LIMIT
+from es_components.config import ES_MAX_CHUNK_BYTES
 from es_components.connections import init_es_connection
 from es_components.constants import EsDictFields
 from es_components.constants import FORCED_FILTER_OUDATED_DAYS
@@ -159,7 +160,8 @@ class BaseManager:
                 connections.get_connection(),
                 self._upsert_generator(_entries),
                 chunk_size=ES_CHUNK_SIZE,
-                refresh=ES_BULK_REFRESH_OPTION
+                refresh=ES_BULK_REFRESH_OPTION,
+                max_chunk_bytes=ES_MAX_CHUNK_BYTES
             )
 
     def _search(self):
