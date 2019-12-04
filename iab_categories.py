@@ -53,4 +53,4 @@ IAB_TO_YOUTUBE_CATEGORIES_MAPPING = {
     "people & blogs": "People & Blogs"
 }
 
-YOUTUBE_TO_IAB_CATEGORIES_MAPPING = {value: key for key, value in IAB_TO_YOUTUBE_CATEGORIES_MAPPING.items()}
+YOUTUBE_TO_IAB_CATEGORIES_MAPPING = {value.lower(): key.title() for key, value in IAB_TO_YOUTUBE_CATEGORIES_MAPPING.items()}
