@@ -50,7 +50,28 @@ IAB_TO_YOUTUBE_CATEGORIES_MAPPING = {
     "comedy": "Comedy",
     "nonprofits & activism": "Nonprofits & Activism",
     "kids content": "Kids Content",
-    "people & blogs": "People & Blogs"
+    "people & blogs": "People & Blogs",
+    "television": "Shows"
 }
 
-YOUTUBE_TO_IAB_CATEGORIES_MAPPING = {value.lower(): key.title() for key, value in IAB_TO_YOUTUBE_CATEGORIES_MAPPING.items()}
+YOUTUBE_TO_IAB_CATEGORIES_MAPPING = {
+    'autos & vehicles': 'Automotive',
+    'education': 'Education',
+    'film & animation': 'Movies',
+    'music': 'Music & Audio',
+    'news & politics': 'News & Politics',
+    'pets & animals': 'Pets',
+    'entertainment': 'Pop Culture',
+    'sports': 'Sports',
+    'howto & style': 'Style & Fashion',
+    'science & technology': 'Technology & Computing',
+    'travel & events': 'Travel',
+    'gaming': 'Video Gaming',
+    'comedy': 'Comedy',
+    'nonprofits & activism': 'Nonprofits & Activism',
+    'kids content': 'Kids Content',
+    'people & blogs': 'People & Blogs',
+    'movies': 'Movies',
+    'shows': 'Television',
+    'trailers': 'Movies'
+}
