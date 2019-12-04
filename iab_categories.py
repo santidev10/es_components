@@ -35,22 +35,22 @@ TOP_LEVEL_CATEGORIES = [
 ]
 
 IAB_TO_YOUTUBE_CATEGORIES_MAPPING = {
-    "automotive": "autos & vehicles",
-    "education": "education",
-    "movies": "film & animation",
-    "music & audio": "music",
-    "news & politics": "news & politics",
-    "pets": "pets & animals",
-    "pop culture": "entertainment",
-    "sports": "sports",
-    "style & fashion": "howto & style",
-    "technology & computing": "science & technology",
-    "travel": "travel & events",
-    "video gaming": "gaming",
-    "comedy": "comedy",
-    "nonprofits & activism": "nonprofits & activism",
-    "kids content": "kids content",
-    "people & blogs": "people & blogs"
+    "automotive": "Autos & Vehicles",
+    "education": "Education",
+    "movies": "Film & Animation",
+    "music & audio": "Music",
+    "news & politics": "News & Politics",
+    "pets": "Pets & Animals",
+    "pop culture": "Entertainment",
+    "sports": "Sports",
+    "style & fashion": "Howto & Style",
+    "technology & computing": "Science & Technology",
+    "travel": "Travel & Events",
+    "video gaming": "Gaming",
+    "comedy": "Comedy",
+    "nonprofits & activism": "Nonprofits & Activism",
+    "kids content": "Kids Content",
+    "people & blogs": "People & Blogs"
 }
 
 YOUTUBE_TO_IAB_CATEGORIES_MAPPING = {value: key for key, value in IAB_TO_YOUTUBE_CATEGORIES_MAPPING.items()}
