@@ -58,8 +58,6 @@ class ChannelSectionStats(BaseInnerDocWithHistory):
     last_30day_views = Long()
     views_per_video = Double()
     views_per_video_history = Double(index=False, multi=True)
-    observed_videos_views = Long()
-    observed_videos_views_history = Long(index=False, multi=True)
     observed_videos_likes = Long(index=False)
     observed_videos_likes_history = Long(index=False, multi=True)
     observed_videos_dislikes = Long(index=False)
@@ -74,7 +72,7 @@ class ChannelSectionStats(BaseInnerDocWithHistory):
     class History:
         all = (
             "subscribers", "views", "total_videos_count", "views_per_video", "observed_videos_count",
-            "observed_videos_views", "observed_videos_likes", "observed_videos_dislikes", "sentiment", "engage_rate"
+            "observed_videos_likes", "observed_videos_dislikes", "sentiment", "engage_rate"
         )
 
 
