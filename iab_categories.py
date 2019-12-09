@@ -1,3 +1,5 @@
+import json
+
 TOP_LEVEL_CATEGORIES = [
     "automotive",
     "books & literature",
@@ -75,3 +77,9 @@ YOUTUBE_TO_IAB_CATEGORIES_MAPPING = {
     'shows': 'Television',
     'trailers': 'Movies'
 }
+
+with open("es_components/iab_tier2_categories.json", "r") as f:
+    IAB_TIER2_CATEGORIES_MAPPING = json.load(f)
+
+with open("es_components/iab_tier3_categories.json", "r") as f:
+    IAB_TIER3_CATEGORIES_MAPPING = json.load(f)
