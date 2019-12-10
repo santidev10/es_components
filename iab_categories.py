@@ -57,25 +57,25 @@ IAB_TO_YOUTUBE_CATEGORIES_MAPPING = {
 }
 
 YOUTUBE_TO_IAB_CATEGORIES_MAPPING = {
-    'autos & vehicles': ['Automotive'],
-    'education': ['Education'],
-    'film & animation': ['Movies'],
-    'music': ['Music & Audio'],
-    'news & politics': ['News & Politics'],
-    'pets & animals': ['Pets'],
-    'entertainment': ['Pop Culture'],
-    'sports': ['Sports'],
-    'howto & style': ['Style & Fashion'],
-    'science & technology': ['Technology & Computing'],
-    'travel & events': ['Travel'],
-    'gaming': ['Video Gaming'],
-    'comedy': ['Television', 'Comedy TV'],
+    'autos & vehicles': ["Automotive"],
+    'education': ["Education"],
+    'film & animation': ["Movies"],
+    'music': ["Music & Audio"],
+    'news & politics': ["News & Politics"],
+    'pets & animals': ["Pets"],
+    'entertainment': ["Pop Culture"],
+    'sports': ["Sports"],
+    'howto & style': ["Style & Fashion"],
+    'science & technology': ["Technology & Computing"],
+    'travel & events': ["Travel"],
+    'gaming': ["Video Gaming"],
+    'comedy': ["Television", "Comedy TV"],
     'nonprofits & activism': ["Business & Finance", "Industries", "Non-Profit Organizations"],
-    'kids content': ['Kids Content'],
-    'people & blogs': ['Content Channel', 'Social'],
-    'movies': ['Movies'],
-    'shows': ['Television'],
-    'trailers': ['Movies']
+    'kids content': ["Kids Content"],
+    'people & blogs': ["Content Channel", "Social"],
+    'movies': ["Movies"],
+    'shows': ["Television"],
+    'trailers': ["Movies"]
 }
 
 with open("es_components/iab_tier2_categories.json", "r") as f:
