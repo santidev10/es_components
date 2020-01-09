@@ -38,7 +38,7 @@ class ChannelSectionStats(BaseInnerDocWithHistory):
     """ Nested statistics section for Channel document """
     fetched_at = Date(index=False)
     historydate = Date(index=False)
-    last_video_published_at = Date(index=False)
+    last_video_published_at = Date()
     subscribers = Long()
     subscribers_history = Long(index=False, multi=True)
     last_day_subscribers = Long(index=False)  # unused
