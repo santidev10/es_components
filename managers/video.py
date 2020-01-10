@@ -119,13 +119,13 @@ class VideoManager(BaseManager):
     def get_total_count_for_channels(self, channels_ids):
         search = self.search(query=self.by_channel_ids_query(channels_ids))
         result = search.execute()
-        total = result.hits.total
+        total = result.hits.total.value
         return total
 
     def get_total_count_for_content_owners(self, content_owner_ids):
         search = self.search(query=self.by_content_owner_ids_query(content_owner_ids))
         result = search.execute()
-        total = result.hits.total
+        total = result.hits.total.value
         return total
 
     def get_totals_by_channels(self, channels: List[Channel]):
