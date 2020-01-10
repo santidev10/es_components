@@ -236,8 +236,7 @@ class BaseManager:
 
     def _drop_invalid_field_from_section_dict(self, entry, entry_dict, section):
         # pylint: disable=protected-access
-        doc_type = entry._doc_type.name
-        doc_mapping = entry._doc_type.mapping.to_dict()[doc_type][EsDictFields.PROPERTIES]
+        doc_mapping = entry._doc_type.mapping.to_dict()[EsDictFields.PROPERTIES]
         # pylint: enable=protected-access
 
         section_mapping = doc_mapping[section][EsDictFields.PROPERTIES].keys()
