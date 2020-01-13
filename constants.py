@@ -47,9 +47,9 @@ class SortDirections:
 
 
 FORCED_FILTER_OUDATED_DAYS = 14
-MAIN_ID_FIELD = "main.id"
-VIDEO_CHANNEL_ID_FIELD = "channel.id"
-CONTENT_OWNER_ID_FIELD = "cms.content_owner_id"
-SEGMENTS_UUID_FIELD = "segments.uuid"
+MAIN_ID_FIELD = "main.id.keyword"
+VIDEO_CHANNEL_ID_FIELD = "channel.id.keyword"
+CONTENT_OWNER_ID_FIELD = "cms.content_owner_id.keyword"
+SEGMENTS_UUID_FIELD = "segments.uuid.keyword"
 VIEWS_FIELD = "stats.views"
 SUBSCRIBERS_FIELD = "stats.subscribers"
