@@ -29,13 +29,13 @@ RANGE_AGGREGATION = (
 )
 
 COUNT_AGGREGATION = (
-    "general_data.country",
-    "general_data.category",
-    "general_data.language",
-    "general_data.iab_categories",
-    "cms.cms_title",
+    "general_data.country.keyword",
+    "general_data.category.keyword",
+    "general_data.language.keyword",
+    "general_data.iab_categories.keyword",
+    "cms.cms_title.keyword",
     "brand_safety",
-    "stats.flags"
+    "stats.flags.keyword"
 )
 
 COUNT_EXISTS_AGGREGATION = ("analytics", "stats.flags", "custom_captions.items", "captions",)
@@ -137,7 +137,7 @@ class VideoManager(BaseManager):
         query = {
             "bool": {
                 "must": [
-                    {"terms": {"channel.id": channel_ids}}
+                    {"terms": {"channel.id.keyword": channel_ids}}
                 ]
             }
         }
@@ -145,7 +145,7 @@ class VideoManager(BaseManager):
         aggregations = {
             aggrenation_name: {
                 "terms": {
-                    "field": "channel.id",
+                    "field": "channel.id.keyword",
                     "size": ES_CHUNK_SIZE,
                 },
             }
@@ -200,9 +200,9 @@ class VideoManager(BaseManager):
         return aggregations_result
 
     def adapt_flags_aggregation(self, aggregations):
-        if "stats.flags" in aggregations:
+        if "stats.flags.keyword" in aggregations:
             flags_buckets = []
-            for bucket in aggregations["stats.flags"]["buckets"]:
+            for bucket in aggregations["stats.flags.keyword"]["buckets"]:
                 key = bucket["key"]
                 if key == "viral":
                     bucket["key"] = "Viral"
@@ -213,8 +213,8 @@ class VideoManager(BaseManager):
                 elif key == "most_watched":
                     bucket["key"] = "Most Watched"
                     flags_buckets.append(bucket)
-            aggregations["stats.flags"]["buckets"] = flags_buckets
-            aggregations["flags"] = aggregations.pop("stats.flags")
+            aggregations["stats.flags.keyword"]["buckets"] = flags_buckets
+            aggregations["flags"] = aggregations.pop("stats.flags.keyword")
         return aggregations
 
     def adapt_transcripts_aggregation(self, aggregations):

@@ -460,13 +460,13 @@ class BaseManager:
         return aggregations
 
     def adapt_iab_categories_aggregation(self, aggregations):
-        if "general_data.iab_categories" in aggregations:
+        if "general_data.iab_categories.keyword" in aggregations:
             top_level_buckets = []
-            buckets = aggregations["general_data.iab_categories"]["buckets"]
+            buckets = aggregations["general_data.iab_categories.keyword"]["buckets"]
             for bucket in buckets:
                 if bucket['key'].lower().replace(" and ", " & ") in TOP_LEVEL_CATEGORIES:
                     top_level_buckets.append(bucket)
-            aggregations["general_data.iab_categories"]["buckets"] = top_level_buckets
+            aggregations["general_data.iab_categories.keyword"]["buckets"] = top_level_buckets
         return aggregations
 
     def generate_distinct_values(self, field, pagesize=10000):
