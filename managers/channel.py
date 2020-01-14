@@ -38,16 +38,16 @@ RANGE_AGGREGATION = (
 )
 
 COUNT_AGGREGATION = (
-    "general_data.country.keyword",
-    "general_data.top_category.keyword",
-    "general_data.top_language.keyword",
-    "general_data.iab_categories.keyword",
+    "general_data.country",
+    "general_data.top_category",
+    "general_data.top_language",
+    "general_data.iab_categories",
     "analytics.is_auth",
     "analytics.is_cms",
     "custom_properties.preferred",
-    "cms.cms_title.keyword",
+    "cms.cms_title",
     "brand_safety",
-    "stats.channel_group.keyword"
+    "stats.channel_group"
 )
 
 COUNT_EXISTS_AGGREGATION = (
@@ -139,9 +139,9 @@ class ChannelManager(BaseManager):
         return aggregations_result
 
     def adapt_channel_group(self, aggregations):
-        if "stats.channel_group.keyword" in aggregations:
+        if "stats.channel_group" in aggregations:
             channel_group_buckets = []
-            for bucket in aggregations["stats.channel_group.keyword"]["buckets"]:
+            for bucket in aggregations["stats.channel_group"]["buckets"]:
                 key = bucket["key"]
                 if key == "influencers":
                     bucket["key"] = "Influencers"
@@ -152,7 +152,7 @@ class ChannelManager(BaseManager):
                 elif key == "media":
                     bucket["key"] = "Media & Entertainment"
                     channel_group_buckets.append(bucket)
-            aggregations["stats.channel_group.keyword"]["buckets"] = channel_group_buckets
+            aggregations["stats.channel_group"]["buckets"] = channel_group_buckets
         return aggregations
 
 
