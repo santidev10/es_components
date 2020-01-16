@@ -156,7 +156,7 @@ class BaseDocument(Document):
             for name, extra_values in append_uniq_kwargs.items():
                 if not isinstance(extra_values, list):
                     raise TypeError
-                values = getattr(section, name)
+                values = getattr(section, name, []) or []
                 values = AttrList(set(list(values) + extra_values))
                 setattr(section, name, values)
 
