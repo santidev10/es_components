@@ -77,6 +77,10 @@ class Rule:
         self.__query.set_rule("prefix")
         return Field(self.__query, PrefixValue)
 
+    def wildcard(self):
+        self.__query.set_rule("wildcard")
+        return Field(self.__query, PrefixValue)
+
     def range(self):
         self.__query.set_rule("range")
         return Field(self.__query, RangeValue)
