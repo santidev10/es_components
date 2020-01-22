@@ -73,6 +73,10 @@ class Rule:
         self.__query.set_rule("match_phrase")
         return Field(self.__query, Value)
 
+    def prefix(self):
+        self.__query.set_rule("prefix")
+        return Field(self.__query, PrefixValue)
+
     def range(self):
         self.__query.set_rule("range")
         return Field(self.__query, RangeValue)
@@ -105,6 +109,11 @@ class Value:
     def value(self, value):
         self.__query.set_value(value)
         return self.__query
+
+
+class PrefixValue(Value):
+    def value(self, value):
+        return super(PrefixValue, self).value({"value": value})
 
 
 class RangeValue:
