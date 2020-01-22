@@ -34,7 +34,7 @@ class VideoSectionGeneralData(BaseInnerDoc):
     license = Keyword(index=False)  # unused
     is_streaming = Boolean(index=False)
     iab_categories = Keyword(multi=True)
-
+    age_restricted = Boolean(index=True)
 
 class VideoSectionChannel(BaseInnerDoc):
     # pylint: disable=invalid-name
