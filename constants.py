@@ -28,6 +28,7 @@ class Sections:
     GENERAL_DATA_SCHEDULE = "general_data_schedule"
     STATS_SCHEDULE = "stats_schedule"
     CAPTIONS_SCHEDULE = "captions_schedule"
+    ADS_STATS_SCHEDULE = "ads_stats_schedule"
 
     SEGMENTS = "segments"
     SIMILAR_CHANNELS = "similar_channels"
