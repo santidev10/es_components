@@ -57,7 +57,8 @@ class VideoManager(BaseManager):
                        + (Sections.GENERAL_DATA, Sections.STATS, Sections.ANALYTICS,
                           Sections.CHANNEL, Sections.CAPTIONS, Sections.MONETIZATION,
                           Sections.ADS_STATS, Sections.CMS, Sections.ANALYTICS_SCHEDULE,
-                          Sections.CAPTIONS_SCHEDULE, Sections.BRAND_SAFETY, Sections.CUSTOM_CAPTIONS)
+                          Sections.ADS_STATS_SCHEDULE, Sections.CAPTIONS_SCHEDULE,
+                          Sections.BRAND_SAFETY, Sections.CUSTOM_CAPTIONS)
     model = Video
     forced_filter_section_oudated = Sections.GENERAL_DATA
     range_aggregation_fields = RANGE_AGGREGATION

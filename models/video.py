@@ -183,6 +183,7 @@ class Video(BaseDocument):
 
     analytics_schedule = Object(Schedule)
     captions_schedule = Object(Schedule)
+    ads_stats_schedule = Object(Schedule)
 
     class Index:
         name = VIDEO_INDEX_NAME

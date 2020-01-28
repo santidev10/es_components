@@ -203,6 +203,7 @@ class Channel(BaseDocument):
     general_data_schedule = Object(Schedule)
     stats_schedule = Object(Schedule)
     analytics_schedule = Object(Schedule)
+    ads_stats_schedule = Object(Schedule)
 
     task_us_data = Object(ChannelSectionTaskUsData)
 
