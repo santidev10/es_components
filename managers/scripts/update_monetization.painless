@@ -1,0 +1,7 @@
+def monetization = ctx._source.monetization;
+if (monetization == null) {
+    monetization = ['created_at': params.now];
+}
+monetization.updated_at = params.now;
+monetization.is_monetizable = params.is_monetizable;
+ctx._source.monetization = monetization;
