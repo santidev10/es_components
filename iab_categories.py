@@ -81,5 +81,11 @@ YOUTUBE_TO_IAB_CATEGORIES_MAPPING = {
 with open("es_components/iab_tier2_categories.json", "r") as f:
     IAB_TIER2_CATEGORIES_MAPPING = json.load(f)
 
+    IAB_TIER2_SET = []
+    for tier_1, tier_2 in IAB_TIER2_CATEGORIES_MAPPING.items():
+        tier_2 += [tier_1]
+        IAB_TIER2_SET.extend(tier_2)
+    IAB_TIER2_SET = set(IAB_TIER2_SET)
+
 with open("es_components/iab_tier3_categories.json", "r") as f:
     IAB_TIER3_CATEGORIES_MAPPING = json.load(f)

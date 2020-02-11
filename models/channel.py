@@ -185,6 +185,10 @@ class ChannelSectionTaskUsData(BaseInnerDoc):
     scalable = Boolean()
     language = Keyword()
     iab_categories = Keyword(multi=True)
+    age_group = Keyword()
+    channel_type = Keyword()
+    gender = Keyword()
+    brand_safety = Keyword(multi=True)
 
 
 class Channel(BaseDocument):
