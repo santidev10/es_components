@@ -97,7 +97,7 @@ class VideoCustomCaptionsItem(BaseInnerDoc):
 
 class VideoSectionCustomCaptions(BaseInnerDoc):
     transcripts_checked = Boolean()
-    submitted_watson = Boolean()
+    watson_job_id = Keyword()
     items = Object(VideoCustomCaptionsItem, multi=True, enabled=True)
 
 
