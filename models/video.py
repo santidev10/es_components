@@ -36,6 +36,7 @@ class VideoSectionGeneralData(BaseInnerDoc):
     iab_categories = Keyword(multi=True)
     age_restricted = Boolean(index=True)
 
+
 class VideoSectionChannel(BaseInnerDoc):
     # pylint: disable=invalid-name
     id = Keyword()
@@ -171,6 +172,19 @@ class VideoSectionBrandSafety(BaseInnerDoc):
     categories = Object()
 
 
+class VideoSectionTaskUsData(BaseInnerDoc):
+    """ Nested TaskUs Data Section for Video document """
+    is_safe = Boolean()
+    is_user_generated_content = Boolean()
+    scalable = Boolean()
+    language = Keyword()
+    iab_categories = Keyword(multi=True)
+    age_group = Keyword()
+    content_type = Keyword()
+    gender = Keyword()
+    brand_safety = Keyword(multi=True)
+
+
 class Video(BaseDocument):
     general_data = Object(VideoSectionGeneralData)
     stats = Object(VideoSectionStats)
@@ -182,6 +196,7 @@ class Video(BaseDocument):
     channel = Object(VideoSectionChannel)
     brand_safety = Object(VideoSectionBrandSafety)
     custom_captions = Object(VideoSectionCustomCaptions)
+    task_us_data = Object(VideoSectionTaskUsData)
 
     analytics_schedule = Object(Schedule)
     captions_schedule = Object(Schedule)
@@ -226,3 +241,6 @@ class Video(BaseDocument):
 
     def populate_custom_captions(self, **kwargs):
         self._populate_section(Sections.CUSTOM_CAPTIONS, **kwargs)
+
+    def populate_task_us_data(self, **kwargs):
+        self._populate_section(Sections.TASK_US_DATA, **kwargs)
