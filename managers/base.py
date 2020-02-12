@@ -511,6 +511,21 @@ class BaseManager:
             .terms().field(SEGMENTS_UUID_FIELD) \
             .value(segment_ids).get()
 
+    def update_monetization(self, filter_query, is_monetizable):
+        if Sections.MONETIZATION not in self.upsert_sections:
+            raise BrokenPipeError(f"This manager can't update {Sections.MONETIZATION} section")
+
+        script = dict(
+            source=CachedScriptsReader.get_script("update_monetization.painless"),
+            params=dict(
+                now=datetime_service.now().isoformat(),
+                is_monetizable=is_monetizable
+            )
+        )
+        return self.update(filter_query) \
+            .script(**script) \
+            .execute()
+
     def remove_sections(self, filter_query, sections):
         if not set(sections).issubset(set(self.allowed_sections)):
             raise SectionsNotAllowed("Cannot find such section in Data Model sections")

@@ -187,6 +187,7 @@ class ChannelSectionTaskUsData(BaseInnerDoc):
     iab_categories = Keyword(multi=True)
     age_group = Keyword()
     channel_type = Keyword()
+    content_type = Keyword()
     gender = Keyword()
     brand_safety = Keyword(multi=True)
 
@@ -203,13 +204,12 @@ class Channel(BaseDocument):
     brand_safety = Object(ChannelSectionBrandSafety)
     auth = Object(ChannelSectionAuth)
     similar_channels = Object(ChannelSectionSimilar)
+    task_us_data = Object(ChannelSectionTaskUsData)
 
     general_data_schedule = Object(Schedule)
     stats_schedule = Object(Schedule)
     analytics_schedule = Object(Schedule)
     ads_stats_schedule = Object(Schedule)
-
-    task_us_data = Object(ChannelSectionTaskUsData)
 
     class Index:
         name = CHANNEL_INDEX_NAME
