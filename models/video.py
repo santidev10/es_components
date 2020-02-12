@@ -28,7 +28,7 @@ class VideoSectionGeneralData(BaseInnerDoc):
     tags = Keyword(multi=True)
     youtube_published_at = Date()
     category = Keyword()
-    lang_code = Keyword(index=False)
+    lang_code = Keyword(index=True)
     language = Keyword()
     duration = Long(index=False)
     license = Keyword(index=False)  # unused
