@@ -28,7 +28,7 @@ class ChannelSectionGeneralData(BaseInnerDoc):
     youtube_published_at = Date(index=True)
     video_tags = Keyword(index=False, multi=True)
     top_category = Keyword()
-    lang_codes = Keyword(index=False, multi=True)
+    lang_codes = Keyword(index=True, multi=True)
     top_language = Keyword()
     emails = Keyword(multi=True)
     iab_categories = Keyword(multi=True)
