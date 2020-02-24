@@ -184,6 +184,7 @@ class ChannelSectionTaskUsData(BaseInnerDoc):
     is_user_generated_content = Boolean()
     scalable = Boolean()
     language = Keyword()
+    lang_code = Keyword(index=True)
     iab_categories = Keyword(multi=True)
     age_group = Keyword()
     channel_type = Keyword()
