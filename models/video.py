@@ -177,6 +177,7 @@ class VideoSectionTaskUsData(BaseInnerDoc):
     is_safe = Boolean()
     is_user_generated_content = Boolean()
     scalable = Boolean()
+    lang_code = Keyword(index=True)
     language = Keyword()
     iab_categories = Keyword(multi=True)
     age_group = Keyword()
