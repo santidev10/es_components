@@ -35,7 +35,7 @@ from es_components.utils import chunks
 AGGREGATION_COUNT_SIZE = 100000
 AGGREGATION_PERCENTS = tuple(range(10, 100, 10))
 
-
+# pylint: disable=too-many-public-methods
 class BaseManager:
     """
     allowed_sections - a tuple of allowed sections name
@@ -647,6 +647,7 @@ class BaseManager:
             alerts=monitor.get_alerts(self._get_enabled_monitoring_alerts())
         )
         return data
+# pylint: enable=too-many-public-methods
 
 
 class CachedScriptsReader:
