@@ -25,6 +25,7 @@ class VideoSectionGeneralData(BaseInnerDoc):
     description = Text()
     thumbnail_image_url = Text(index=False)
     country = Keyword()
+    country_code = Keyword()
     tags = Keyword(multi=True)
     youtube_published_at = Date()
     category = Keyword()
