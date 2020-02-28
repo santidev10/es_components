@@ -24,7 +24,9 @@ class ChannelSectionGeneralData(BaseInnerDoc):
     description = Text()
     thumbnail_image_url = Text(index=False)
     country = Keyword()
+    country_code = Keyword()
     country_original = Keyword(index=False)
+    country_code_original = Keyword(index=False)
     youtube_published_at = Date(index=True)
     video_tags = Keyword(index=False, multi=True)
     top_category = Keyword()
@@ -153,6 +155,7 @@ class ChannelSectionCMS(BaseInnerDoc):
 class ChannelSectionCustomPropetries(BaseInnerDoc):
     emails = Keyword(multi=True, index=False)  # unused
     country = Keyword(index=False)
+    country_code = Keyword(index=False)
     preferred = Boolean()
     social_links = Object(enabled=False)
     channel_group = Keyword(index=False)  # unused. copy of stats.channel_group?
