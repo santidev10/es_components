@@ -526,7 +526,7 @@ class BaseManager:
             .script(**script) \
             .execute()
 
-    def remove_sections(self, filter_query, sections):
+    def remove_sections(self, filter_query, sections, proceed_conflict=False):
         if not set(sections).issubset(set(self.allowed_sections)):
             raise SectionsNotAllowed("Cannot find such section in Data Model sections")
 
@@ -536,9 +536,11 @@ class BaseManager:
                 sections=sections
             )
         )
-        return self.update(filter_query) \
-            .script(**script) \
-            .execute()
+        update = self.update(filter_query)\
+            .script(**script)
+        if proceed_conflict is True:
+            update = update.params(conflicts="proceed")
+        return update.execute()
 
     def add_to_segment(self, filter_query, segment_uuid):
         if Sections.SEGMENTS not in self.upsert_sections:
