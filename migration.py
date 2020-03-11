@@ -18,7 +18,8 @@ connection = connections.get_connection()
 
 def init_mapping():
     for _model in ALL_MODELS:
-        _model.init()
+        _model.init(index=_model.Index.name)
+
 
 def reindex():
     for model in ALL_MODELS:
@@ -31,6 +32,7 @@ def reindex():
             body=body,
             wait_for_completion=False,
         )
+
 
 def get_reindex_tasks():
     tasks = connection.tasks.list(group_by="parents", actions="*reindex").get("tasks")
