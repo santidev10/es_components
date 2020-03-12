@@ -29,13 +29,14 @@ class VideoSectionGeneralData(BaseInnerDoc):
     tags = Keyword(multi=True)
     youtube_published_at = Date()
     category = Keyword()
-    lang_code = Keyword(index=True)
+    lang_code = Keyword()
     language = Keyword()
     duration = Long(index=False)
     license = Keyword(index=False)  # unused
     is_streaming = Boolean(index=False)
     iab_categories = Keyword(multi=True)
     age_restricted = Boolean(index=True)
+    made_for_kids = Boolean()
 
 
 class VideoSectionChannel(BaseInnerDoc):
