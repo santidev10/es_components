@@ -36,6 +36,7 @@ class VideoSectionGeneralData(BaseInnerDoc):
     is_streaming = Boolean(index=False)
     iab_categories = Keyword(multi=True)
     age_restricted = Boolean(index=True)
+    made_for_kids = Boolean()
 
 
 class VideoSectionChannel(BaseInnerDoc):

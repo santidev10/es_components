@@ -33,6 +33,7 @@ class ChannelSectionGeneralData(BaseInnerDoc):
     top_lang_code = Keyword()
     emails = Keyword(multi=True)
     iab_categories = Keyword(multi=True)
+    made_for_kids = Boolean()
 
 
 class ChannelSectionStats(BaseInnerDocWithHistory):
