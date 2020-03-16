@@ -1,4 +1,4 @@
-COUNTRIES = {
+COUNTRY_CODES = {
     "Aruba": "AW",
     "Afghanistan": "AF",
     "Angola": "AO",
@@ -283,7 +283,7 @@ COUNTRIES = {
     "Zimbabwe": "ZW"}
 
 
-COUNTRY_CODES = {
+COUNTRIES = {
     'AW': ['Aruba'],
     'AF': ['Afghanistan'],
     'AO': ['Angola'],
