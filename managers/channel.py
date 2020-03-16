@@ -6,6 +6,7 @@ from es_components.query_builder import QueryBuilder
 from es_components.monitor import Emergency
 from es_components.monitor import Warnings
 from es_components.utils import add_brand_safety_labels
+from es_components.languages import LANGUAGES
 
 
 AGGREGATION_COUNT_SIZE = 100000
@@ -39,8 +40,10 @@ RANGE_AGGREGATION = (
 
 COUNT_AGGREGATION = (
     "general_data.country",
+    "general_data.country_code",
     "general_data.top_category",
     "general_data.top_language",
+    "general_data.top_lang_code",
     "general_data.iab_categories",
     "analytics.is_auth",
     "analytics.is_cms",
@@ -135,8 +138,18 @@ class ChannelManager(BaseManager):
         aggregations_result = add_brand_safety_labels(aggregations_result)
         aggregations_result = self.adapt_channel_group(aggregations_result)
         aggregations_result = self.adapt_iab_categories_aggregation(aggregations_result)
-
+        aggregations_result = self.adapt_country_code_aggregation(aggregations_result)
+        aggregations_result = self.adapt_lang_code_aggregation(aggregations_result)
         return aggregations_result
+
+    def adapt_lang_code_aggregation(self, aggregations):
+        if "general_data.top_lang_code" in aggregations:
+            for bucket in aggregations["general_data.top_lang_code"]["buckets"]:
+                try:
+                    bucket["language"] = LANGUAGES[bucket["key"]]
+                except Exception as e:
+                    pass
+        return aggregations
 
     def adapt_channel_group(self, aggregations):
         if "stats.channel_group" in aggregations:

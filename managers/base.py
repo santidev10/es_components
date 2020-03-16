@@ -31,6 +31,7 @@ from es_components.monitor import Monitor
 from es_components.monitor import Warnings
 from es_components.query_builder import QueryBuilder
 from es_components.utils import chunks
+from es_components.countries import COUNTRIES
 
 AGGREGATION_COUNT_SIZE = 100000
 AGGREGATION_PERCENTS = tuple(range(10, 100, 10))
@@ -452,6 +453,15 @@ class BaseManager:
         aggregations_result = aggregations_search.execute().aggregations.to_dict()
         aggregations_result = self.adapt_is_viral_aggregation(aggregations_result)
         return aggregations_result
+
+    def adapt_country_code_aggregation(self, aggregations):
+        if "general_data.country_code" in aggregations:
+            for bucket in aggregations["general_data.country_code"]["buckets"]:
+                try:
+                    bucket["country"] = COUNTRIES[bucket["key"]][0]
+                except Exception as e:
+                    pass
+        return aggregations
 
     def adapt_is_viral_aggregation(self, aggregations):
         if "stats.is_viral" in aggregations:

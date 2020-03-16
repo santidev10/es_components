@@ -15,6 +15,7 @@ from es_components.query_builder import QueryBuilder
 from es_components.monitor import Emergency
 from es_components.monitor import Warnings
 from es_components.utils import add_brand_safety_labels
+from es_components.languages import LANGUAGES
 
 
 RANGE_AGGREGATION = (
@@ -30,8 +31,10 @@ RANGE_AGGREGATION = (
 
 COUNT_AGGREGATION = (
     "general_data.country",
+    "general_data.country_code",
     "general_data.category",
     "general_data.language",
+    "general_data.lang_code",
     "general_data.iab_categories",
     "cms.cms_title",
     "brand_safety",
@@ -198,7 +201,18 @@ class VideoManager(BaseManager):
         aggregations_result = self.adapt_flags_aggregation(aggregations_result)
         aggregations_result = self.adapt_transcripts_aggregation(aggregations_result)
         aggregations_result = self.adapt_iab_categories_aggregation(aggregations_result)
+        aggregations_result = self.adapt_country_code_aggregation(aggregations_result)
+        aggregations_result = self.adapt_lang_code_aggregation(aggregations_result)
         return aggregations_result
+
+    def adapt_lang_code_aggregation(self, aggregations):
+        if "general_data.lang_code" in aggregations:
+            for bucket in aggregations["general_data.lang_code"]["buckets"]:
+                try:
+                    bucket["language"] = LANGUAGES[bucket["key"]]
+                except Exception as e:
+                    pass
+        return aggregations
 
     def adapt_flags_aggregation(self, aggregations):
         if "stats.flags" in aggregations:
