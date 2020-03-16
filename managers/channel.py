@@ -39,8 +39,10 @@ RANGE_AGGREGATION = (
 
 COUNT_AGGREGATION = (
     "general_data.country",
+    "general_data.country_code",
     "general_data.top_category",
     "general_data.top_language",
+    "general_data.top_lang_code",
     "general_data.iab_categories",
     "analytics.is_auth",
     "analytics.is_cms",
@@ -135,8 +137,12 @@ class ChannelManager(BaseManager):
         aggregations_result = add_brand_safety_labels(aggregations_result)
         aggregations_result = self.adapt_channel_group(aggregations_result)
         aggregations_result = self.adapt_iab_categories_aggregation(aggregations_result)
+        aggregations_result = self.adapt_country_code_aggregation(aggregations_result)
 
         return aggregations_result
+
+    def adapt_country_code_aggregation(self, aggregations):
+        return aggregations
 
     def adapt_channel_group(self, aggregations):
         if "stats.channel_group" in aggregations:

@@ -30,8 +30,10 @@ RANGE_AGGREGATION = (
 
 COUNT_AGGREGATION = (
     "general_data.country",
+    "general_data.country_code",
     "general_data.category",
     "general_data.language",
+    "general_data.lang_code",
     "general_data.iab_categories",
     "cms.cms_title",
     "brand_safety",
@@ -198,7 +200,11 @@ class VideoManager(BaseManager):
         aggregations_result = self.adapt_flags_aggregation(aggregations_result)
         aggregations_result = self.adapt_transcripts_aggregation(aggregations_result)
         aggregations_result = self.adapt_iab_categories_aggregation(aggregations_result)
+        aggregations_result = self.adapt_country_code_aggregation(aggregations_result)
         return aggregations_result
+
+    def adapt_country_code_aggregation(self, aggregations):
+        return aggregations
 
     def adapt_flags_aggregation(self, aggregations):
         if "stats.flags" in aggregations:
