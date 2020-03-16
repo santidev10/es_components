@@ -140,7 +140,7 @@ class ChannelManager(BaseManager):
         aggregations_result = self.adapt_channel_group(aggregations_result)
         aggregations_result = self.adapt_iab_categories_aggregation(aggregations_result)
         aggregations_result = self.adapt_country_code_aggregation(aggregations_result)
-
+        aggregations_result = self.adapt_lang_code_aggregation(aggregations_result)
         return aggregations_result
 
     def adapt_country_code_aggregation(self, aggregations):
