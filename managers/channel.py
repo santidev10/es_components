@@ -147,8 +147,10 @@ class ChannelManager(BaseManager):
             for bucket in aggregations["general_data.top_lang_code"]["buckets"]:
                 try:
                     bucket["language"] = LANGUAGES[bucket["key"]]
+                # pylint: disable=invalid-name
                 except Exception as e:
                     pass
+                # pylint: enable=invalid-name
         return aggregations
 
     def adapt_channel_group(self, aggregations):
