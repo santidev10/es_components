@@ -15,6 +15,8 @@ from es_components.query_builder import QueryBuilder
 from es_components.monitor import Emergency
 from es_components.monitor import Warnings
 from es_components.utils import add_brand_safety_labels
+from es_components.countries import COUNTRIES
+from es_components.languages import LANGUAGES
 
 
 RANGE_AGGREGATION = (
@@ -204,6 +206,21 @@ class VideoManager(BaseManager):
         return aggregations_result
 
     def adapt_country_code_aggregation(self, aggregations):
+        if "general_data.country_code" in aggregations:
+            for bucket in aggregations["general_data.country_code"]["buckets"]:
+                try:
+                    bucket["country"] = COUNTRIES[bucket["key"]][0]
+                except Exception as e:
+                    pass
+        return aggregations
+
+    def adapt_lang_code_aggregation(self, aggregations):
+        if "general_data.lang_code" in aggregations:
+            for bucket in aggregations["general_data.lang_code"]["buckets"]:
+                try:
+                    bucket["language"] = LANGUAGES[bucket["key"]]
+                except Exception as e:
+                    pass
         return aggregations
 
     def adapt_flags_aggregation(self, aggregations):
