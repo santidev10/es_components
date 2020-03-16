@@ -461,7 +461,7 @@ class BaseManager:
                     bucket["country"] = COUNTRIES[bucket["key"]][0]
                 # pylint: disable=invalid-name
                 except Exception as e:
-                    pass
+                    bucket["country"] = bucket["key"]
                 # pylint: enable=invalid-name
         return aggregations
 
