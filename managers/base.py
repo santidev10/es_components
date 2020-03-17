@@ -173,8 +173,8 @@ class BaseManager:
         if query:
             search = search.query(query)
         if filters and isinstance(filters, list):
-            for filter in filters:
-                search = search.query(filter)
+            for es_filter in filters:
+                search = search.query(es_filter)
         elif filters:
             search = search.filter(filters)
         if sort:
