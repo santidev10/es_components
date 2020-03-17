@@ -149,7 +149,7 @@ class ChannelManager(BaseManager):
                     bucket["language"] = LANGUAGES[bucket["key"]]
                 # pylint: disable=invalid-name
                 # pylint: disable=broad-except
-                except Exception as e:
+                except Exception:
                     bucket["language"] = bucket["key"]
                 # pylint: enable=invalid-name
                 # pylint: enable=broad-except
