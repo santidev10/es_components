@@ -7,7 +7,6 @@ from typing import Type
 from elasticsearch import NotFoundError
 from elasticsearch.helpers import bulk
 from elasticsearch_dsl import MultiSearch
-from elasticsearch_dsl import Q
 from elasticsearch_dsl import connections
 
 from es_components.config import ES_BULK_REFRESH_OPTION
