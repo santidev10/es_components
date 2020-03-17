@@ -460,9 +460,11 @@ class BaseManager:
                 try:
                     bucket["country"] = COUNTRIES[bucket["key"]][0]
                 # pylint: disable=invalid-name
+                # pylint: disable=broad-except
                 except Exception as e:
                     bucket["country"] = bucket["key"]
                 # pylint: enable=invalid-name
+                # pylint: enable=broad-except
         return aggregations
 
     def adapt_is_viral_aggregation(self, aggregations):
