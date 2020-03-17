@@ -458,7 +458,7 @@ class BaseManager:
         if "general_data.country_code" in aggregations:
             for bucket in aggregations["general_data.country_code"]["buckets"]:
                 try:
-                    bucket["country"] = COUNTRIES[bucket["key"]][0]
+                    bucket["title"] = COUNTRIES[bucket["key"]][0]
                 except Exception as e:
                     pass
         return aggregations
