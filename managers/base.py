@@ -7,7 +7,6 @@ from typing import Type
 from elasticsearch import NotFoundError
 from elasticsearch.helpers import bulk
 from elasticsearch_dsl import MultiSearch
-from elasticsearch_dsl import Q
 from elasticsearch_dsl import connections
 
 from es_components.config import ES_BULK_REFRESH_OPTION
@@ -173,8 +172,8 @@ class BaseManager:
         if query:
             search = search.query(query)
         if filters and isinstance(filters, list):
-            for filter in filters:
-                search = search.query(filter)
+            for es_filter in filters:
+                search = search.query(es_filter)
         elif filters:
             search = search.filter(filters)
         if sort:
@@ -459,8 +458,12 @@ class BaseManager:
             for bucket in aggregations["general_data.country_code"]["buckets"]:
                 try:
                     bucket["title"] = COUNTRIES[bucket["key"]][0]
-                except Exception as e:
-                    pass
+                # pylint: disable=invalid-name
+                # pylint: disable=broad-except
+                except Exception:
+                    bucket["title"] = bucket["key"]
+                # pylint: enable=invalid-name
+                # pylint: enable=broad-except
         return aggregations
 
     def adapt_is_viral_aggregation(self, aggregations):

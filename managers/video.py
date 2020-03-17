@@ -210,8 +210,12 @@ class VideoManager(BaseManager):
             for bucket in aggregations["general_data.lang_code"]["buckets"]:
                 try:
                     bucket["title"] = LANGUAGES[bucket["key"]]
-                except Exception as e:
-                    pass
+                # pylint: disable=invalid-name
+                # pylint: disable=broad-except
+                except Exception:
+                    bucket["title"] = bucket["key"]
+                # pylint: enable=invalid-name
+                # pylint: enable=broad-except
         return aggregations
 
     def adapt_flags_aggregation(self, aggregations):
