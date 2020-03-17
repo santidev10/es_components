@@ -196,8 +196,8 @@ LANGUAGES = {
     "yo": "Yoruba",
     "za": "Zhuang; Chuang",
     "zh": "Chinese",
-    "zh-c": "Chinese - Cantonese",
-    "zh-m": "Chinese - Mandarin",
+    "yue": "Chinese - Cantonese",
+    "cmn": "Chinese - Mandarin",
     "zu": "Zulu",
 }
 
