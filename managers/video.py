@@ -209,11 +209,11 @@ class VideoManager(BaseManager):
         if "general_data.lang_code" in aggregations:
             for bucket in aggregations["general_data.lang_code"]["buckets"]:
                 try:
-                    bucket["language"] = LANGUAGES[bucket["key"]]
+                    bucket["title"] = LANGUAGES[bucket["key"]]
                 # pylint: disable=invalid-name
                 # pylint: disable=broad-except
                 except Exception:
-                    bucket["language"] = bucket["key"]
+                    bucket["title"] = bucket["key"]
                 # pylint: enable=invalid-name
                 # pylint: enable=broad-except
         return aggregations

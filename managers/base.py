@@ -457,11 +457,11 @@ class BaseManager:
         if "general_data.country_code" in aggregations:
             for bucket in aggregations["general_data.country_code"]["buckets"]:
                 try:
-                    bucket["country"] = COUNTRIES[bucket["key"]][0]
+                    bucket["title"] = COUNTRIES[bucket["key"]][0]
                 # pylint: disable=invalid-name
                 # pylint: disable=broad-except
                 except Exception:
-                    bucket["country"] = bucket["key"]
+                    bucket["title"] = bucket["key"]
                 # pylint: enable=invalid-name
                 # pylint: enable=broad-except
         return aggregations
