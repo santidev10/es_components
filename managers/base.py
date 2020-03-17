@@ -460,7 +460,7 @@ class BaseManager:
                     bucket["country"] = COUNTRIES[bucket["key"]][0]
                 # pylint: disable=invalid-name
                 # pylint: disable=broad-except
-                except Exception as e:
+                except Exception:
                     bucket["country"] = bucket["key"]
                 # pylint: enable=invalid-name
                 # pylint: enable=broad-except
