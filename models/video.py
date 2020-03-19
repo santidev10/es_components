@@ -170,7 +170,8 @@ class VideoSectionCMS(BaseInnerDoc):
 class VideoSectionBrandSafety(BaseInnerDoc):
     """ Nested brand safety section for Video document """
     overall_score = Long()
-    language = Keyword(multi=True)
+    language = Keyword()
+    transcript_language = Keyword()
     categories = Object()
 
 
