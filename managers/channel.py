@@ -151,7 +151,7 @@ class ChannelManager(BaseManager):
                 # pylint: disable=invalid-name
                 # pylint: disable=broad-except
                 except Exception:
-                    bucket["title"] = languages.get(alpha_3=bucket["key"]) or bucket["key"]
+                    bucket["title"] = languages.get(alpha_3=bucket["key"]).name or bucket["key"]
                 # pylint: enable=invalid-name
                 # pylint: enable=broad-except
         return aggregations
