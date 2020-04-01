@@ -1,5 +1,6 @@
 from typing import List
 
+from pycountry import languages
 from collections import OrderedDict
 from es_components.config import ES_CHUNK_SIZE
 from es_components.constants import CONTENT_OWNER_ID_FIELD
@@ -213,7 +214,7 @@ class VideoManager(BaseManager):
                 # pylint: disable=invalid-name
                 # pylint: disable=broad-except
                 except Exception:
-                    bucket["title"] = bucket["key"]
+                    bucket["title"] = languages.get(alpha_3=bucket["key"]) or bucket["key"]
                 # pylint: enable=invalid-name
                 # pylint: enable=broad-except
         return aggregations

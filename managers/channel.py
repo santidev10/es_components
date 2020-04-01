@@ -1,3 +1,4 @@
+from pycountry import languages
 from es_components.managers.base import BaseManager
 from es_components.models.channel import Channel
 from es_components.constants import Sections
@@ -150,7 +151,7 @@ class ChannelManager(BaseManager):
                 # pylint: disable=invalid-name
                 # pylint: disable=broad-except
                 except Exception:
-                    bucket["title"] = bucket["key"]
+                    bucket["title"] = languages.get(alpha_3=bucket["key"]) or bucket["key"]
                 # pylint: enable=invalid-name
                 # pylint: enable=broad-except
         return aggregations
