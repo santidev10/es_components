@@ -1,7 +1,8 @@
+from collections import OrderedDict
 from typing import List
 
 from pycountry import languages
-from collections import OrderedDict
+
 from es_components.config import ES_CHUNK_SIZE
 from es_components.constants import CONTENT_OWNER_ID_FIELD
 from es_components.constants import MAIN_ID_FIELD
