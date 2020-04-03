@@ -525,7 +525,7 @@ class BaseManager:
             .terms().field(SEGMENTS_UUID_FIELD) \
             .value(segment_ids).get()
 
-    def update_monetization(self, filter_query, is_monetizable, proceed_conflict=False):
+    def update_monetization(self, filter_query, is_monetizable, proceed_conflict=True):
         if Sections.MONETIZATION not in self.upsert_sections:
             raise BrokenPipeError(f"This manager can't update {Sections.MONETIZATION} section")
 
