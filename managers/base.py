@@ -525,7 +525,7 @@ class BaseManager:
             .terms().field(SEGMENTS_UUID_FIELD) \
             .value(segment_ids).get()
 
-    def update_monetization(self, filter_query, is_monetizable):
+    def update_monetization(self, filter_query, is_monetizable, proceed_conflict=False):
         if Sections.MONETIZATION not in self.upsert_sections:
             raise BrokenPipeError(f"This manager can't update {Sections.MONETIZATION} section")
 
@@ -536,9 +536,11 @@ class BaseManager:
                 is_monetizable=is_monetizable
             )
         )
-        return self.update(filter_query) \
-            .script(**script) \
-            .execute()
+        update = self.update(filter_query) \
+            .script(**script)
+        if proceed_conflict is True:
+            update = update.params(conflicts="proceed")
+        return update.execute()
 
     def remove_sections(self, filter_query, sections, proceed_conflict=False):
         if not set(sections).issubset(set(self.allowed_sections)):
