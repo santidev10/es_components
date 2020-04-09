@@ -9,26 +9,7 @@ class HistoryValueError(Exception):
     pass
 
 
-class History:
-    """
-        The History context manager is needed to build *_history fields
-        from field with some stats metric.
-
-
-        Usage scenatio:
-            history = History(stats_section, ['subscribers', 'views'])
-
-            stats_section.videos = 12
-            stats_section.subscribers = 123
-            stats_section.views = 1234
-
-            history.update()
-
-        It will update appropriate history fields:
-            stats_section.subscribers_history = [...some previous values...]
-            stats_section.views_history = [...some previous values...]
-    """
-
+class BaseHistory:
     DAYS_LIMIT = None
 
     ONE_DAY = timedelta(days=1)
@@ -37,9 +18,9 @@ class History:
         self.section = section
         self.field_names = field_names
 
-        self.prev_values = {}
         self.prev_fetched_at = None
         self.prev_historydate = None
+        self.prev_values = {}
         self.save_prev_values()
 
     def save_prev_values(self):
@@ -72,6 +53,37 @@ class History:
             raise HistoryValueError("Can't update a history with older values.")
 
         self.section.historydate = self.prev_day_last_second(self.section.fetched_at)
+
+    def prev_day_last_second(self, datetime):
+        value = datetime.replace(hour=23, minute=59, second=59)
+        value -= self.ONE_DAY
+        return value
+
+
+
+class History(BaseHistory):
+    """
+        The History context manager is needed to build *_history fields
+        from field with some stats metric.
+
+
+        Usage scenatio:
+            history = History(stats_section, ['subscribers', 'views'])
+
+            stats_section.videos = 12
+            stats_section.subscribers = 123
+            stats_section.views = 1234
+
+            history.update()
+
+        It will update appropriate history fields:
+            stats_section.subscribers_history = [...some previous values...]
+            stats_section.views_history = [...some previous values...]
+    """
+
+
+    def update(self):
+        super(History, self).update()
 
         if self.prev_fetched_at is None or self.prev_fetched_at.date() == self.section.fetched_at.date():
             return
@@ -117,8 +129,3 @@ class History:
             values_history = []
 
         setattr(self.section, history_field_name, values_history)
-
-    def prev_day_last_second(self, datetime):
-        value = datetime.replace(hour=23, minute=59, second=59)
-        value -= self.ONE_DAY
-        return value

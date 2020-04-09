@@ -52,17 +52,20 @@ class VideoSectionStats(BaseInnerDocWithHistory):
     historydate = Date(index=False)
     views = Long()
     views_history = Long(index=False, multi=True)
+    views_raw_history = Object(enabled=False)
     last_day_views = Long()
     last_7day_views = Long()
     last_30day_views = Long()
     views_per_day = Double()
     likes = Long()
     likes_history = Long(index=False, multi=True)
+    liked_raw_history = Object(enabled=False)
     last_day_likes = Long(index=False)
     last_7day_likes = Long(index=False)
     last_30day_likes = Long(index=False)
     dislikes = Long()
     dislikes_history = Long(index=False, multi=True)
+    dislikes_raw_history = Object(enabled=False)
     comments = Long()
     comments_history = Long(index=False, multi=True)
     last_day_comments = Long(index=False)
@@ -77,6 +80,9 @@ class VideoSectionStats(BaseInnerDocWithHistory):
 
     class History:
         all = ("views", "likes", "dislikes", "comments", "sentiment", "engage_rate")
+
+    class RawHistory:
+        all = ("views", "likes", "dislikes")
 
 
 class VideoCaptionsItem(InnerDoc):
