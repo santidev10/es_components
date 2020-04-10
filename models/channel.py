@@ -43,6 +43,7 @@ class ChannelSectionStats(BaseInnerDocWithHistory):
     last_video_published_at = Date()
     subscribers = Long()
     subscribers_history = Long(index=False, multi=True)
+    subscribers_raw_history = Object(enabled=False)
     last_day_subscribers = Long(index=False)  # unused
     last_7day_subscribers = Long(index=False)  # unused
     last_30day_subscribers = Long()
@@ -55,6 +56,7 @@ class ChannelSectionStats(BaseInnerDocWithHistory):
     last_365day_published_videos = Long(index=False)
     views = Long()
     views_history = Long(index=False, multi=True)
+    views_raw_history = Object(enabled=False)
     last_day_views = Long()
     last_7day_views = Long()
     last_30day_views = Long()
@@ -76,6 +78,9 @@ class ChannelSectionStats(BaseInnerDocWithHistory):
             "subscribers", "views", "total_videos_count", "views_per_video", "observed_videos_count",
             "observed_videos_likes", "observed_videos_dislikes", "sentiment", "engage_rate"
         )
+
+    class RawHistory:
+        all = ("subscribers", "views")
 
 
 class ChannelSectionMonetization(BaseInnerDoc):

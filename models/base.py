@@ -10,6 +10,7 @@ from elasticsearch_dsl.utils import AttrList
 
 from es_components.constants import Sections
 from es_components.stats import History
+from es_components.stats import RawHistory
 
 
 class BaseInnerDoc(InnerDoc):
@@ -35,6 +36,7 @@ class MainSection(BaseInnerDoc):
 
 class BaseInnerDocWithHistory(BaseInnerDoc):
     __history = None
+    __raw_history = None
 
     def prepare_history(self):
         self.__history = History(self, self.History.all)
@@ -45,6 +47,14 @@ class BaseInnerDocWithHistory(BaseInnerDoc):
 
     def __del__(self):
         self.__history = None
+        self.__raw_history = None
+
+    def prepare_raw_history(self):
+        self.__raw_history = RawHistory(self, self.RawHistory.all)
+
+    def update_raw_history(self):
+        if self.__raw_history:
+            self.__raw_history.update()
 
 
 class Schedule(BaseInnerDoc):
