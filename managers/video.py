@@ -56,6 +56,8 @@ PERCENTILES_AGGREGATION = (
     "stats.sentiment"
 )
 
+MINIMUM_AGGREGATION_COUNT = 10
+
 
 class VideoManager(BaseManager):
     allowed_sections = BaseManager.allowed_sections\
@@ -210,6 +212,8 @@ class VideoManager(BaseManager):
     def adapt_lang_code_aggregation(self, aggregations):
         if "general_data.lang_code" in aggregations:
             for bucket in aggregations["general_data.lang_code"]["buckets"]:
+                if bucket["doc_count"] < MINIMUM_AGGREGATION_COUNT:
+                    continue
                 try:
                     bucket["title"] = LANGUAGES[bucket["key"]]
                 # pylint: disable=invalid-name
