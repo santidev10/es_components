@@ -77,6 +77,8 @@ PERCENTILES_AGGREGATION = (
 )
 FORCED_FILTER_MIN_VIDEO_COUNT = 0
 
+MINIMUM_AGGREGATION_COUNT = 5
+
 
 class ChannelManager(BaseManager):
     allowed_sections = BaseManager.allowed_sections\
@@ -146,12 +148,15 @@ class ChannelManager(BaseManager):
     def adapt_lang_code_aggregation(self, aggregations):
         if "general_data.top_lang_code" in aggregations:
             for bucket in aggregations["general_data.top_lang_code"]["buckets"]:
+                if bucket["doc_count"] < MINIMUM_AGGREGATION_COUNT:
+                    continue
                 try:
                     bucket["title"] = LANGUAGES[bucket["key"]]
                 # pylint: disable=invalid-name
                 # pylint: disable=broad-except
                 except Exception:
-                    bucket["title"] = languages.get(alpha_3=bucket["key"]).name or bucket["key"]
+                    language = languages.get(alpha_3=bucket["key"])
+                    bucket["title"] = language.name if language else bucket["key"]
                 # pylint: enable=invalid-name
                 # pylint: enable=broad-except
         return aggregations
