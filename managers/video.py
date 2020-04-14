@@ -215,7 +215,8 @@ class VideoManager(BaseManager):
                 # pylint: disable=invalid-name
                 # pylint: disable=broad-except
                 except Exception:
-                    bucket["title"] = languages.get(alpha_3=bucket["key"]).name or bucket["key"]
+                    language = languages.get(alpha_3=bucket["key"])
+                    bucket["title"] = language.name if language else bucket["key"]
                 # pylint: enable=invalid-name
                 # pylint: enable=broad-except
         return aggregations
