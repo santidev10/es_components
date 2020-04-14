@@ -147,8 +147,10 @@ class ChannelManager(BaseManager):
 
     def adapt_lang_code_aggregation(self, aggregations):
         if "general_data.top_lang_code" in aggregations:
+            buckets_to_remove = []
             for bucket in aggregations["general_data.top_lang_code"]["buckets"]:
                 if bucket["doc_count"] < MINIMUM_AGGREGATION_COUNT:
+                    buckets_to_remove.append(bucket)
                     continue
                 try:
                     bucket["title"] = LANGUAGES[bucket["key"]]
@@ -159,6 +161,8 @@ class ChannelManager(BaseManager):
                     bucket["title"] = language.name if language else bucket["key"]
                 # pylint: enable=invalid-name
                 # pylint: enable=broad-except
+            for bucket in buckets_to_remove:
+                aggregations["general_data.top_lang_code"]["buckets"].remove(bucket)
         return aggregations
 
     def adapt_channel_group(self, aggregations):
