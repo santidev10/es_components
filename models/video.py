@@ -110,6 +110,7 @@ class VideoSectionCustomCaptions(BaseInnerDoc):
     watson_job_id = Keyword()
     items = Object(VideoCustomCaptionsItem, multi=True, enabled=True)
     transcripts_checked_tts_url = Boolean()
+    is_asr = Boolean()
 
 
 class VideoSectionMonetization(BaseInnerDoc):
