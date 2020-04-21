@@ -103,6 +103,7 @@ class VideoCustomCaptionsItem(BaseInnerDoc):
     text = Text(index=False)
     language_code = Text()
     source = Keyword()
+    is_asr = Boolean()
 
 
 class VideoSectionCustomCaptions(BaseInnerDoc):
@@ -110,7 +111,6 @@ class VideoSectionCustomCaptions(BaseInnerDoc):
     watson_job_id = Keyword()
     items = Object(VideoCustomCaptionsItem, multi=True, enabled=True)
     transcripts_checked_tts_url = Boolean()
-    is_asr = Boolean()
 
 
 class VideoSectionMonetization(BaseInnerDoc):
