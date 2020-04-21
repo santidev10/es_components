@@ -103,6 +103,7 @@ class VideoCustomCaptionsItem(BaseInnerDoc):
     text = Text(index=False)
     language_code = Text()
     source = Keyword()
+    is_asr = Boolean()
 
 
 class VideoSectionCustomCaptions(BaseInnerDoc):
