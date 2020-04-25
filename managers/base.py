@@ -1,7 +1,7 @@
-from collections import OrderedDict
 import os
 import re
 import statistics
+from collections import OrderedDict
 from typing import Type
 
 from elasticsearch import NotFoundError
@@ -11,8 +11,8 @@ from elasticsearch_dsl import connections
 
 from es_components.config import ES_BULK_REFRESH_OPTION
 from es_components.config import ES_CHUNK_SIZE
-from es_components.config import ES_REQUEST_LIMIT
 from es_components.config import ES_MAX_CHUNK_BYTES
+from es_components.config import ES_REQUEST_LIMIT
 from es_components.connections import init_es_connection
 from es_components.constants import EsDictFields
 from es_components.constants import FORCED_FILTER_OUDATED_DAYS
@@ -21,6 +21,7 @@ from es_components.constants import SEGMENTS_UUID_FIELD
 from es_components.constants import Sections
 from es_components.constants import SortDirections
 from es_components.constants import TimestampFields
+from es_components.countries import COUNTRIES
 from es_components.datetime_service import datetime_service
 from es_components.exceptions import DataModelNotSpecified
 from es_components.exceptions import SectionsNotAllowed
@@ -30,10 +31,10 @@ from es_components.monitor import Monitor
 from es_components.monitor import Warnings
 from es_components.query_builder import QueryBuilder
 from es_components.utils import chunks
-from es_components.countries import COUNTRIES
 
 AGGREGATION_COUNT_SIZE = 100000
 AGGREGATION_PERCENTS = tuple(range(10, 100, 10))
+
 
 # pylint: disable=too-many-public-methods
 class BaseManager:
@@ -129,7 +130,7 @@ class BaseManager:
 
         return entries
 
-    def truncate(self):
+    def recreate_index(self):
         """ Recreate index with deleting all documents. """
         # pylint: disable=protected-access
         try:
@@ -139,6 +140,9 @@ class BaseManager:
         # pylint: enable=protected-access
         self.model.init()
 
+    def truncate(self):
+        return self._search().query("match_all").delete()
+
     def delete(self, ids):
         """ Delete entities.
 
@@ -147,7 +151,6 @@ class BaseManager:
 
         for _ids in chunks(ids, ES_REQUEST_LIMIT):
             self.model.search().query("ids", values=list(_ids)).delete()
-
 
     def upsert(self, entries):
         """ Upsert a list of entries.
@@ -312,7 +315,7 @@ class BaseManager:
         field_updated_at = f"{control_section}.{TimestampFields.UPDATED_AT}"
 
         _filters = [QueryBuilder().build().must().range().field(field_updated_at) \
-            .lt(outdated_at).get()]
+                        .lt(outdated_at).get()]
 
         # to ignore items without main id field
         _filters.append(self._filter_existent_section(MAIN_ID_FIELD))
@@ -552,7 +555,7 @@ class BaseManager:
                 sections=sections
             )
         )
-        update = self.update(filter_query)\
+        update = self.update(filter_query) \
             .script(**script)
         if proceed_conflict is True:
             update = update.params(conflicts="proceed")
@@ -643,7 +646,6 @@ class BaseManager:
             break
         return number_of_shards
 
-
     def _get_enabled_monitoring_warnings(self):
         return (Warnings.MainSectionNotFilled(),)
 
@@ -652,7 +654,6 @@ class BaseManager:
 
     def _get_enabled_monitoring_params_info(self):
         return self.sections, ()
-
 
     def get_monitoring_data(self):
         # pylint: disable=protected-access
@@ -665,6 +666,8 @@ class BaseManager:
             alerts=monitor.get_alerts(self._get_enabled_monitoring_alerts())
         )
         return data
+
+
 # pylint: enable=too-many-public-methods
 
 

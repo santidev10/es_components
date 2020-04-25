@@ -71,4 +71,3 @@ class ESTestCase(TestCase):
                 manager_cls().truncate()
             except NotFoundError:
                 pass
-
