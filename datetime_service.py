@@ -23,5 +23,8 @@ class DateTimeService:
             value = datetime(**kwargs, tzinfo=timezone)
         return value
 
+    def fromisoformat(self, date_string):
+        return datetime.fromisoformat(date_string)
+
 
 datetime_service = DateTimeService()
