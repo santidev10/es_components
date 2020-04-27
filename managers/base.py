@@ -141,7 +141,7 @@ class BaseManager:
         self.model.init()
 
     def truncate(self):
-        return self._search().query("match_all").delete()
+        return self._search().query("match_all").params(conflicts="proceed").delete()
 
     def delete(self, ids):
         """ Delete entities.
