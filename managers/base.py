@@ -140,8 +140,11 @@ class BaseManager:
         # pylint: enable=protected-access
         self.model.init()
 
-    def truncate(self):
-        return self._search().query("match_all").params(conflicts="proceed").delete()
+    def truncate(self, refresh=False):
+        return self._search().query("match_all").params(
+            conflicts="proceed",
+            refresh=refresh,
+        ).delete()
 
     def delete(self, ids):
         """ Delete entities.
