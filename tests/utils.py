@@ -68,6 +68,6 @@ class ESTestCase(TestCase):
     def setUp(self):
         for manager_cls in BaseManager.__subclasses__():
             try:
-                manager_cls().truncate()
+                manager_cls().truncate(refresh=True)
             except NotFoundError:
                 pass
