@@ -543,9 +543,8 @@ class BaseManager:
             )
         )
         update = self.update(filter_query) \
-            .script(**script)
-        if kwargs:
-            update = update.params(**kwargs)
+            .script(**script)\
+            .params(**kwargs)
         return update.execute()
 
     def remove_sections(self, filter_query, sections, proceed_conflict=False):
