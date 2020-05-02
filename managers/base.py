@@ -531,7 +531,7 @@ class BaseManager:
             .terms().field(SEGMENTS_UUID_FIELD) \
             .value(segment_ids).get()
 
-    def update_monetization(self, filter_query, is_monetizable, proceed_conflict=True):
+    def update_monetization(self, filter_query, is_monetizable, **kwargs):
         if Sections.MONETIZATION not in self.upsert_sections:
             raise BrokenPipeError(f"This manager can't update {Sections.MONETIZATION} section")
 
@@ -544,8 +544,8 @@ class BaseManager:
         )
         update = self.update(filter_query) \
             .script(**script)
-        if proceed_conflict is True:
-            update = update.params(conflicts="proceed")
+        if kwargs:
+            update = update.params(**kwargs)
         return update.execute()
 
     def remove_sections(self, filter_query, sections, proceed_conflict=False):
