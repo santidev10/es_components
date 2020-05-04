@@ -223,6 +223,7 @@ class Channel(BaseDocument):
         prefix = CHANNEL_INDEX_PREFIX
         settings = dict(
             number_of_shards=24,
+            refresh_interval="1m",
         )
 
     class Meta:
