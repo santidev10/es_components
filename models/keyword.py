@@ -54,7 +54,7 @@ class Keyword(BaseDocument):
         prefix = KEYWORD_INDEX_PREFIX
         settings = dict(
             number_of_shards=24,
-            refresh_interval="1m",
+            refresh_interval="10s",
         )
 
     class Meta:
