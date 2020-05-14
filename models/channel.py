@@ -229,6 +229,20 @@ class Channel(BaseDocument):
     class Meta:
         doc_type = CHANNEL_DOC_TYPE
 
+    def to_dict(self, include_meta=False, skip_empty=True):
+        '''
+        By default es_dsl.Document ignores skip_empty flag for inner documents.
+        If video_tags contains a list of values in the database, and we would like
+        to put an empty array instead of existing list, default implementation
+        will not serialize empty array.
+        We cannot override existing value with empty array, without direct call.
+        '''
+        res_dict = super(Channel, self).to_dict(include_meta=include_meta, skip_empty=skip_empty)
+        # pylint: disable=unexpected-keyword-arg
+        res_dict["_source"]["general_data"] = self.general_data.to_dict(skip_empty=skip_empty)
+        # pylint: enable=unexpected-keyword-arg
+        return res_dict
+
     def populate_general_data(self, **kwargs):
         self._populate_section(Sections.GENERAL_DATA, **kwargs)
 
