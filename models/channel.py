@@ -238,9 +238,13 @@ class Channel(BaseDocument):
         We cannot override existing value with empty array, without direct call.
         '''
         res_dict = super(Channel, self).to_dict(include_meta=include_meta, skip_empty=skip_empty)
-        # pylint: disable=unexpected-keyword-arg
-        res_dict["_source"]["general_data"] = self.general_data.to_dict(skip_empty=skip_empty)
-        # pylint: enable=unexpected-keyword-arg
+        if isinstance(self.general_data, ChannelSectionGeneralData) and "_source" in res_dict:
+            # Default constructor from dict creates: elasticsearch_dsl.utils.AttrDict,
+            # While reading from ES generates: es_components.models.channel.ChannelSectionGeneralData
+            # Thus we need to check type beforehand.
+            # pylint: disable=unexpected-keyword-arg
+            res_dict["_source"]["general_data"] = self.general_data.to_dict(skip_empty=skip_empty)
+            # pylint: enable=unexpected-keyword-arg
         return res_dict
 
     def populate_general_data(self, **kwargs):
