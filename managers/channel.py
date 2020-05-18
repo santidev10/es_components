@@ -51,7 +51,11 @@ COUNT_AGGREGATION = (
     "custom_properties.preferred",
     "cms.cms_title",
     "brand_safety",
-    "stats.channel_group"
+    "stats.channel_group",
+    "task_us_data.age_group",
+    "task_us_data.content_type",
+    "task_us_data.gender",
+    "custom_properties.is_tracked"
 )
 
 COUNT_EXISTS_AGGREGATION = (
@@ -143,6 +147,10 @@ class ChannelManager(BaseManager):
         aggregations_result = self.adapt_iab_categories_aggregation(aggregations_result)
         aggregations_result = self.adapt_country_code_aggregation(aggregations_result)
         aggregations_result = self.adapt_lang_code_aggregation(aggregations_result)
+        aggregations_result = self.adapt_age_group_aggregation(aggregations_result)
+        aggregations_result = self.adapt_gender_aggregation(aggregations_result)
+        aggregations_result = self.adapt_content_type_aggregation(aggregations_result)
+        aggregations_result = self.adapt_is_tracked_aggregation(aggregations_result)
         return aggregations_result
 
     def adapt_lang_code_aggregation(self, aggregations):
@@ -163,6 +171,11 @@ class ChannelManager(BaseManager):
                 # pylint: enable=broad-except
             for bucket in buckets_to_remove:
                 aggregations["general_data.top_lang_code"]["buckets"].remove(bucket)
+        return aggregations
+
+    def adapt_is_tracked_aggregation(self, aggregations):
+        if "custom_properties.is_tracked" in aggregations:
+            aggregations["custom_properties.is_tracked"]["buckets"][0]["key"] = "Vetted Channels"
         return aggregations
 
     def adapt_channel_group(self, aggregations):

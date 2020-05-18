@@ -489,6 +489,49 @@ class BaseManager:
             aggregations["general_data.iab_categories"]["buckets"] = top_level_buckets
         return aggregations
 
+    def adapt_vetted_aggregations(self, aggregations, field, mapping):
+        new_buckets = []
+        old_buckets = aggregations[field]["buckets"]
+        for bucket in old_buckets:
+            key = bucket["key"]
+            bucket["key"] = mapping[key]
+            new_buckets.append(bucket)
+        aggregations[field]["buckets"] = new_buckets
+        return aggregations
+
+    def adapt_age_group_aggregation(self, aggregations):
+        age_groups = {
+            '0': "0 - 3 Toddlers",
+            '1': "4 - 8 Young Kids",
+            '2': "9 - 12 Older Kids",
+            '3': "13 - 17 Teens",
+            '4': "18 - 35 Adults",
+            '5': "36 - 54 Older Adults",
+            '6': "55+ Seniors",
+            '7': "Group - Kids (not teens)",
+            '8': "Group - Family Friendly"
+        }
+        if "task_us_data.age_group" in aggregations:
+            return self.adapt_vetted_aggregations(aggregations, "task_us_data.age_group", age_groups)
+
+    def adapt_gender_aggregation(self, aggregations):
+        genders = {
+            "0": "Neutral",
+            "1": "Female",
+            "2": "Male"
+        }
+        if "task_us_data.gender" in aggregations:
+            return self.adapt_vetted_aggregations(aggregations, "task_us_data.gender", genders)
+
+    def adapt_content_type_aggregation(self, aggregations):
+        content_types = {
+            "0": "MC / Brand",
+            "1": "Regular UGC",
+            "2": "Premium UGC"
+        }
+        if "task_us_data.content_type" in aggregations:
+            return self.adapt_vetted_aggregations(aggregations, "task_us_data.content_type", content_types)
+
     def generate_distinct_values(self, field, pagesize=10000):
         composite = {
             "size": pagesize,
