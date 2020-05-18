@@ -45,8 +45,8 @@ COUNT_AGGREGATION = (
     "task_us_data.gender",
 )
 
-COUNT_EXISTS_AGGREGATION = ("stats.flags", "custom_captions.items", "captions",)
-COUNT_MISSING_AGGREGATION = ("stats.flags", "custom_captions.items", "captions",)
+COUNT_EXISTS_AGGREGATION = ("stats.flags", "custom_captions.items", "captions", "task_us_data")
+COUNT_MISSING_AGGREGATION = ("stats.flags", "custom_captions.items", "captions", "task_us_data")
 
 PERCENTILES_AGGREGATION = (
     "stats.views",
