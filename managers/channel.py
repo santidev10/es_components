@@ -53,7 +53,8 @@ COUNT_AGGREGATION = (
     "stats.channel_group",
     "task_us_data.age_group",
     "task_us_data.content_type",
-    "task_us_data.gender"
+    "task_us_data.gender",
+    "custom_properties.is_tracked"
 )
 
 COUNT_EXISTS_AGGREGATION = (
