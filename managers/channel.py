@@ -174,7 +174,7 @@ class ChannelManager(BaseManager):
 
     def adapt_is_tracked_aggregation(self, aggregations):
         if "custom_properties.is_tracked" in aggregations:
-            aggregations["custom_properties.is_tracked"]["buckets"][0]["key"] = "Vetted Channels"
+            aggregations["custom_properties.is_tracked"]["buckets"][0]["key"] = "Tracked Channels"
         return aggregations
 
     def adapt_channel_group(self, aggregations):
