@@ -148,7 +148,6 @@ class ChannelManager(BaseManager):
         aggregations_result = self.adapt_age_group_aggregation(aggregations_result)
         aggregations_result = self.adapt_gender_aggregation(aggregations_result)
         aggregations_result = self.adapt_content_type_aggregation(aggregations_result)
-        aggregations_result = self.adapt_is_tracked_aggregation(aggregations_result)
         return aggregations_result
 
     def adapt_lang_code_aggregation(self, aggregations):
@@ -169,11 +168,6 @@ class ChannelManager(BaseManager):
                 # pylint: enable=broad-except
             for bucket in buckets_to_remove:
                 aggregations["general_data.top_lang_code"]["buckets"].remove(bucket)
-        return aggregations
-
-    def adapt_is_tracked_aggregation(self, aggregations):
-        if "custom_properties.is_tracked" in aggregations:
-            aggregations["custom_properties.is_tracked"]["buckets"][0]["key"] = "Vetted Channels"
         return aggregations
 
     def adapt_channel_group(self, aggregations):
