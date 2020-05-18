@@ -49,7 +49,6 @@ COUNT_AGGREGATION = (
     "analytics.is_auth",
     "analytics.is_cms",
     "custom_properties.preferred",
-    "cms.cms_title",
     "brand_safety",
     "stats.channel_group",
     "task_us_data.age_group",
@@ -61,10 +60,9 @@ COUNT_AGGREGATION = (
 COUNT_EXISTS_AGGREGATION = (
     "general_data.emails",
     "ads_stats",
-    "analytics",
     "monetization.is_monetizable"
 )
-COUNT_MISSING_AGGREGATION = ("general_data.emails", "analytics",)
+COUNT_MISSING_AGGREGATION = ("general_data.emails", )
 
 PERCENTILES_AGGREGATION = (
     "stats.subscribers",

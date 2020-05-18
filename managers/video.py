@@ -38,7 +38,6 @@ COUNT_AGGREGATION = (
     "general_data.language",
     "general_data.lang_code",
     "general_data.iab_categories",
-    "cms.cms_title",
     "brand_safety",
     "stats.flags",
     "task_us_data.age_group",
@@ -46,8 +45,8 @@ COUNT_AGGREGATION = (
     "task_us_data.gender",
 )
 
-COUNT_EXISTS_AGGREGATION = ("analytics", "stats.flags", "custom_captions.items", "captions",)
-COUNT_MISSING_AGGREGATION = ("analytics", "stats.flags", "custom_captions.items", "captions",)
+COUNT_EXISTS_AGGREGATION = ("stats.flags", "custom_captions.items", "captions",)
+COUNT_MISSING_AGGREGATION = ("stats.flags", "custom_captions.items", "captions",)
 
 PERCENTILES_AGGREGATION = (
     "stats.views",
