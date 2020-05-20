@@ -514,6 +514,7 @@ class BaseManager:
         }
         if "task_us_data.age_group" in aggregations:
             return self.adapt_vetted_aggregations(aggregations, "task_us_data.age_group", age_groups)
+        return None
 
     def adapt_gender_aggregation(self, aggregations):
         genders = {
@@ -523,6 +524,7 @@ class BaseManager:
         }
         if "task_us_data.gender" in aggregations:
             return self.adapt_vetted_aggregations(aggregations, "task_us_data.gender", genders)
+        return None
 
     def adapt_content_type_aggregation(self, aggregations):
         content_types = {
@@ -532,6 +534,7 @@ class BaseManager:
         }
         if "task_us_data.content_type" in aggregations:
             return self.adapt_vetted_aggregations(aggregations, "task_us_data.content_type", content_types)
+        return None
 
     def generate_distinct_values(self, field, pagesize=10000):
         composite = {
