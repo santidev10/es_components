@@ -493,6 +493,7 @@ class BaseManager:
     def adapt_vetted_aggregations(self, aggregations, field, mapping):
         new_buckets = []
         old_buckets = aggregations[field]["buckets"]
+        old_buckets = sorted(old_buckets, key=lambda old_bucket: int(old_bucket['key']))
         for bucket in old_buckets:
             key = bucket["key"]
             bucket["key"] = mapping[key]
