@@ -286,7 +286,8 @@ class BaseManager:
         return self.filter_alive() & filter_range
 
     def search_nonexistent_section_records(self, ids=None, id_field=MAIN_ID_FIELD,
-                                           exclude_ids=None, exclude_id_field=None, ignore_deleted=None, limit=10000):
+                                           exclude_ids=None, exclude_id_field=None, ignore_deleted=None,
+                                           limit=10000, offset=None):
         control_section = self._get_control_section()
         field_updated_at = f"{control_section}.{TimestampFields.UPDATED_AT}"
 
@@ -311,10 +312,11 @@ class BaseManager:
             {field_updated_at: {"order": SortDirections.ASCENDING}},
             {MAIN_ID_FIELD: {"order": SortDirections.ASCENDING}},
         ]
-        return self.search(query=_query, filters=_filters, sort=_sort, limit=limit)
+        return self.search(query=_query, filters=_filters, sort=_sort, limit=limit, offset=offset)
 
     def search_outdated_records(self, outdated_at, ids=None, id_field=MAIN_ID_FIELD,
-                                exclude_ids=None, exclude_id_field=None, ignore_deleted=None, limit=10000):
+                                exclude_ids=None, exclude_id_field=None, ignore_deleted=None,
+                                limit=10000, offset=None):
         control_section = self._get_control_section()
         field_updated_at = f"{control_section}.{TimestampFields.UPDATED_AT}"
 
@@ -340,10 +342,10 @@ class BaseManager:
             {field_updated_at: {"order": SortDirections.ASCENDING}},
             {MAIN_ID_FIELD: {"order": SortDirections.ASCENDING}},
         ]
-        return self.search(query=_query, filters=_filters, sort=_sort, limit=limit)
+        return self.search(query=_query, filters=_filters, sort=_sort, limit=limit, offset=offset)
 
     def get_never_updated(self, ids=None, id_field=MAIN_ID_FIELD, exclude_ids=None, exclude_id_field=None,
-                          limit=10000, extract_hits=True, ignore_deleted=True):
+                          limit=10000, extract_hits=True, ignore_deleted=True, offset=None):
         search = self.search_nonexistent_section_records(
             ids=ids,
             id_field=id_field,
@@ -351,6 +353,7 @@ class BaseManager:
             exclude_id_field=exclude_id_field,
             ignore_deleted=ignore_deleted,
             limit=limit,
+            offset=offset,
         )
         if not extract_hits:
             return search
@@ -358,7 +361,7 @@ class BaseManager:
         return entries
 
     def get_outdated(self, outdated_at, ids=None, id_field=MAIN_ID_FIELD, exclude_ids=None, exclude_id_field=None,
-                     limit=10000, extract_hits=True, ignore_deleted=True):
+                     limit=10000, extract_hits=True, ignore_deleted=True, offset=None):
         search = self.search_outdated_records(
             outdated_at,
             ids=ids,
@@ -367,6 +370,7 @@ class BaseManager:
             exclude_id_field=exclude_id_field,
             ignore_deleted=ignore_deleted,
             limit=limit,
+            offset=offset,
         )
         if not extract_hits:
             return search
