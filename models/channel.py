@@ -244,6 +244,7 @@ class Channel(BaseDocument):
             # Thus we need to check type beforehand.
             # pylint: disable=unexpected-keyword-arg
             res_dict["_source"]["general_data"] = self.general_data.to_dict(skip_empty=skip_empty)
+            res_dict["retry_on_conflict"] = 3  # VIQ2-161: Trying to fix: BulkIndexError
             # pylint: enable=unexpected-keyword-arg
         return res_dict
 
