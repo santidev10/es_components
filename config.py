@@ -14,7 +14,8 @@ KEYWORD_INDEX_PREFIX = "keywords_"
 KEYWORD_DOC_TYPE = "keyword"
 
 ES_REQUEST_LIMIT = int(os.getenv("ES_REQUEST_LIMIT", "10000"))
-ES_CHUNK_SIZE = int(os.getenv("ES_CHUNK_SIZE", "500"))
+# VIQ2-161: Trying to fix: circuit_breaking_exception; orig: "ES_CHUNK_SIZE", "500"
+ES_CHUNK_SIZE = int(os.getenv("ES_CHUNK_SIZE", "400"))
 ES_BULK_REFRESH_OPTION = os.getenv("ES_BULK_REFRESH_OPTION", "wait_for")
 
 ES_MAX_CHUNK_BYTES = int(os.getenv("ES_MAX_CHUNK_BYTES", "10485760"))
