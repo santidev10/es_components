@@ -489,7 +489,7 @@ class BaseManager:
             top_level_buckets = []
             buckets = aggregations["general_data.iab_categories"]["buckets"]
             for bucket in buckets:
-                if bucket['key'].lower().replace(" and ", " & ") in TOP_LEVEL_CATEGORIES:
+                if bucket["key"].lower().replace(" and ", " & ") in TOP_LEVEL_CATEGORIES:
                     top_level_buckets.append(bucket)
             aggregations["general_data.iab_categories"]["buckets"] = top_level_buckets
         return aggregations
@@ -506,18 +506,19 @@ class BaseManager:
 
     def adapt_age_group_aggregation(self, aggregations):
         age_groups = {
-            '0': "0 - 3 Toddlers",
-            '1': "4 - 8 Young Kids",
-            '2': "9 - 12 Older Kids",
-            '3': "13 - 17 Teens",
-            '4': "18 - 35 Adults",
-            '5': "36 - 54 Older Adults",
-            '6': "55+ Seniors",
-            '7': "Group - Kids (not teens)",
-            '8': "Group - Family Friendly"
+            "0": "0 - 3 Toddlers",
+            "1": "4 - 8 Young Kids",
+            "2": "9 - 12 Older Kids",
+            "3": "13 - 17 Teens",
+            "4": "18 - 35 Adults",
+            "5": "36 - 54 Older Adults",
+            "6": "55+ Seniors",
+            "7": "Group - Kids (not teens)",
+            "8": "Group - Family Friendly"
         }
         if "task_us_data.age_group" in aggregations:
             return self.adapt_vetted_aggregations(aggregations, "task_us_data.age_group", age_groups)
+        return None
 
     def adapt_gender_aggregation(self, aggregations):
         genders = {
@@ -527,6 +528,7 @@ class BaseManager:
         }
         if "task_us_data.gender" in aggregations:
             return self.adapt_vetted_aggregations(aggregations, "task_us_data.gender", genders)
+        return None
 
     def adapt_content_type_aggregation(self, aggregations):
         content_types = {
@@ -536,6 +538,7 @@ class BaseManager:
         }
         if "task_us_data.content_type" in aggregations:
             return self.adapt_vetted_aggregations(aggregations, "task_us_data.content_type", content_types)
+        return None
 
     def generate_distinct_values(self, field, pagesize=10000):
         composite = {
