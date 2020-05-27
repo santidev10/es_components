@@ -57,25 +57,25 @@ IAB_TO_YOUTUBE_CATEGORIES_MAPPING = {
 }
 
 YOUTUBE_TO_IAB_CATEGORIES_MAPPING = {
-    'autos & vehicles': ["Automotive"],
-    'education': ["Education"],
-    'film & animation': ["Movies"],
-    'music': ["Music & Audio"],
-    'news & politics': ["News & Politics"],
-    'pets & animals': ["Pets"],
-    'entertainment': ["Pop Culture"],
-    'sports': ["Sports"],
-    'howto & style': ["Style & Fashion"],
-    'science & technology': ["Technology & Computing"],
-    'travel & events': ["Travel"],
-    'gaming': ["Video Gaming"],
-    'comedy': ["Television", "Comedy TV"],
-    'nonprofits & activism': ["Business & Finance", "Industries", "Non-Profit Organizations"],
-    'kids content': ["Kids Content"],
-    'people & blogs': ["Content Channel", "Social"],
-    'movies': ["Movies"],
-    'shows': ["Television"],
-    'trailers': ["Movies"]
+    "autos & vehicles": ["Automotive"],
+    "education": ["Education"],
+    "film & animation": ["Movies"],
+    "music": ["Music & Audio"],
+    "news & politics": ["News & Politics"],
+    "pets & animals": ["Pets"],
+    "entertainment": ["Pop Culture"],
+    "sports": ["Sports"],
+    "howto & style": ["Style & Fashion"],
+    "science & technology": ["Technology & Computing"],
+    "travel & events": ["Travel"],
+    "gaming": ["Video Gaming"],
+    "comedy": ["Television", "Comedy TV"],
+    "nonprofits & activism": ["Business & Finance", "Industries", "Non-Profit Organizations"],
+    "kids content": ["Kids Content"],
+    "people & blogs": ["Content Channel", "Social"],
+    "movies": ["Movies"],
+    "shows": ["Television"],
+    "trailers": ["Movies"]
 }
 
 IAB_TIER2_SET = []

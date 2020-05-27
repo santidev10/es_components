@@ -23,7 +23,7 @@ class Emergency:
 
         @property
         def message(self):
-            sections = ', '.join(self.sections)
+            sections = ", ".join(self.sections)
             return f"Less than {self.control_percentage}% of {sections} data has been updated during the last day"
 
 class Warnings:
@@ -37,7 +37,7 @@ class Warnings:
 
         @property
         def message(self):
-            sections = ','.join(self.params)
+            sections = ",".join(self.params)
             return f"No new {sections} sections in the last 3 days"
 
 
