@@ -33,9 +33,28 @@ from es_components.monitor import Warnings
 from es_components.query_builder import QueryBuilder
 from es_components.utils import chunks
 
+# TODO remove w/ retry_on_conflict
+import time
+from elasticsearch.exceptions import ConflictError
+
 AGGREGATION_COUNT_SIZE = 100000
 AGGREGATION_PERCENTS = tuple(range(10, 100, 10))
 
+def retry_on_conflict(method, *args, retry_amount=5, sleep_coeff=2, **kwargs):
+    """
+    Retry on Document Conflicts. THIS IS JANKY AND TEMPORARY. circular import for segment.utils.utils
+    """
+    tries_count = 0
+    while tries_count <= retry_amount:
+        try:
+            result = method(*args, **kwargs)
+        except ConflictError as e:
+            tries_count += 1
+            if tries_count <= retry_amount:
+                sleep_seconds_count = tries_count ** sleep_coeff
+                time.sleep(sleep_seconds_count)
+        else:
+            return result
 
 # pylint: disable=too-many-public-methods
 class BaseManager:
@@ -637,7 +656,7 @@ class BaseManager:
             .terms().field(MAIN_ID_FIELD) \
             .value(ids) \
             .get()
-        return self.add_to_segment(filter_query=query, segment_uuid=segment_uuid)
+        return retry_on_conflict(self.add_to_segment, filter_query=query, segment_uuid=segment_uuid)
 
     def remove_from_segment(self, filter_query, segment_uuid):
         if Sections.SEGMENTS not in self.upsert_sections:
