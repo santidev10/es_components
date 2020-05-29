@@ -1,6 +1,7 @@
+from elasticsearch.exceptions import ConflictError
 from itertools import count
 from itertools import groupby
-
+import time
 
 def chunks(iterable, size):
     chunk = count()
@@ -22,3 +23,19 @@ def add_brand_safety_labels(aggregations):
         aggregations["brand_safety"]["buckets"][2]["key"] = "Medium Suitability"
         aggregations["brand_safety"]["buckets"][3]["key"] = "Suitable"
     return aggregations
+
+def retry_on_conflict(method, *args, retry_amount=5, sleep_coeff=2, **kwargs):
+    """
+    Retry on Document Conflicts
+    """
+    tries_count = 0
+    while tries_count <= retry_amount:
+        try:
+            result = method(*args, **kwargs)
+        except ConflictError as e:
+            tries_count += 1
+            if tries_count <= retry_amount:
+                sleep_seconds_count = tries_count ** sleep_coeff
+                time.sleep(sleep_seconds_count)
+        else:
+            return result
