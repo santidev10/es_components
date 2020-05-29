@@ -286,7 +286,8 @@ class BaseManager:
         return self.filter_alive() & filter_range
 
     def search_nonexistent_section_records(self, ids=None, id_field=MAIN_ID_FIELD,
-                                           exclude_ids=None, exclude_id_field=None, ignore_deleted=None, limit=10000):
+                                           exclude_ids=None, exclude_id_field=None, ignore_deleted=None,
+                                           limit=10000, offset=None):
         control_section = self._get_control_section()
         field_updated_at = f"{control_section}.{TimestampFields.UPDATED_AT}"
 
@@ -311,10 +312,11 @@ class BaseManager:
             {field_updated_at: {"order": SortDirections.ASCENDING}},
             {MAIN_ID_FIELD: {"order": SortDirections.ASCENDING}},
         ]
-        return self.search(query=_query, filters=_filters, sort=_sort, limit=limit)
+        return self.search(query=_query, filters=_filters, sort=_sort, limit=limit, offset=offset)
 
     def search_outdated_records(self, outdated_at, ids=None, id_field=MAIN_ID_FIELD,
-                                exclude_ids=None, exclude_id_field=None, ignore_deleted=None, limit=10000):
+                                exclude_ids=None, exclude_id_field=None, ignore_deleted=None,
+                                limit=10000, offset=None):
         control_section = self._get_control_section()
         field_updated_at = f"{control_section}.{TimestampFields.UPDATED_AT}"
 
@@ -340,10 +342,10 @@ class BaseManager:
             {field_updated_at: {"order": SortDirections.ASCENDING}},
             {MAIN_ID_FIELD: {"order": SortDirections.ASCENDING}},
         ]
-        return self.search(query=_query, filters=_filters, sort=_sort, limit=limit)
+        return self.search(query=_query, filters=_filters, sort=_sort, limit=limit, offset=offset)
 
     def get_never_updated(self, ids=None, id_field=MAIN_ID_FIELD, exclude_ids=None, exclude_id_field=None,
-                          limit=10000, extract_hits=True, ignore_deleted=True):
+                          limit=10000, extract_hits=True, ignore_deleted=True, offset=None):
         search = self.search_nonexistent_section_records(
             ids=ids,
             id_field=id_field,
@@ -351,6 +353,7 @@ class BaseManager:
             exclude_id_field=exclude_id_field,
             ignore_deleted=ignore_deleted,
             limit=limit,
+            offset=offset,
         )
         if not extract_hits:
             return search
@@ -358,7 +361,7 @@ class BaseManager:
         return entries
 
     def get_outdated(self, outdated_at, ids=None, id_field=MAIN_ID_FIELD, exclude_ids=None, exclude_id_field=None,
-                     limit=10000, extract_hits=True, ignore_deleted=True):
+                     limit=10000, extract_hits=True, ignore_deleted=True, offset=None):
         search = self.search_outdated_records(
             outdated_at,
             ids=ids,
@@ -367,6 +370,7 @@ class BaseManager:
             exclude_id_field=exclude_id_field,
             ignore_deleted=ignore_deleted,
             limit=limit,
+            offset=offset,
         )
         if not extract_hits:
             return search
@@ -485,7 +489,7 @@ class BaseManager:
             top_level_buckets = []
             buckets = aggregations["general_data.iab_categories"]["buckets"]
             for bucket in buckets:
-                if bucket['key'].lower().replace(" and ", " & ") in TOP_LEVEL_CATEGORIES:
+                if bucket["key"].lower().replace(" and ", " & ") in TOP_LEVEL_CATEGORIES:
                     top_level_buckets.append(bucket)
             aggregations["general_data.iab_categories"]["buckets"] = top_level_buckets
         return aggregations
@@ -493,7 +497,7 @@ class BaseManager:
     def adapt_vetted_aggregations(self, aggregations, field, mapping):
         new_buckets = []
         old_buckets = aggregations[field]["buckets"]
-        old_buckets = sorted(old_buckets, key=lambda old_bucket: int(old_bucket['key']))
+        old_buckets = sorted(old_buckets, key=lambda old_bucket: int(old_bucket["key"]))
         for bucket in old_buckets:
             key = bucket["key"]
             bucket["key"] = mapping[key]
@@ -503,15 +507,15 @@ class BaseManager:
 
     def adapt_age_group_aggregation(self, aggregations):
         age_groups = {
-            '0': "0 - 3 Toddlers",
-            '1': "4 - 8 Young Kids",
-            '2': "9 - 12 Older Kids",
-            '3': "13 - 17 Teens",
-            '4': "18 - 35 Adults",
-            '5': "36 - 54 Older Adults",
-            '6': "55+ Seniors",
-            '7': "Group - Kids (not teens)",
-            '8': "Group - Family Friendly"
+            "0": "0 - 3 Toddlers",
+            "1": "4 - 8 Young Kids",
+            "2": "9 - 12 Older Kids",
+            "3": "13 - 17 Teens",
+            "4": "18 - 35 Adults",
+            "5": "36 - 54 Older Adults",
+            "6": "55+ Seniors",
+            "7": "Group - Kids (not teens)",
+            "8": "Group - Family Friendly"
         }
         if "task_us_data.age_group" in aggregations:
             return self.adapt_vetted_aggregations(aggregations, "task_us_data.age_group", age_groups)

@@ -230,13 +230,13 @@ class Channel(BaseDocument):
         doc_type = CHANNEL_DOC_TYPE
 
     def to_dict(self, include_meta=False, skip_empty=True):
-        '''
+        """
         By default es_dsl.Document ignores skip_empty flag for inner documents.
         If video_tags contains a list of values in the database, and we would like
         to put an empty array instead of existing list, default implementation
         will not serialize empty array.
         We cannot override existing value with empty array, without direct call.
-        '''
+        """
         res_dict = super(Channel, self).to_dict(include_meta=include_meta, skip_empty=skip_empty)
         if isinstance(self.general_data, ChannelSectionGeneralData) and "_source" in res_dict:
             # Default constructor from dict creates: elasticsearch_dsl.utils.AttrDict,
@@ -244,6 +244,7 @@ class Channel(BaseDocument):
             # Thus we need to check type beforehand.
             # pylint: disable=unexpected-keyword-arg
             res_dict["_source"]["general_data"] = self.general_data.to_dict(skip_empty=skip_empty)
+            res_dict["retry_on_conflict"] = 3  # VIQ2-161: Trying to fix: BulkIndexError
             # pylint: enable=unexpected-keyword-arg
         return res_dict
 
