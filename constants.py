@@ -47,7 +47,7 @@ class SortDirections:
     DESCENDING = "desc"
 
 
-FORCED_FILTER_OUDATED_DAYS = 14
+FORCED_FILTER_OUDATED_DAYS = 30
 MAIN_ID_FIELD = "main.id"
 VIDEO_CHANNEL_ID_FIELD = "channel.id"
 CONTENT_OWNER_ID_FIELD = "cms.content_owner_id"
