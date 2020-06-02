@@ -72,6 +72,7 @@ class ChannelSectionStats(BaseInnerDocWithHistory):
     sentiment = Double()
     sentiment_history = Double(index=False, multi=True)
     channel_group = Keyword()
+    hidden_subscriber_count = Boolean()
 
     class History:
         all = (
