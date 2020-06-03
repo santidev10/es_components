@@ -1,8 +1,15 @@
 from collections import OrderedDict
+import os
+import re
+import statistics
+from typing import Type
+
 from elasticsearch import NotFoundError
 from elasticsearch.helpers import bulk
 from elasticsearch_dsl import MultiSearch
 from elasticsearch_dsl import connections
+from urllib3.exceptions import LocationValueError
+
 from es_components.config import ES_BULK_REFRESH_OPTION
 from es_components.config import ES_CHUNK_SIZE
 from es_components.config import ES_MAX_CHUNK_BYTES
@@ -26,11 +33,6 @@ from es_components.monitor import Warnings
 from es_components.query_builder import QueryBuilder
 from es_components.utils import chunks
 from es_components.utils import retry_on_conflict
-from typing import Type
-from urllib3.exceptions import LocationValueError
-import os
-import re
-import statistics
 
 
 AGGREGATION_COUNT_SIZE = 100000
