@@ -1,7 +1,8 @@
-from elasticsearch.exceptions import ConflictError
 from itertools import count
 from itertools import groupby
 import time
+
+from elasticsearch.exceptions import ConflictError
 
 def chunks(iterable, size):
     chunk = count()
