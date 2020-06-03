@@ -24,6 +24,7 @@ def add_brand_safety_labels(aggregations):
         aggregations["brand_safety"]["buckets"][3]["key"] = "Suitable"
     return aggregations
 
+
 def retry_on_conflict(method, *args, retry_amount=5, sleep_coeff=2, **kwargs):
     """
     Retry on Document Conflicts
@@ -32,7 +33,7 @@ def retry_on_conflict(method, *args, retry_amount=5, sleep_coeff=2, **kwargs):
     while tries_count <= retry_amount:
         try:
             result = method(*args, **kwargs)
-        except ConflictError as e:
+        except ConflictError:
             tries_count += 1
             if tries_count <= retry_amount:
                 sleep_seconds_count = tries_count ** sleep_coeff
