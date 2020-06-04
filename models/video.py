@@ -11,6 +11,7 @@ from elasticsearch_dsl import Text
 from es_components.config import VIDEO_DOC_TYPE
 from es_components.config import VIDEO_INDEX_NAME
 from es_components.config import VIDEO_INDEX_PREFIX
+from es_components.config import VIDEO_REFRESH_INTERVAL
 from es_components.constants import Sections
 from es_components.models.base import BaseDocument
 from es_components.models.base import BaseInnerDoc
@@ -219,7 +220,7 @@ class Video(BaseDocument):
         prefix = VIDEO_INDEX_PREFIX
         settings = dict(
             number_of_shards=24,
-            refresh_interval="10s",
+            refresh_interval=VIDEO_REFRESH_INTERVAL,
         )
 
     class Meta:
