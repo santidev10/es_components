@@ -349,7 +349,7 @@ class BaseManager:
             should_filters.append(QueryBuilder().build().should().term().field(f"{Sections.CUSTOM_PROPERTIES}"
                                                                                f".is_tracked").value(True).get())
         if ignore_deleted is True:
-            should_filters.append(QueryBuilder().build().must_not().exists().field(Sections.DELETED).get())
+            should_filters.append(self.filter_alive())
         _filters.append(reduce(lambda a, b: a | b, should_filters))
 
         _query = None
