@@ -24,8 +24,8 @@ class KeywordManager(BaseManager):
     count_aggregation_fields = ("stats.top_category", "stats.is_viral")
     allowed_sections = BaseManager.allowed_sections + (Sections.STATS, Sections.STATS_SCHEDULE)
 
-    def forced_filters(self):
-        return super(KeywordManager, self).forced_filters() &\
+    def forced_filters(self, include_deleted=False):
+        return super(KeywordManager, self).forced_filters(include_deleted=include_deleted) &\
                self._filter_existent_section(Sections.STATS)
 
     def _get_enabled_monitoring_warnings(self):
