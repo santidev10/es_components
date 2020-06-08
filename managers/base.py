@@ -1,3 +1,4 @@
+from functools import reduce
 import os
 import re
 import statistics
@@ -333,7 +334,7 @@ class BaseManager:
         return self.search(query=_query, filters=_filters, sort=_sort, limit=limit)
 
     def search_outdated_records(self, outdated_at, ids=None, id_field=MAIN_ID_FIELD,
-                                exclude_ids=None, exclude_id_field=None, ignore_deleted=None, limit=10000):
+                                exclude_ids=None, exclude_id_field=None, ignore_deleted=None, get_tracked=None, limit=10000):
         control_section = self._get_control_section()
         field_updated_at = f"{control_section}.{TimestampFields.UPDATED_AT}"
 
@@ -343,8 +344,13 @@ class BaseManager:
         # to ignore items without main id field
         _filters.append(self._filter_existent_section(MAIN_ID_FIELD))
 
+        should_filters = []
+        if get_tracked is True:
+            should_filters.append(QueryBuilder().build().should().term().field(f"{Sections.CUSTOM_PROPERTIES}"
+                                                                               f".is_tracked").value(True).get())
         if ignore_deleted is True:
-            _filters.append(self.filter_alive())
+            should_filters.append(QueryBuilder().build().must_not().exists().field(Sections.DELETED).get())
+        _filters.append(reduce(lambda a, b: a | b, should_filters))
 
         _query = None
         if ids or exclude_ids:
@@ -377,13 +383,14 @@ class BaseManager:
         return entries
 
     def get_outdated(self, outdated_at, ids=None, id_field=MAIN_ID_FIELD, exclude_ids=None, exclude_id_field=None,
-                     limit=10000, extract_hits=True, ignore_deleted=True):
+                     limit=10000, extract_hits=True, ignore_deleted=True, get_tracked=True):
         search = self.search_outdated_records(
             outdated_at,
             ids=ids,
             id_field=id_field,
             exclude_ids=exclude_ids,
             exclude_id_field=exclude_id_field,
+            get_tracked=get_tracked,
             ignore_deleted=ignore_deleted,
             limit=limit,
         )
