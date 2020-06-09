@@ -24,8 +24,8 @@ class ESTestCase(TestCase):
     def __dangerous_environment_check(self):
         hosts = [item["host"] for item in connections.get_connection("default").transport.hosts]
         dangerous_hosts = (
-            r'prod',
-            r'rc',
+            r"prod",
+            r"rc",
         )
         if any([any([re.search(host_mask, host) for host_mask in dangerous_hosts]) for host in hosts]):
             raise ConnectionError("Testing on dangerous ElasticSearch host detected")
