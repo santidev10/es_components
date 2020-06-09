@@ -199,6 +199,7 @@ class ChannelSectionTaskUsData(BaseInnerDoc):
     content_type = Keyword()
     gender = Keyword()
     brand_safety = Keyword(multi=True)
+    last_vetted = Date()
 
 
 class Channel(BaseDocument):
