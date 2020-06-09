@@ -10,6 +10,7 @@ from elasticsearch_dsl import Text
 from es_components.config import CHANNEL_DOC_TYPE
 from es_components.config import CHANNEL_INDEX_NAME
 from es_components.config import CHANNEL_INDEX_PREFIX
+from es_components.config import CHANNEL_REFRESH_INTERVAL
 from es_components.constants import Sections
 from es_components.models.base import BaseDocument
 from es_components.models.base import BaseInnerDoc
@@ -72,6 +73,7 @@ class ChannelSectionStats(BaseInnerDocWithHistory):
     sentiment = Double()
     sentiment_history = Double(index=False, multi=True)
     channel_group = Keyword()
+    hidden_subscriber_count = Boolean()
 
     class History:
         all = (
@@ -223,7 +225,7 @@ class Channel(BaseDocument):
         prefix = CHANNEL_INDEX_PREFIX
         settings = dict(
             number_of_shards=24,
-            refresh_interval="10s",
+            refresh_interval=CHANNEL_REFRESH_INTERVAL,
         )
 
     class Meta:

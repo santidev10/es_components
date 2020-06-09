@@ -4,14 +4,17 @@ import os
 CHANNEL_INDEX_NAME = "channels"
 CHANNEL_INDEX_PREFIX = "channels_"
 CHANNEL_DOC_TYPE = "channel"
+CHANNEL_REFRESH_INTERVAL = os.getenv("ES_CHANNEL_REFRESH_INTERVAL", "1s")
 
 VIDEO_INDEX_NAME = "videos"
 VIDEO_INDEX_PREFIX = "videos_"
 VIDEO_DOC_TYPE = "video"
+VIDEO_REFRESH_INTERVAL = os.getenv("ES_VIDEO_REFRESH_INTERVAL", "1s")
 
 KEYWORD_INDEX_NAME = "keywords"
 KEYWORD_INDEX_PREFIX = "keywords_"
 KEYWORD_DOC_TYPE = "keyword"
+KEYWORD_REFRESH_INTERVAL = os.getenv("ES_KEYWORD_REFRESH_INTERVAL", "1s")
 
 ES_REQUEST_LIMIT = int(os.getenv("ES_REQUEST_LIMIT", "10000"))
 # VIQ2-161: Trying to fix: circuit_breaking_exception; orig: "ES_CHUNK_SIZE", "500"

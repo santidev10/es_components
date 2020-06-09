@@ -35,10 +35,12 @@ from es_components.monitor import Monitor
 from es_components.monitor import Warnings
 from es_components.query_builder import QueryBuilder
 from es_components.utils import chunks
+from es_components.utils import retry_on_conflict
 
 
 AGGREGATION_COUNT_SIZE = 100000
 AGGREGATION_PERCENTS = tuple(range(10, 100, 10))
+
 
 def retry_on_conflict(method, *args, retry_amount=5, sleep_coeff=2, **kwargs):
     """
@@ -294,7 +296,7 @@ class BaseManager:
     def filter_alive(self):
         return self._filter_nonexistent_section(Sections.DELETED)
 
-    def forced_filters(self):
+    def forced_filters(self, include_deleted=False):
         # "now-1d/d" time format is used
         # it avoids being tied to the current point in time and makes it possible to cache request/response
         outdated_seconds = self.forced_filter_oudated_days * 86400
@@ -302,10 +304,12 @@ class BaseManager:
         field_updated_at = f"{self.forced_filter_section_oudated}.{TimestampFields.UPDATED_AT}"
         filter_range = QueryBuilder().build().must().range().field(field_updated_at) \
             .gt(updated_at).get()
-        return self.filter_alive() & filter_range
+
+        return self.filter_alive() & filter_range if not include_deleted else filter_range
 
     def search_nonexistent_section_records(self, ids=None, id_field=MAIN_ID_FIELD,
-                                           exclude_ids=None, exclude_id_field=None, ignore_deleted=None, limit=10000):
+                                           exclude_ids=None, exclude_id_field=None, ignore_deleted=None,
+                                           limit=10000, offset=None):
         control_section = self._get_control_section()
         field_updated_at = f"{control_section}.{TimestampFields.UPDATED_AT}"
 
@@ -330,10 +334,11 @@ class BaseManager:
             {field_updated_at: {"order": SortDirections.ASCENDING}},
             {MAIN_ID_FIELD: {"order": SortDirections.ASCENDING}},
         ]
-        return self.search(query=_query, filters=_filters, sort=_sort, limit=limit)
+        return self.search(query=_query, filters=_filters, sort=_sort, limit=limit, offset=offset)
+
 
     def search_outdated_records(self, outdated_at, ids=None, id_field=MAIN_ID_FIELD, exclude_ids=None,
-                                exclude_id_field=None, ignore_deleted=None, get_tracked=None, limit=10000):
+                                exclude_id_field=None, ignore_deleted=None, get_tracked=None, offset=None, limit=10000):
         control_section = self._get_control_section()
         field_updated_at = f"{control_section}.{TimestampFields.UPDATED_AT}"
 
@@ -364,10 +369,10 @@ class BaseManager:
             {field_updated_at: {"order": SortDirections.ASCENDING}},
             {MAIN_ID_FIELD: {"order": SortDirections.ASCENDING}},
         ]
-        return self.search(query=_query, filters=_filters, sort=_sort, limit=limit)
+        return self.search(query=_query, filters=_filters, sort=_sort, limit=limit, offset=offset)
 
     def get_never_updated(self, ids=None, id_field=MAIN_ID_FIELD, exclude_ids=None, exclude_id_field=None,
-                          limit=10000, extract_hits=True, ignore_deleted=True):
+                          limit=10000, extract_hits=True, ignore_deleted=True, offset=None):
         search = self.search_nonexistent_section_records(
             ids=ids,
             id_field=id_field,
@@ -375,6 +380,7 @@ class BaseManager:
             exclude_id_field=exclude_id_field,
             ignore_deleted=ignore_deleted,
             limit=limit,
+            offset=offset,
         )
         if not extract_hits:
             return search
@@ -382,16 +388,17 @@ class BaseManager:
         return entries
 
     def get_outdated(self, outdated_at, ids=None, id_field=MAIN_ID_FIELD, exclude_ids=None, exclude_id_field=None,
-                     limit=10000, extract_hits=True, ignore_deleted=True, get_tracked=True):
+                     limit=10000, extract_hits=True, ignore_deleted=True, offset=None, get_tracked=True):
         search = self.search_outdated_records(
             outdated_at,
             ids=ids,
             id_field=id_field,
             exclude_ids=exclude_ids,
             exclude_id_field=exclude_id_field,
-            get_tracked=get_tracked,
             ignore_deleted=ignore_deleted,
             limit=limit,
+            offset=offset,
+            get_tracked=get_tracked,
         )
         if not extract_hits:
             return search
