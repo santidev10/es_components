@@ -1,10 +1,13 @@
 from collections import OrderedDict
+from functools import reduce
 import os
 import re
 import statistics
+import time
 from typing import Type
 
 from elasticsearch import NotFoundError
+from elasticsearch.exceptions import ConflictError
 from elasticsearch.helpers import bulk
 from elasticsearch_dsl import MultiSearch
 from elasticsearch_dsl import connections
@@ -37,6 +40,23 @@ from es_components.utils import retry_on_conflict
 
 AGGREGATION_COUNT_SIZE = 100000
 AGGREGATION_PERCENTS = tuple(range(10, 100, 10))
+
+
+def retry_on_conflict(method, *args, retry_amount=5, sleep_coeff=2, **kwargs):
+    """
+    Retry on Document Conflicts. THIS IS JANKY AND TEMPORARY. circular import for segment.utils.utils
+    """
+    tries_count = 0
+    while tries_count <= retry_amount:
+        try:
+            result = method(*args, **kwargs)
+        except ConflictError:
+            tries_count += 1
+            if tries_count <= retry_amount:
+                sleep_seconds_count = tries_count ** sleep_coeff
+                time.sleep(sleep_seconds_count)
+        else:
+            return result
 
 # pylint: disable=too-many-public-methods
 class BaseManager:
@@ -316,9 +336,9 @@ class BaseManager:
         ]
         return self.search(query=_query, filters=_filters, sort=_sort, limit=limit, offset=offset)
 
-    def search_outdated_records(self, outdated_at, ids=None, id_field=MAIN_ID_FIELD,
-                                exclude_ids=None, exclude_id_field=None, ignore_deleted=None,
-                                limit=10000, offset=None):
+
+    def search_outdated_records(self, outdated_at, ids=None, id_field=MAIN_ID_FIELD, exclude_ids=None,
+                                exclude_id_field=None, ignore_deleted=None, get_tracked=None, offset=None, limit=10000):
         control_section = self._get_control_section()
         field_updated_at = f"{control_section}.{TimestampFields.UPDATED_AT}"
 
@@ -328,8 +348,13 @@ class BaseManager:
         # to ignore items without main id field
         _filters.append(self._filter_existent_section(MAIN_ID_FIELD))
 
+        should_filters = []
+        if get_tracked is True:
+            should_filters.append(QueryBuilder().build().should().term().field(f"{Sections.CUSTOM_PROPERTIES}"
+                                                                               f".is_tracked").value(True).get())
         if ignore_deleted is True:
-            _filters.append(self.filter_alive())
+            should_filters.append(self.filter_alive())
+        _filters.append(reduce(lambda a, b: a | b, should_filters))
 
         _query = None
         if ids or exclude_ids:
@@ -363,7 +388,7 @@ class BaseManager:
         return entries
 
     def get_outdated(self, outdated_at, ids=None, id_field=MAIN_ID_FIELD, exclude_ids=None, exclude_id_field=None,
-                     limit=10000, extract_hits=True, ignore_deleted=True, offset=None):
+                     limit=10000, extract_hits=True, ignore_deleted=True, offset=None, get_tracked=True):
         search = self.search_outdated_records(
             outdated_at,
             ids=ids,
@@ -373,6 +398,7 @@ class BaseManager:
             ignore_deleted=ignore_deleted,
             limit=limit,
             offset=offset,
+            get_tracked=get_tracked,
         )
         if not extract_hits:
             return search

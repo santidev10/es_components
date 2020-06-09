@@ -1,3 +1,4 @@
+# pylint: disable=invalid-string-quote
 COUNTRY_CODES = {
     "Aruba": "AW",
     "Afghanistan": "AF",
@@ -281,7 +282,6 @@ COUNTRY_CODES = {
     "South Africa": "ZA",
     "Zambia": "ZM",
     "Zimbabwe": "ZW"}
-
 
 COUNTRIES = {
     "AW": ["Aruba"],
