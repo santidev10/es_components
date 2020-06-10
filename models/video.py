@@ -197,6 +197,7 @@ class VideoSectionTaskUsData(BaseInnerDoc):
     gender = Keyword()
     brand_safety = Keyword(multi=True)
     last_vetted_at = Date()
+    mixed_language = Boolean()
 
 
 class Video(BaseDocument):
