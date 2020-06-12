@@ -200,6 +200,7 @@ class ChannelSectionTaskUsData(BaseInnerDoc):
     gender = Keyword()
     brand_safety = Keyword(multi=True)
     last_vetted_at = Date()
+    mismatched_language = Boolean()
 
 
 class Channel(BaseDocument):
