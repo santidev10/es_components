@@ -54,7 +54,6 @@ class Keyword(BaseDocument):
         name = KEYWORD_INDEX_NAME
         prefix = KEYWORD_INDEX_PREFIX
         settings = dict(
-            number_of_shards=24,
             refresh_interval=KEYWORD_REFRESH_INTERVAL,
         )
 

@@ -225,7 +225,6 @@ class Channel(BaseDocument):
         name = CHANNEL_INDEX_NAME
         prefix = CHANNEL_INDEX_PREFIX
         settings = dict(
-            number_of_shards=24,
             refresh_interval=CHANNEL_REFRESH_INTERVAL,
         )
 

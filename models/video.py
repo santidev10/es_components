@@ -221,7 +221,6 @@ class Video(BaseDocument):
         name = VIDEO_INDEX_NAME
         prefix = VIDEO_INDEX_PREFIX
         settings = dict(
-            number_of_shards=24,
             refresh_interval=VIDEO_REFRESH_INTERVAL,
         )
 
