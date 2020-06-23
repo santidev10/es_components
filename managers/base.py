@@ -370,6 +370,7 @@ class BaseManager:
         entries = search.execute().hits
         return entries
 
+# pylint: disable=too-many-arguments
     def get_outdated(self, outdated_at, ids=None, id_field=MAIN_ID_FIELD, exclude_ids=None, exclude_id_field=None,
                      limit=10000, extract_hits=True, ignore_deleted=True, offset=None, get_tracked=True):
         search = self.search_outdated_records(
@@ -387,6 +388,7 @@ class BaseManager:
             return search
         entries = search.execute().hits
         return entries
+# pylint: enable=too-many-arguments
 
     def get_by_forced_filter(self):
         forced_filter = self.forced_filters()

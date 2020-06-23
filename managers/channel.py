@@ -1,14 +1,14 @@
 from pycountry import languages
+
+from es_components.constants import CONTENT_OWNER_ID_FIELD
+from es_components.constants import Sections
+from es_components.languages import LANGUAGES
 from es_components.managers.base import BaseManager
 from es_components.models.channel import Channel
-from es_components.constants import Sections
-from es_components.constants import CONTENT_OWNER_ID_FIELD
-from es_components.query_builder import QueryBuilder
 from es_components.monitor import Emergency
 from es_components.monitor import Warnings
+from es_components.query_builder import QueryBuilder
 from es_components.utils import add_brand_safety_labels
-from es_components.languages import LANGUAGES
-
 
 AGGREGATION_COUNT_SIZE = 100000
 AGGREGATION_PERCENTS = tuple(range(10, 100, 10))
@@ -84,7 +84,7 @@ MINIMUM_AGGREGATION_COUNT = 5
 
 
 class ChannelManager(BaseManager):
-    allowed_sections = BaseManager.allowed_sections\
+    allowed_sections = BaseManager.allowed_sections \
                        + (Sections.GENERAL_DATA, Sections.STATS, Sections.ANALYTICS, Sections.AUTH,
                           Sections.MONETIZATION, Sections.SOCIAL, Sections.ADS_STATS, Sections.CMS,
                           Sections.CUSTOM_PROPERTIES, Sections.GENERAL_DATA_SCHEDULE, Sections.SIMILAR_CHANNELS,
@@ -99,7 +99,7 @@ class ChannelManager(BaseManager):
     count_missing_aggregation_fields = COUNT_MISSING_AGGREGATION
 
     def by_content_owner_ids_query(self, content_owner_ids):
-        return QueryBuilder().build().must().terms().field(CONTENT_OWNER_ID_FIELD)\
+        return QueryBuilder().build().must().terms().field(CONTENT_OWNER_ID_FIELD) \
             .value(content_owner_ids).get()
 
     def forced_filters(self, include_deleted=False):
@@ -194,7 +194,6 @@ class ChannelManager(BaseManager):
             aggregations["stats.channel_group"]["buckets"] = channel_group_buckets
         return aggregations
 
-
     def _get_enabled_monitoring_warnings(self):
         warning_few_records_updated = (
             Warnings.FewRecordsUpdated(Sections.GENERAL_DATA, 15, True),
@@ -212,4 +211,3 @@ class ChannelManager(BaseManager):
     def _get_enabled_monitoring_params_info(self):
         skipped_sections = (Sections.GENERAL_DATA,)
         return self.sections, skipped_sections, True
-

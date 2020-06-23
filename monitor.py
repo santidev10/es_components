@@ -1,8 +1,8 @@
 from collections import defaultdict
 
 from es_components.connections import connections
-from es_components.constants import TimestampFields
 from es_components.constants import Sections
+from es_components.constants import TimestampFields
 from es_components.query_builder import QueryBuilder
 
 
@@ -26,11 +26,11 @@ class Emergency:
             sections = ", ".join(self.sections)
             return f"Less than {self.control_percentage}% of {sections} data has been updated during the last day"
 
+
 class Warnings:
     class MainSectionNotFilled(BaseWarning):
         name = "MainSectionNotFilled"
         message = "The total count is bigger than the count of records with the filled `main` section"
-
 
     class NoNewSections(BaseWarning):
         name = "NoNewSections"
@@ -39,7 +39,6 @@ class Warnings:
         def message(self):
             sections = ",".join(self.params)
             return f"No new {sections} sections in the last 3 days"
-
 
     class FewRecordsUpdated(BaseWarning):
         name = "FewRecordsUpdated"
@@ -91,6 +90,7 @@ class MonitoringIndex(BaseMonitor):
             rep=info_data.get("rep"),
 
         )
+
     # pylint: enable=arguments-differ
 
     # pylint: disable=unused-argument
@@ -117,7 +117,6 @@ class MonitoringPerformance(BaseMonitor):
     SKIPPED_SECTION_CHECK_DAYS = 7
     UPDATER_TASK_EXPIRE_DAYS = 2
 
-
     def __init__(self, *args, **kwargs):
         super(MonitoringPerformance, self).__init__(*args, **kwargs)
         self._warnings_check_func = {
@@ -135,7 +134,6 @@ class MonitoringPerformance(BaseMonitor):
             Emergency.NoneRecordsUpdated.name: self.__check_none_records_updated
         }
 
-
     def __get_count(self, query=None):
         body = {}
         if query:
@@ -145,9 +143,9 @@ class MonitoringPerformance(BaseMonitor):
 
     def __timestamp_query_generator(self, section=Sections.MAIN, timestamp_field=TimestampFields.CREATED_AT):
         for key, days in self.DAYS_LIST:
-            yield key, QueryBuilder().build().must().range()\
-                .field(f"{section}.{timestamp_field}")\
-                .gt(f"now-{86400 * days}s/s")\
+            yield key, QueryBuilder().build().must().range() \
+                .field(f"{section}.{timestamp_field}") \
+                .gt(f"now-{86400 * days}s/s") \
                 .get()
 
     def get_section_info(self, section, ignore_deleted=False):
@@ -186,11 +184,11 @@ class MonitoringPerformance(BaseMonitor):
 
         for section in skipped_sections:
             __queries = \
-                QueryBuilder().build().must_not().range().field(f"{section}.{TimestampFields.UPDATED_AT}")\
+                QueryBuilder().build().must_not().range().field(f"{section}.{TimestampFields.UPDATED_AT}") \
                     .gt(f"now-{86400 * self.SKIPPED_SECTION_CHECK_DAYS}s/s").get() & \
-                QueryBuilder().build().must().range().field(f"{section}_schedule.{TimestampFields.UPDATED_AT}")\
+                QueryBuilder().build().must().range().field(f"{section}_schedule.{TimestampFields.UPDATED_AT}") \
                     .gt(f"now-{86400 * self.SKIPPED_SECTION_CHECK_DAYS}s/s").get() & \
-                QueryBuilder().build().must().range().field(f"{section}_schedule.{TimestampFields.CREATED_AT}")\
+                QueryBuilder().build().must().range().field(f"{section}_schedule.{TimestampFields.CREATED_AT}") \
                     .lt(f"now-{86400}s/s").get()
 
             queries = queries | __queries if queries is not None else __queries
@@ -200,6 +198,7 @@ class MonitoringPerformance(BaseMonitor):
     # pylint: disable=no-member
     def __get_deleted(self):
         return self.__get_count(query=QueryBuilder().build().must().exists().field(Sections.DELETED).get())
+
     # pylint: enable=no-member
 
     # pylint: disable=arguments-differ
@@ -214,6 +213,7 @@ class MonitoringPerformance(BaseMonitor):
             "skipped": self.__get_skipped(skipped_sections)
         }
         return dict(info_by_sections=info_by_sections, general=general)
+
     # pylint: enable=arguments-differ
 
     # pylint: disable=arguments-differ
@@ -232,6 +232,7 @@ class MonitoringPerformance(BaseMonitor):
             warning_messages += prepare_messages(warnings)
         # pylint: enable=redefined-argument-from-local
         return warning_messages
+
     # pylint: enable=arguments-differ
 
     # pylint: disable=unused-argument
@@ -243,8 +244,8 @@ class MonitoringPerformance(BaseMonitor):
             if check_func and check_func(*emergency.params):
                 alert_messages.append(emergency.message)
 
-
         return alert_messages
+
     # pylint: enable=unused-argument
 
     # pylint: disable=unused-argument
@@ -254,13 +255,14 @@ class MonitoringPerformance(BaseMonitor):
         # pylint: enable=no-member
         total_count = self.__get_count()
         return count < total_count
+
     # pylint: enable=unused-argument
 
     def __check_no_new_section(self, section):
         count = self.__get_count(
-            query=QueryBuilder().build().must().range()\
-                .field(f"{section}.{TimestampFields.CREATED_AT}")\
-                .gt(f"now-{86400 * self.WARNINGS_CHECK_DAYS}s/s")\
+            query=QueryBuilder().build().must().range() \
+                .field(f"{section}.{TimestampFields.CREATED_AT}") \
+                .gt(f"now-{86400 * self.WARNINGS_CHECK_DAYS}s/s") \
                 .get()
         )
         return count == 0
@@ -330,6 +332,7 @@ class Monitor(BaseMonitor):
         for monitor in self.__monitors:
             results[monitor.name] = monitor.get_info(*args)
         return results
+
     # pylint: enable=arguments-differ
 
     # pylint: disable=arguments-differ
@@ -338,6 +341,7 @@ class Monitor(BaseMonitor):
         for monitor in self.__monitors:
             results += monitor.get_warnings(*args)
         return results
+
     # pylint: enable=arguments-differ
 
     # pylint: disable=arguments-differ
@@ -347,4 +351,3 @@ class Monitor(BaseMonitor):
             results += monitor.get_alerts(*args)
         return results
     # pylint: enable=arguments-differ
-
