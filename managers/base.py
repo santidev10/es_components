@@ -1,8 +1,8 @@
-from collections import OrderedDict
-from functools import reduce
 import os
 import re
 import statistics
+from collections import OrderedDict
+from functools import reduce
 from typing import Type
 
 from elasticsearch import NotFoundError
@@ -34,7 +34,6 @@ from es_components.monitor import Warnings
 from es_components.query_builder import QueryBuilder
 from es_components.utils import chunks
 from es_components.utils import retry_on_conflict
-
 
 AGGREGATION_COUNT_SIZE = 100000
 AGGREGATION_PERCENTS = tuple(range(10, 100, 10))
@@ -289,6 +288,7 @@ class BaseManager:
 
         return self.filter_alive() & filter_range if not include_deleted else filter_range
 
+    # pylint: disable=too-many-arguments
     def search_nonexistent_section_records(self, ids=None, id_field=MAIN_ID_FIELD,
                                            exclude_ids=None, exclude_id_field=None, ignore_deleted=None,
                                            limit=10000, offset=None):
@@ -318,7 +318,8 @@ class BaseManager:
         ]
         return self.search(query=_query, filters=_filters, sort=_sort, limit=limit, offset=offset)
 
-
+    # pylint: enable=too-many-arguments
+    # pylint: disable=too-many-arguments
     def search_outdated_records(self, outdated_at, ids=None, id_field=MAIN_ID_FIELD, exclude_ids=None,
                                 exclude_id_field=None, ignore_deleted=None, get_tracked=None,
                                 offset=None, limit=10000):
@@ -354,6 +355,8 @@ class BaseManager:
         ]
         return self.search(query=_query, filters=_filters, sort=_sort, limit=limit, offset=offset)
 
+    # pylint: enable=too-many-arguments
+    # pylint: disable=too-many-arguments
     def get_never_updated(self, ids=None, id_field=MAIN_ID_FIELD, exclude_ids=None, exclude_id_field=None,
                           limit=10000, extract_hits=True, ignore_deleted=True, offset=None):
         search = self.search_nonexistent_section_records(
@@ -370,6 +373,8 @@ class BaseManager:
         entries = search.execute().hits
         return entries
 
+    # pylint: enable=too-many-arguments
+    # pylint: disable=too-many-arguments
     def get_outdated(self, outdated_at, ids=None, id_field=MAIN_ID_FIELD, exclude_ids=None, exclude_id_field=None,
                      limit=10000, extract_hits=True, ignore_deleted=True, offset=None, get_tracked=True):
         search = self.search_outdated_records(
@@ -387,6 +392,8 @@ class BaseManager:
             return search
         entries = search.execute().hits
         return entries
+
+    # pylint: enable=too-many-arguments
 
     def get_by_forced_filter(self):
         forced_filter = self.forced_filters()

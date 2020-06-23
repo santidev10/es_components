@@ -88,7 +88,7 @@ class History(BaseHistory):
         if self.prev_fetched_at is None or self.prev_fetched_at.date() == self.section.fetched_at.date():
             return
 
-        for field_name in self.prev_values.keys():
+        for field_name in self.prev_values:
             self._update_field_history(field_name)
 
     def _update_field_history(self, field_name):

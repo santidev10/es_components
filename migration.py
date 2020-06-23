@@ -17,8 +17,8 @@ connection = connections.get_connection()
 
 
 def init_mapping():
-    for _model in ALL_MODELS:
-        _model.init(index=_model.Index.name)
+    for model in ALL_MODELS:
+        model.init(index=model.Index.name)
 
 
 def reindex():
