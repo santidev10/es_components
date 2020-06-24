@@ -50,7 +50,6 @@ COUNT_AGGREGATION = (
     "analytics.is_cms",
     "custom_properties.preferred",
     "brand_safety",
-    "stats.channel_group",
     "task_us_data.age_group",
     "task_us_data.content_type",
     "task_us_data.gender",
@@ -142,7 +141,6 @@ class ChannelManager(BaseManager):
         aggregations_result.update(count_exists_aggs_result)
 
         aggregations_result = add_brand_safety_labels(aggregations_result)
-        aggregations_result = self.adapt_channel_group(aggregations_result)
         aggregations_result = self.adapt_iab_categories_aggregation(aggregations_result)
         aggregations_result = self.adapt_country_code_aggregation(aggregations_result)
         aggregations_result = self.adapt_lang_code_aggregation(aggregations_result)
@@ -175,23 +173,6 @@ class ChannelManager(BaseManager):
     def adapt_is_tracked_aggregation(self, aggregations):
         if "custom_properties.is_tracked" in aggregations:
             aggregations["custom_properties.is_tracked"]["buckets"][0]["key"] = "Tracked Channels"
-        return aggregations
-
-    def adapt_channel_group(self, aggregations):
-        if "stats.channel_group" in aggregations:
-            channel_group_buckets = []
-            for bucket in aggregations["stats.channel_group"]["buckets"]:
-                key = bucket["key"]
-                if key == "influencers":
-                    bucket["key"] = "Influencers"
-                    channel_group_buckets.append(bucket)
-                elif key == "brands":
-                    bucket["key"] = "Brands"
-                    channel_group_buckets.append(bucket)
-                elif key == "media":
-                    bucket["key"] = "Media & Entertainment"
-                    channel_group_buckets.append(bucket)
-            aggregations["stats.channel_group"]["buckets"] = channel_group_buckets
         return aggregations
 
     def _get_enabled_monitoring_warnings(self):
