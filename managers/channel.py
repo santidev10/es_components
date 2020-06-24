@@ -54,12 +54,11 @@ COUNT_AGGREGATION = (
 )
 
 COUNT_EXISTS_AGGREGATION = (
-    "general_data.emails",
     "ads_stats",
     "monetization.is_monetizable",
     "task_us_data"
 )
-COUNT_MISSING_AGGREGATION = ("general_data.emails", "task_us_data")
+COUNT_MISSING_AGGREGATION = ("task_us_data",)
 
 PERCENTILES_AGGREGATION = (
     "stats.subscribers",
