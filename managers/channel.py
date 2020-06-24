@@ -15,9 +15,6 @@ AGGREGATION_PERCENTS = tuple(range(10, 100, 10))
 
 RANGE_AGGREGATION = (
     "stats.subscribers",
-    "social.facebook_likes",
-    "social.twitter_followers",
-    "social.instagram_followers",
     "stats.last_30day_subscribers",
     "stats.last_30day_views",
     "stats.views_per_video",
@@ -66,9 +63,6 @@ COUNT_MISSING_AGGREGATION = ("general_data.emails", "task_us_data")
 
 PERCENTILES_AGGREGATION = (
     "stats.subscribers",
-    "social.facebook_likes",
-    "social.twitter_followers",
-    "social.instagram_followers",
     "stats.last_30day_subscribers",
     "stats.last_30day_views",
     "stats.views_per_video",
