@@ -34,7 +34,8 @@ RANGE_AGGREGATION = (
     "ads_stats.ctr",
     "ads_stats.ctr_v",
     "ads_stats.average_cpv",
-    "ads_stats.average_cpm"
+    "ads_stats.average_cpm",
+    "ads_stats.video_quartile_100_rate"
 )
 
 COUNT_AGGREGATION = (

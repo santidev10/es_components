@@ -25,9 +25,11 @@ RANGE_AGGREGATION = (
     "stats.last_day_views",
     "stats.channel_subscribers",
     "ads_stats.video_view_rate",
+    "ads_stats.ctr",
     "ads_stats.ctr_v",
     "ads_stats.average_cpv",
     "ads_stats.average_cpm",
+    "ads_stats.video_quartile_100_rate",
     "general_data.youtube_published_at",
     "stats.sentiment"
 )
@@ -54,9 +56,11 @@ PERCENTILES_AGGREGATION = (
     "stats.last_day_views",
     "stats.channel_subscribers",
     "ads_stats.video_view_rate",
+    "ads_stats.ctr",
     "ads_stats.ctr_v",
     "ads_stats.average_cpv",
     "ads_stats.average_cpm",
+    "ads_stats.video_quartile_100_rate",
     "stats.sentiment"
 )
 
