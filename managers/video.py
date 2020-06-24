@@ -27,6 +27,7 @@ RANGE_AGGREGATION = (
     "ads_stats.video_view_rate",
     "ads_stats.ctr_v",
     "ads_stats.average_cpv",
+    "ads_stats.average_cpm",
     "general_data.youtube_published_at",
     "stats.sentiment"
 )
@@ -55,6 +56,7 @@ PERCENTILES_AGGREGATION = (
     "ads_stats.video_view_rate",
     "ads_stats.ctr_v",
     "ads_stats.average_cpv",
+    "ads_stats.average_cpm",
     "stats.sentiment"
 )
 
