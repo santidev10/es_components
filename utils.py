@@ -30,9 +30,9 @@ def add_brand_safety_labels(aggregations):
 
 def add_sentiment_labels(aggregations):
     if "stats.sentiment" in aggregations:
-        aggregations["stats.sentiment"]["buckets"][0]["key"] = video_constants.CONTROVERSIAL
-        aggregations["stats.sentiment"]["buckets"][1]["key"] = video_constants.AVERAGE
-        aggregations["stats.sentiment"]["buckets"][2]["key"] = video_constants.WELL_LIKED
+        aggregations["stats.sentiment"]["buckets"][0]["key"] = "Controversial"
+        aggregations["stats.sentiment"]["buckets"][1]["key"] = "Average"
+        aggregations["stats.sentiment"]["buckets"][2]["key"] = "Well Liked"
     return aggregations
 
 
