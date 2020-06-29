@@ -424,6 +424,17 @@ class BaseManager:
                 }
             }
 
+        count_aggs["stats.sentiment"] = {
+            "range": {
+                "field": "stats.sentiment",
+                "ranges": [
+                    {"from": 90, "to": 100.1},
+                    {"from": 70, "to": 89.1},
+                    {"from": 0, "to": 69.1},
+                ]
+            }
+        }
+
         count_aggs["brand_safety"] = {
             "range": {
                 "field": "brand_safety.overall_score",

@@ -17,6 +17,7 @@ from es_components.query_builder import QueryBuilder
 from es_components.monitor import Emergency
 from es_components.monitor import Warnings
 from es_components.utils import add_brand_safety_labels
+from es_components.utils import add_sentiment_labels
 from es_components.languages import LANGUAGES
 
 
@@ -25,10 +26,12 @@ RANGE_AGGREGATION = (
     "stats.last_day_views",
     "stats.channel_subscribers",
     "ads_stats.video_view_rate",
+    "ads_stats.ctr",
     "ads_stats.ctr_v",
     "ads_stats.average_cpv",
-    "general_data.youtube_published_at",
-    "stats.sentiment"
+    "ads_stats.average_cpm",
+    "ads_stats.video_quartile_100_rate",
+    "general_data.youtube_published_at"
 )
 
 COUNT_AGGREGATION = (
@@ -43,6 +46,7 @@ COUNT_AGGREGATION = (
     "task_us_data.age_group",
     "task_us_data.content_type",
     "task_us_data.gender",
+    "stats.sentiment"
 )
 
 COUNT_EXISTS_AGGREGATION = ("stats.flags", "custom_captions.items", "captions", "task_us_data")
@@ -53,8 +57,11 @@ PERCENTILES_AGGREGATION = (
     "stats.last_day_views",
     "stats.channel_subscribers",
     "ads_stats.video_view_rate",
+    "ads_stats.ctr",
     "ads_stats.ctr_v",
     "ads_stats.average_cpv",
+    "ads_stats.average_cpm",
+    "ads_stats.video_quartile_100_rate",
     "stats.sentiment"
 )
 
@@ -202,8 +209,8 @@ class VideoManager(BaseManager):
 
         count_exists_aggs_result = self._get_count_exists_aggs_result(search, properties)
         aggregations_result.update(count_exists_aggs_result)
-
         aggregations_result = add_brand_safety_labels(aggregations_result)
+        aggregations_result = add_sentiment_labels(aggregations_result)
         aggregations_result = self.adapt_flags_aggregation(aggregations_result)
         aggregations_result = self.adapt_transcripts_aggregation(aggregations_result)
         aggregations_result = self.adapt_iab_categories_aggregation(aggregations_result)

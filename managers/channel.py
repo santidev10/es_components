@@ -15,9 +15,6 @@ AGGREGATION_PERCENTS = tuple(range(10, 100, 10))
 
 RANGE_AGGREGATION = (
     "stats.subscribers",
-    "social.facebook_likes",
-    "social.twitter_followers",
-    "social.instagram_followers",
     "stats.last_30day_subscribers",
     "stats.last_30day_views",
     "stats.views_per_video",
@@ -36,7 +33,9 @@ RANGE_AGGREGATION = (
     "ads_stats.video_view_rate",
     "ads_stats.ctr",
     "ads_stats.ctr_v",
-    "ads_stats.average_cpv"
+    "ads_stats.average_cpv",
+    "ads_stats.average_cpm",
+    "ads_stats.video_quartile_100_rate"
 )
 
 COUNT_AGGREGATION = (
@@ -50,7 +49,6 @@ COUNT_AGGREGATION = (
     "analytics.is_cms",
     "custom_properties.preferred",
     "brand_safety",
-    "stats.channel_group",
     "task_us_data.age_group",
     "task_us_data.content_type",
     "task_us_data.gender",
@@ -58,25 +56,21 @@ COUNT_AGGREGATION = (
 )
 
 COUNT_EXISTS_AGGREGATION = (
-    "general_data.emails",
-    "ads_stats",
     "monetization.is_monetizable",
     "task_us_data"
 )
-COUNT_MISSING_AGGREGATION = ("general_data.emails", "task_us_data")
+COUNT_MISSING_AGGREGATION = ("task_us_data",)
 
 PERCENTILES_AGGREGATION = (
     "stats.subscribers",
-    "social.facebook_likes",
-    "social.twitter_followers",
-    "social.instagram_followers",
     "stats.last_30day_subscribers",
     "stats.last_30day_views",
     "stats.views_per_video",
     "ads_stats.video_view_rate",
     "ads_stats.ctr",
     "ads_stats.ctr_v",
-    "ads_stats.average_cpv"
+    "ads_stats.average_cpv",
+    "ads_stats.average_cpm"
 )
 FORCED_FILTER_MIN_VIDEO_COUNT = 0
 
@@ -142,7 +136,6 @@ class ChannelManager(BaseManager):
         aggregations_result.update(count_exists_aggs_result)
 
         aggregations_result = add_brand_safety_labels(aggregations_result)
-        aggregations_result = self.adapt_channel_group(aggregations_result)
         aggregations_result = self.adapt_iab_categories_aggregation(aggregations_result)
         aggregations_result = self.adapt_country_code_aggregation(aggregations_result)
         aggregations_result = self.adapt_lang_code_aggregation(aggregations_result)
@@ -175,23 +168,6 @@ class ChannelManager(BaseManager):
     def adapt_is_tracked_aggregation(self, aggregations):
         if "custom_properties.is_tracked" in aggregations:
             aggregations["custom_properties.is_tracked"]["buckets"][0]["key"] = "Tracked Channels"
-        return aggregations
-
-    def adapt_channel_group(self, aggregations):
-        if "stats.channel_group" in aggregations:
-            channel_group_buckets = []
-            for bucket in aggregations["stats.channel_group"]["buckets"]:
-                key = bucket["key"]
-                if key == "influencers":
-                    bucket["key"] = "Influencers"
-                    channel_group_buckets.append(bucket)
-                elif key == "brands":
-                    bucket["key"] = "Brands"
-                    channel_group_buckets.append(bucket)
-                elif key == "media":
-                    bucket["key"] = "Media & Entertainment"
-                    channel_group_buckets.append(bucket)
-            aggregations["stats.channel_group"]["buckets"] = channel_group_buckets
         return aggregations
 
     def _get_enabled_monitoring_warnings(self):

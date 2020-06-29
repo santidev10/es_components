@@ -4,6 +4,8 @@ import time
 
 from elasticsearch.exceptions import ConflictError
 
+import video.constants as video_constants
+
 def chunks(iterable, size):
     chunk = count()
     for _, group in groupby(iterable, lambda _: next(chunk) // size):
@@ -23,6 +25,14 @@ def add_brand_safety_labels(aggregations):
         aggregations["brand_safety"]["buckets"][1]["key"] = "Low Suitability"
         aggregations["brand_safety"]["buckets"][2]["key"] = "Medium Suitability"
         aggregations["brand_safety"]["buckets"][3]["key"] = "Suitable"
+    return aggregations
+
+
+def add_sentiment_labels(aggregations):
+    if "stats.sentiment" in aggregations:
+        aggregations["stats.sentiment"]["buckets"][0]["key"] = "Controversial"
+        aggregations["stats.sentiment"]["buckets"][1]["key"] = "Average"
+        aggregations["stats.sentiment"]["buckets"][2]["key"] = "Well Liked"
     return aggregations
 
 
