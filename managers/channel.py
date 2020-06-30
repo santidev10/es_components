@@ -52,12 +52,12 @@ COUNT_AGGREGATION = (
     "task_us_data.age_group",
     "task_us_data.content_type",
     "task_us_data.gender",
-    "custom_properties.is_tracked"
+    "custom_properties.is_tracked",
+    "monetization.is_monetizable"
 )
 
 COUNT_EXISTS_AGGREGATION = (
-    "monetization.is_monetizable",
-    "task_us_data"
+    "task_us_data",
 )
 COUNT_MISSING_AGGREGATION = ("task_us_data",)
 
@@ -136,6 +136,7 @@ class ChannelManager(BaseManager):
         aggregations_result.update(count_exists_aggs_result)
 
         aggregations_result = add_brand_safety_labels(aggregations_result)
+        aggregations_result = self.adapt_is_monetizable_aggregation(aggregations_result)
         aggregations_result = self.adapt_iab_categories_aggregation(aggregations_result)
         aggregations_result = self.adapt_country_code_aggregation(aggregations_result)
         aggregations_result = self.adapt_lang_code_aggregation(aggregations_result)
@@ -143,6 +144,7 @@ class ChannelManager(BaseManager):
         aggregations_result = self.adapt_gender_aggregation(aggregations_result)
         aggregations_result = self.adapt_content_type_aggregation(aggregations_result)
         aggregations_result = self.adapt_is_tracked_aggregation(aggregations_result)
+        aggregations_result = self.adapt_features_aggregation(aggregations_result)
         return aggregations_result
 
     def adapt_lang_code_aggregation(self, aggregations):
@@ -169,6 +171,21 @@ class ChannelManager(BaseManager):
         if "custom_properties.is_tracked" in aggregations:
             aggregations["custom_properties.is_tracked"]["buckets"][0]["key"] = "Tracked Channels"
         return aggregations
+
+    def adapt_is_monetizable_aggregation(self, aggregations):
+        if "monetization.is_monetizable" in aggregations:
+            aggregations["monetization.is_monetizable"]["buckets"].pop(1)
+        return aggregations
+
+    def adapt_features_aggregation(self, aggregations):
+        features = {}
+        if "monetization.is_monetizable" in aggregations:
+            features["monetization.is_monetizable"] = aggregations.pop("monetization.is_monetizable")
+        if "custom_properties.preferred" in aggregations:
+            features["custom_properties.preferred"] = aggregations.pop("custom_properties.preferred")
+        aggregations["features"] = features
+        return aggregations
+
 
     def _get_enabled_monitoring_warnings(self):
         warning_few_records_updated = (
