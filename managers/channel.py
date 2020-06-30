@@ -186,7 +186,6 @@ class ChannelManager(BaseManager):
         aggregations["features"] = features
         return aggregations
 
-
     def _get_enabled_monitoring_warnings(self):
         warning_few_records_updated = (
             Warnings.FewRecordsUpdated(Sections.GENERAL_DATA, 15, True),
