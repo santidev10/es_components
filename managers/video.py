@@ -260,14 +260,14 @@ class VideoManager(BaseManager):
         return aggregations
 
     def adapt_transcripts_aggregation(self, aggregations):
-        if "custom_captions.items:exists" in aggregations and "captions:exists" in aggregations \
-                and "custom_captions.items:missing" in aggregations and "captions:missing" in aggregations:
+        if "custom_captions.items:exists" in aggregations and "captions:exists" in aggregations:
             transcripts_count = aggregations["custom_captions.items:exists"] + aggregations["captions:exists"]
-            no_transcripts_count = aggregations["captions:missing"] - aggregations["custom_captions.items:exists"]
             aggregations["transcripts:exists"] = transcripts_count
-            aggregations["transcripts:missing"] = no_transcripts_count
             aggregations.pop("custom_captions.items:exists")
             aggregations.pop("captions:exists")
+        if "custom_captions.items:missing" in aggregations and "captions:missing" in aggregations:
+            no_transcripts_count = aggregations["captions:missing"] - aggregations["custom_captions.items:exists"]
+            aggregations["transcripts:missing"] = no_transcripts_count
             aggregations.pop("custom_captions.items:missing")
             aggregations.pop("captions:missing")
         return aggregations
