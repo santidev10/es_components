@@ -219,7 +219,6 @@ class VideoManager(BaseManager):
         aggregations_result = self.adapt_age_group_aggregation(aggregations_result)
         aggregations_result = self.adapt_gender_aggregation(aggregations_result)
         aggregations_result = self.adapt_content_type_aggregation(aggregations_result)
-        aggregations_result = self.adapt_features_aggregation(aggregations_result)
         return aggregations_result
 
     def adapt_lang_code_aggregation(self, aggregations):
@@ -271,17 +270,6 @@ class VideoManager(BaseManager):
             aggregations.pop("captions:exists")
             aggregations.pop("custom_captions.items:missing")
             aggregations.pop("captions:missing")
-        return aggregations
-
-    def adapt_features_aggregation(self, aggregations):
-        features = {}
-        if "monetization.is_monetizable" in aggregations:
-            features["monetization.is_monetizable"] = aggregations.pop("monetization.is_monetizable")
-        if "transcripts:exists" in aggregations:
-            features["transcripts:exists"] = aggregations.pop("transcripts:exists")
-        if "flags" in aggregations:
-            features["flags"] = aggregations.pop("flags")
-        aggregations["features"] = features
         return aggregations
 
     def _get_enabled_monitoring_warnings(self):

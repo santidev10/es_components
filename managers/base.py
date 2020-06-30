@@ -429,8 +429,8 @@ class BaseManager:
                 "field": "stats.sentiment",
                 "ranges": [
                     {"from": 90, "to": 100.1},
-                    {"from": 70, "to": 100.1},
-                    {"from": 0, "to": 100.1},
+                    {"from": 70, "to": 89.1},
+                    {"from": 0, "to": 69.1},
                 ]
             }
         }
