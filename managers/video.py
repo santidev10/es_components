@@ -50,7 +50,7 @@ COUNT_AGGREGATION = (
 )
 
 COUNT_EXISTS_AGGREGATION = ("stats.flags", "custom_captions.items", "captions", "task_us_data",
-                            "monetization.is_monetizable", "ads_stats")
+                            "monetization.is_monetizable")
 COUNT_MISSING_AGGREGATION = ("stats.flags", "custom_captions.items", "captions", "task_us_data")
 
 PERCENTILES_AGGREGATION = (
