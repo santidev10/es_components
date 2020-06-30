@@ -266,11 +266,6 @@ class VideoManager(BaseManager):
             aggregations["transcripts:exists"] = transcripts_count
             aggregations.pop("custom_captions.items:exists")
             aggregations.pop("captions:exists")
-        if "custom_captions.items:missing" in aggregations and "captions:missing" in aggregations:
-            no_transcripts_count = aggregations["captions:missing"] - aggregations["custom_captions.items:exists"]
-            aggregations["transcripts:missing"] = no_transcripts_count
-            aggregations.pop("custom_captions.items:missing")
-            aggregations.pop("captions:missing")
         return aggregations
 
     def _get_enabled_monitoring_warnings(self):
