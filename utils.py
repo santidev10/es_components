@@ -4,7 +4,6 @@ import time
 
 from elasticsearch.exceptions import ConflictError
 
-import video.constants as video_constants
 
 def chunks(iterable, size):
     chunk = count()
