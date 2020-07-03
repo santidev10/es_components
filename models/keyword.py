@@ -8,7 +8,6 @@ from elasticsearch_dsl import Object
 from es_components.config import KEYWORD_DOC_TYPE
 from es_components.config import KEYWORD_INDEX_NAME
 from es_components.config import KEYWORD_INDEX_PREFIX
-from es_components.config import KEYWORD_REFRESH_INTERVAL
 from es_components.models.base import BaseDocument
 from es_components.models.base import BaseInnerDocWithHistory
 from es_components.models.base import Schedule
@@ -53,9 +52,7 @@ class Keyword(BaseDocument):
     class Index:
         name = KEYWORD_INDEX_NAME
         prefix = KEYWORD_INDEX_PREFIX
-        settings = dict(
-            refresh_interval=KEYWORD_REFRESH_INTERVAL,
-        )
+        settings = dict()
 
     class Meta:
         doc_type = KEYWORD_DOC_TYPE
