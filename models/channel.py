@@ -165,6 +165,7 @@ class ChannelSectionCustomPropetries(BaseInnerDoc):
     social_links = Object(enabled=False)
     channel_group = Keyword(index=False)  # unused. copy of stats.channel_group?
     is_tracked = Boolean()
+    rescore = Boolean()  # Flag used if should be rescored by brand safety script
 
 
 class ChannelSectionBrandSafety(BaseInnerDoc):
