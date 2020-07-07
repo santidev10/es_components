@@ -197,6 +197,7 @@ class ChannelSectionTaskUsData(BaseInnerDoc):
     age_group = Keyword()
     channel_type = Keyword()
     content_type = Keyword()
+    content_quality = Keyword()
     gender = Keyword()
     brand_safety = Keyword(multi=True)
     last_vetted_at = Date()
