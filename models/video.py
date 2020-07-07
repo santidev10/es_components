@@ -194,6 +194,7 @@ class VideoSectionTaskUsData(BaseInnerDoc):
     iab_categories = Keyword(multi=True)
     age_group = Keyword()
     content_type = Keyword()
+    content_quality = Keyword()
     gender = Keyword()
     brand_safety = Keyword(multi=True)
     last_vetted_at = Date()
