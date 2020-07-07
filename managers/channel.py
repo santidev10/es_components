@@ -2,8 +2,10 @@ from pycountry import languages
 
 from es_components.constants import CONTENT_OWNER_ID_FIELD
 from es_components.constants import Sections
+from es_components.datetime_service import datetime_service
 from es_components.languages import LANGUAGES
 from es_components.managers.base import BaseManager
+from es_components.managers.base import CachedScriptsReader
 from es_components.models.channel import Channel
 from es_components.monitor import Emergency
 from es_components.monitor import Warnings
@@ -169,6 +171,23 @@ class ChannelManager(BaseManager):
         if "custom_properties.is_tracked" in aggregations:
             aggregations["custom_properties.is_tracked"]["buckets"][0]["key"] = "Tracked Channels"
         return aggregations
+
+    def update_rescore(self, filter_query, rescore=False, **kwargs):
+        """ Update by query to update custom_properties.rescore boolean """
+
+        if Sections.CUSTOM_PROPERTIES not in self.upsert_sections:
+            raise BrokenPipeError(f"This manager can't update {Sections.CUSTOM_PROPERTIES} section")
+        script = dict(
+            source=CachedScriptsReader.get_script("update_rescore.painless"),
+            params=dict(
+                now=datetime_service.now().isoformat(),
+                rescore=rescore
+            )
+        )
+        update = self.update(filter_query) \
+            .script(**script) \
+            .params(**kwargs)
+        return update.execute()
 
     def _get_enabled_monitoring_warnings(self):
         warning_few_records_updated = (
