@@ -1,6 +1,6 @@
-def custom_properties = ctx._source.custom_properties;
-if (custom_properties == null) {
-    custom_properties = ['created_at': params.now];
+def brand_safety = ctx._source.brand_safety;
+if (brand_safety == null) {
+    brand_safety = ['created_at': params.now];
 }
-custom_properties.rescore = params.rescore;
-ctx._source.custom_properties = custom_properties;
+brand_safety.rescore = params.rescore;
+ctx._source.brand_safety = brand_safety;

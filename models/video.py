@@ -182,6 +182,7 @@ class VideoSectionBrandSafety(BaseInnerDoc):
     overall_score = Long()
     transcript_language = Keyword(index=False)
     categories = Object()
+    rescore = Boolean()  # Flag used if should be rescored by brand safety script
 
 
 class VideoSectionTaskUsData(BaseInnerDoc):
@@ -201,10 +202,6 @@ class VideoSectionTaskUsData(BaseInnerDoc):
     mismatched_language = Boolean()
 
 
-class VideoSectionCustomProperties(BaseInnerDoc):
-    rescore = Boolean()  # Flag used if should be rescored by brand safety script
-
-
 class Video(BaseDocument):
     general_data = Object(VideoSectionGeneralData)
     stats = Object(VideoSectionStats)
@@ -217,7 +214,6 @@ class Video(BaseDocument):
     brand_safety = Object(VideoSectionBrandSafety)
     custom_captions = Object(VideoSectionCustomCaptions)
     task_us_data = Object(VideoSectionTaskUsData)
-    custom_properties = Object(VideoSectionCustomProperties)
 
     analytics_schedule = Object(Schedule)
     captions_schedule = Object(Schedule)
