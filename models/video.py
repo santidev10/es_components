@@ -182,6 +182,7 @@ class VideoSectionBrandSafety(BaseInnerDoc):
     overall_score = Long()
     transcript_language = Keyword(index=False)
     categories = Object()
+    rescore = Boolean()  # Flag used if should be rescored by brand safety script
 
 
 class VideoSectionTaskUsData(BaseInnerDoc):
