@@ -629,6 +629,23 @@ class BaseManager:
             .params(**kwargs)
         return update.execute()
 
+    def update_rescore(self, filter_query, rescore=False, **kwargs):
+        """ Update by query to update custom_properties.rescore boolean """
+
+        if Sections.CUSTOM_PROPERTIES not in self.upsert_sections:
+            raise BrokenPipeError(f"This manager can't update {Sections.CUSTOM_PROPERTIES} section")
+        script = dict(
+            source=CachedScriptsReader.get_script("update_rescore.painless"),
+            params=dict(
+                now=datetime_service.now().isoformat(),
+                rescore=rescore
+            )
+        )
+        update = self.update(filter_query) \
+            .script(**script) \
+            .params(**kwargs)
+        return update.execute()
+
     def remove_sections(self, filter_query, sections, proceed_conflict=False):
         if not set(sections).issubset(set(self.allowed_sections)):
             raise SectionsNotAllowed("Cannot find such section in Data Model sections")
