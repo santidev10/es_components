@@ -173,23 +173,6 @@ class ChannelManager(BaseManager):
             aggregations["custom_properties.is_tracked"]["buckets"].pop(1)
         return aggregations
 
-    def update_rescore(self, filter_query, rescore=False, **kwargs):
-        """ Update by query to update custom_properties.rescore boolean """
-
-        if Sections.CUSTOM_PROPERTIES not in self.upsert_sections:
-            raise BrokenPipeError(f"This manager can't update {Sections.CUSTOM_PROPERTIES} section")
-        script = dict(
-            source=CachedScriptsReader.get_script("update_rescore.painless"),
-            params=dict(
-                now=datetime_service.now().isoformat(),
-                rescore=rescore
-            )
-        )
-        update = self.update(filter_query) \
-            .script(**script) \
-            .params(**kwargs)
-        return update.execute()
-
     def _get_enabled_monitoring_warnings(self):
         warning_few_records_updated = (
             Warnings.FewRecordsUpdated(Sections.GENERAL_DATA, 15, True),
