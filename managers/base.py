@@ -515,7 +515,12 @@ class BaseManager:
         return aggregations
 
     def adapt_iab_categories_aggregation(self, aggregations):
+        hidden_iab_categories = ["Content Channel", "Content Type", "Content Media Format", "Content Language",
+                                 "Content Source", "Content Source Geo", "Video Game Genres"]
         if "general_data.iab_categories" in aggregations:
+            aggregations["general_data.iab_categories"]["buckets"] = \
+                [bucket for bucket in aggregations["general_data.iab_categories"]["buckets"] if
+                 bucket["key"].title().replace(" and ", " & ") not in hidden_iab_categories]
             aggregations["general_data.iab_categories"]["buckets"] = \
                 aggregations["general_data.iab_categories"]["buckets"][:100]
         return aggregations
