@@ -516,12 +516,8 @@ class BaseManager:
 
     def adapt_iab_categories_aggregation(self, aggregations):
         if "general_data.iab_categories" in aggregations:
-            top_level_buckets = []
-            buckets = aggregations["general_data.iab_categories"]["buckets"]
-            for bucket in buckets:
-                if bucket["key"].lower().replace(" and ", " & ") in TOP_LEVEL_CATEGORIES:
-                    top_level_buckets.append(bucket)
-            aggregations["general_data.iab_categories"]["buckets"] = top_level_buckets
+            aggregations["general_data.iab_categories"]["buckets"] = \
+                aggregations["general_data.iab_categories"]["buckets"][:100]
         return aggregations
 
     def adapt_vetted_aggregations(self, aggregations, field, mapping):
