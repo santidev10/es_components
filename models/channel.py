@@ -10,7 +10,6 @@ from elasticsearch_dsl import Text
 from es_components.config import CHANNEL_DOC_TYPE
 from es_components.config import CHANNEL_INDEX_NAME
 from es_components.config import CHANNEL_INDEX_PREFIX
-from es_components.config import CHANNEL_REFRESH_INTERVAL
 from es_components.constants import Sections
 from es_components.models.base import BaseDocument
 from es_components.models.base import BaseInnerDoc
@@ -119,7 +118,7 @@ class ChannelSectionAdsStats(BaseInnerDoc):
     impressions_spv_count = Long(index=False)
     impressions_spm_count = Long(index=False)
     video_view_rate = Double()
-    ctr = Double(index=False)
+    ctr = Double()
     ctr_v = Double()
     average_cpv = Double()
     video_quartile_25_rate = Double(index=False)
@@ -131,7 +130,7 @@ class ChannelSectionAdsStats(BaseInnerDoc):
     video_quartile_75_rate = Double(index=False)
     video_quartile_75_rate_bottom = Double(index=False)
     video_quartile_75_rate_top = Double(index=False)
-    video_quartile_100_rate = Double(index=False)
+    video_quartile_100_rate = Double()
     video_quartile_100_rate_bottom = Double(index=False)
     video_quartile_100_rate_top = Double(index=False)
     all_conversions = Double(index=False)
@@ -145,7 +144,7 @@ class ChannelSectionAdsStats(BaseInnerDoc):
     cpm_bid = Float(index=False)
     cpm_bid_top = Float(index=False)
     cpm_bid_bottom = Float(index=False)
-    average_cpm = Float(index=False)
+    average_cpm = Float()
     average_cpm_top = Float(index=False)
     average_cpm_bottom = Float(index=False)
     average_cpc = Float(index=False)
@@ -227,9 +226,7 @@ class Channel(BaseDocument):
     class Index:
         name = CHANNEL_INDEX_NAME
         prefix = CHANNEL_INDEX_PREFIX
-        settings = dict(
-            refresh_interval=CHANNEL_REFRESH_INTERVAL,
-        )
+        settings = dict()
 
     class Meta:
         doc_type = CHANNEL_DOC_TYPE

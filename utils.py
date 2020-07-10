@@ -29,9 +29,11 @@ def add_brand_safety_labels(aggregations):
 
 def add_sentiment_labels(aggregations):
     if "stats.sentiment" in aggregations:
-        aggregations["stats.sentiment"]["buckets"][0]["key"] = "0% or above liked"
+        aggregations["stats.sentiment"]["buckets"][0]["key"] = "All"
         aggregations["stats.sentiment"]["buckets"][1]["key"] = "At least 79% liked"
         aggregations["stats.sentiment"]["buckets"][2]["key"] = "At least 90% liked"
+        bottom_bucket = aggregations["stats.sentiment"]["buckets"].pop(1)
+        aggregations["stats.sentiment"]["buckets"].append(bottom_bucket)
     return aggregations
 
 
