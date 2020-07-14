@@ -158,19 +158,23 @@ class BaseManager:
         for _ids in chunks(ids, ES_REQUEST_LIMIT):
             self.model.search().query("ids", values=list(_ids)).delete()
 
-    def upsert(self, entries):
+    def upsert(self, entries, **kwargs):
         """ Upsert a list of entries.
 
         :param entries: a list of model objects
         """
 
         for _entries in chunks(entries, ES_REQUEST_LIMIT):
+            params = dict(
+                chunk_size=ES_CHUNK_SIZE,
+                refresh=ES_BULK_REFRESH_OPTION,
+                max_chunk_bytes=ES_MAX_CHUNK_BYTES,
+            )
+            params.update(kwargs)
             bulk(
                 connections.get_connection(),
                 self._upsert_generator(_entries),
-                chunk_size=ES_CHUNK_SIZE,
-                refresh=ES_BULK_REFRESH_OPTION,
-                max_chunk_bytes=ES_MAX_CHUNK_BYTES
+                **params,
             )
 
     def _search(self):
