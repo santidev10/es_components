@@ -633,8 +633,8 @@ class BaseManager:
     def update_rescore(self, filter_query, rescore=False, **kwargs):
         """ Update by query to update custom_properties.rescore boolean """
 
-        if Sections.CUSTOM_PROPERTIES not in self.upsert_sections:
-            raise BrokenPipeError(f"This manager can't update {Sections.CUSTOM_PROPERTIES} section")
+        if Sections.BRAND_SAFETY not in self.upsert_sections:
+            raise BrokenPipeError(f"This manager can't update {Sections.BRAND_SAFETY} section")
         script = dict(
             source=CachedScriptsReader.get_script("update_rescore.painless"),
             params=dict(
