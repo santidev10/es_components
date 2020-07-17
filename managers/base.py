@@ -27,7 +27,7 @@ from es_components.countries import COUNTRIES
 from es_components.datetime_service import datetime_service
 from es_components.exceptions import DataModelNotSpecified
 from es_components.exceptions import SectionsNotAllowed
-from es_components.iab_categories import TOP_LEVEL_CATEGORIES
+from es_components.iab_categories import HIDDEN_IAB_CATEGORIES
 from es_components.models.base import BaseDocument
 from es_components.monitor import Monitor
 from es_components.monitor import Warnings
@@ -519,12 +519,10 @@ class BaseManager:
         return aggregations
 
     def adapt_iab_categories_aggregation(self, aggregations):
-        hidden_iab_categories = ["Content Channel", "Content Type", "Content Media Format", "Content Language",
-                                 "Content Source", "Content Source Geo", "Video Game Genres"]
         if "general_data.iab_categories" in aggregations:
             aggregations["general_data.iab_categories"]["buckets"] = \
                 [bucket for bucket in aggregations["general_data.iab_categories"]["buckets"] if
-                 bucket["key"].title().replace(" and ", " & ") not in hidden_iab_categories]
+                 bucket["key"].title().replace(" and ", " & ") not in HIDDEN_IAB_CATEGORIES]
             aggregations["general_data.iab_categories"]["buckets"] = \
                 aggregations["general_data.iab_categories"]["buckets"][:100]
         return aggregations
