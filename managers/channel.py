@@ -59,7 +59,8 @@ COUNT_AGGREGATION = (
 
 COUNT_EXISTS_AGGREGATION = (
     "monetization.is_monetizable",
-    "task_us_data"
+    "task_us_data",
+    "ads_stats"
 )
 COUNT_MISSING_AGGREGATION = ("task_us_data",)
 
