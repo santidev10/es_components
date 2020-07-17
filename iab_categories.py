@@ -90,3 +90,13 @@ with open("es_components/iab_tier2_categories.json", "r") as f:
 IAB_TIER3_CATEGORIES_MAPPING = []
 with open("es_components/iab_tier3_categories.json", "r") as f:
     IAB_TIER3_CATEGORIES_MAPPING = json.load(f)
+
+HIDDEN_IAB_CATEGORIES = [
+    "Content Channel",
+    "Content Language",
+    "Content Media Format",
+    "Content Source Geo",
+    "Content Source",
+    "Content Type",
+    "Video Game Genres"
+]
