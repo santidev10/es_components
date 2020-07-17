@@ -568,9 +568,9 @@ class BaseManager:
 
     def adapt_content_type_aggregation(self, aggregations):
         content_types = {
-            "0": "MC / Brand",
-            "1": "Regular UGC",
-            "2": "Premium UGC"
+            "0": "UGC",
+            "1": "Broadcast",
+            "2": "Brands"
         }
         if "task_us_data.content_type" in aggregations:
             return self.adapt_vetted_aggregations(aggregations, "task_us_data.content_type", content_types)
