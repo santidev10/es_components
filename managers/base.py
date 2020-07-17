@@ -27,7 +27,7 @@ from es_components.countries import COUNTRIES
 from es_components.datetime_service import datetime_service
 from es_components.exceptions import DataModelNotSpecified
 from es_components.exceptions import SectionsNotAllowed
-from es_components.iab_categories import TOP_LEVEL_CATEGORIES
+from es_components.iab_categories import HIDDEN_IAB_CATEGORIES
 from es_components.models.base import BaseDocument
 from es_components.monitor import Monitor
 from es_components.monitor import Warnings
@@ -158,19 +158,23 @@ class BaseManager:
         for _ids in chunks(ids, ES_REQUEST_LIMIT):
             self.model.search().query("ids", values=list(_ids)).delete()
 
-    def upsert(self, entries):
+    def upsert(self, entries, **kwargs):
         """ Upsert a list of entries.
 
         :param entries: a list of model objects
         """
 
         for _entries in chunks(entries, ES_REQUEST_LIMIT):
+            params = dict(
+                chunk_size=ES_CHUNK_SIZE,
+                refresh=ES_BULK_REFRESH_OPTION,
+                max_chunk_bytes=ES_MAX_CHUNK_BYTES,
+            )
+            params.update(kwargs)
             bulk(
                 connections.get_connection(),
                 self._upsert_generator(_entries),
-                chunk_size=ES_CHUNK_SIZE,
-                refresh=ES_BULK_REFRESH_OPTION,
-                max_chunk_bytes=ES_MAX_CHUNK_BYTES
+                **params,
             )
 
     def _search(self):
@@ -515,12 +519,10 @@ class BaseManager:
         return aggregations
 
     def adapt_iab_categories_aggregation(self, aggregations):
-        hidden_iab_categories = ["Content Channel", "Content Type", "Content Media Format", "Content Language",
-                                 "Content Source", "Content Source Geo", "Video Game Genres"]
         if "general_data.iab_categories" in aggregations:
             aggregations["general_data.iab_categories"]["buckets"] = \
                 [bucket for bucket in aggregations["general_data.iab_categories"]["buckets"] if
-                 bucket["key"].title().replace(" and ", " & ") not in hidden_iab_categories]
+                 bucket["key"].title().replace(" and ", " & ") not in HIDDEN_IAB_CATEGORIES]
             aggregations["general_data.iab_categories"]["buckets"] = \
                 aggregations["general_data.iab_categories"]["buckets"][:100]
         return aggregations
@@ -633,8 +635,8 @@ class BaseManager:
     def update_rescore(self, filter_query, rescore=False, **kwargs):
         """ Update by query to update custom_properties.rescore boolean """
 
-        if Sections.CUSTOM_PROPERTIES not in self.upsert_sections:
-            raise BrokenPipeError(f"This manager can't update {Sections.CUSTOM_PROPERTIES} section")
+        if Sections.BRAND_SAFETY not in self.upsert_sections:
+            raise BrokenPipeError(f"This manager can't update {Sections.BRAND_SAFETY} section")
         script = dict(
             source=CachedScriptsReader.get_script("update_rescore.painless"),
             params=dict(
