@@ -44,6 +44,7 @@ COUNT_AGGREGATION = (
     "brand_safety",
     "stats.flags",
     "task_us_data.age_group",
+    "task_us_data.content_quality",
     "task_us_data.content_type",
     "task_us_data.gender",
     "stats.sentiment"
@@ -220,6 +221,7 @@ class VideoManager(BaseManager):
         aggregations_result = self.adapt_age_group_aggregation(aggregations_result)
         aggregations_result = self.adapt_gender_aggregation(aggregations_result)
         aggregations_result = self.adapt_content_type_aggregation(aggregations_result)
+        aggregations_result = self.adapt_content_quality_aggregation(aggregations_result)
         return aggregations_result
 
     def adapt_lang_code_aggregation(self, aggregations):
