@@ -51,6 +51,7 @@ COUNT_AGGREGATION = (
     "analytics.is_cms",
     "custom_properties.preferred",
     "brand_safety",
+    "brand_safety.review",
     "task_us_data.age_group",
     "task_us_data.content_type",
     "task_us_data.gender",
@@ -58,9 +59,10 @@ COUNT_AGGREGATION = (
 )
 
 COUNT_EXISTS_AGGREGATION = (
+    "ads_stats"
     "monetization.is_monetizable",
     "task_us_data",
-    "ads_stats"
+
 )
 COUNT_MISSING_AGGREGATION = ("task_us_data",)
 

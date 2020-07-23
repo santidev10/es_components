@@ -182,6 +182,7 @@ class VideoSectionBrandSafety(BaseInnerDoc):
     transcript_language = Keyword(index=False)
     categories = Object()
     rescore = Boolean()  # Flag used if should be rescored by brand safety script
+    review = Boolean()  # Flag used if scoring should be reviewed by a user
 
 
 class VideoSectionTaskUsData(BaseInnerDoc):
