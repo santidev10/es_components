@@ -42,7 +42,6 @@ COUNT_AGGREGATION = (
     "general_data.lang_code",
     "general_data.iab_categories",
     "brand_safety",
-    "brand_safety.review",
     "stats.flags",
     "task_us_data.age_group",
     "task_us_data.content_quality",
@@ -51,8 +50,15 @@ COUNT_AGGREGATION = (
     "stats.sentiment"
 )
 
-COUNT_EXISTS_AGGREGATION = ("stats.flags", "custom_captions.items", "captions", "task_us_data",
-                            "monetization.is_monetizable", "ads_stats")
+COUNT_EXISTS_AGGREGATION = (
+    "ads_stats",
+    "brand_safety.limbo_status",
+    "captions",
+    "custom_captions.items",
+    "monetization.is_monetizable",
+    "stats.flags",
+    "task_us_data",
+)
 COUNT_MISSING_AGGREGATION = ("stats.flags", "custom_captions.items", "captions", "task_us_data")
 
 PERCENTILES_AGGREGATION = (

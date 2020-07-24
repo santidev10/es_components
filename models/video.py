@@ -182,7 +182,8 @@ class VideoSectionBrandSafety(BaseInnerDoc):
     transcript_language = Keyword(index=False)
     categories = Object()
     rescore = Boolean()  # Flag used if should be rescored by brand safety script
-    review = Boolean()  # Flag used if scoring should be reviewed by a user
+    limbo_status = Boolean()  # Flag used if vetting should be reviewed
+    pre_limbo_score = Long()  # Brand safety script score
 
 
 class VideoSectionTaskUsData(BaseInnerDoc):
