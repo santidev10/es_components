@@ -550,9 +550,11 @@ class BaseManager:
             "7": "Group - Kids (not teens)",
             "8": "Group - Family Friendly"
         }
-        if "task_us_data.age_group" in aggregations:
-            return self.adapt_vetted_aggregations(aggregations, "task_us_data.age_group", age_groups)
-        return None
+        try:
+            aggregations = self.adapt_vetted_aggregations(aggregations, "task_us_data.age_group", age_groups)
+        except KeyError:
+            pass
+        return aggregations
 
     def adapt_gender_aggregation(self, aggregations):
         genders = {
@@ -560,9 +562,24 @@ class BaseManager:
             "1": "Female",
             "2": "Male"
         }
-        if "task_us_data.gender" in aggregations:
-            return self.adapt_vetted_aggregations(aggregations, "task_us_data.gender", genders)
-        return None
+        try:
+            aggregations = self.adapt_vetted_aggregations(aggregations, "task_us_data.gender", genders)
+        except KeyError:
+            pass
+        return aggregations
+
+    def adapt_content_quality_aggregation(self, aggregations):
+        content_qualities = {
+            "0": "Poor",
+            "1": "Average",
+            "2": "Premium",
+        }
+        try:
+            aggregations = self.adapt_vetted_aggregations(aggregations, "task_us_data.content_quality",
+                                                          content_qualities)
+        except KeyError:
+            pass
+        return aggregations
 
     def adapt_content_type_aggregation(self, aggregations):
         content_types = {
@@ -570,9 +587,11 @@ class BaseManager:
             "1": "Broadcast",
             "2": "Brands"
         }
-        if "task_us_data.content_type" in aggregations:
-            return self.adapt_vetted_aggregations(aggregations, "task_us_data.content_type", content_types)
-        return None
+        try:
+            aggregations = self.adapt_vetted_aggregations(aggregations, "task_us_data.content_type", content_types)
+        except KeyError:
+            pass
+        return aggregations
 
     def generate_distinct_values(self, field, pagesize=10000):
         composite = {
