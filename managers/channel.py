@@ -53,6 +53,7 @@ COUNT_AGGREGATION = (
     "brand_safety",
     "brand_safety.review",
     "task_us_data.age_group",
+    "task_us_data.content_quality",
     "task_us_data.content_type",
     "task_us_data.gender",
     "custom_properties.is_tracked"
@@ -148,6 +149,7 @@ class ChannelManager(BaseManager):
         aggregations_result = self.adapt_gender_aggregation(aggregations_result)
         aggregations_result = self.adapt_content_type_aggregation(aggregations_result)
         aggregations_result = self.adapt_is_tracked_aggregation(aggregations_result)
+        aggregations_result = self.adapt_content_quality_aggregation(aggregations_result)
         return aggregations_result
 
     def adapt_lang_code_aggregation(self, aggregations):
@@ -172,8 +174,11 @@ class ChannelManager(BaseManager):
 
     def adapt_is_tracked_aggregation(self, aggregations):
         if "custom_properties.is_tracked" in aggregations:
-            aggregations["custom_properties.is_tracked"]["buckets"][0]["key"] = "Tracked Channels"
-            aggregations["custom_properties.is_tracked"]["buckets"].pop(1)
+            try:
+                aggregations["custom_properties.is_tracked"]["buckets"][0]["key"] = "Tracked Channels"
+                aggregations["custom_properties.is_tracked"]["buckets"].pop(1)
+            except (KeyError, IndexError):
+                pass
         return aggregations
 
     def _get_enabled_monitoring_warnings(self):
