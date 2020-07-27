@@ -57,9 +57,10 @@ COUNT_AGGREGATION = (
 )
 
 COUNT_EXISTS_AGGREGATION = (
+    "ads_stats",
+    "brand_safety.limbo_status",
     "monetization.is_monetizable",
     "task_us_data",
-    "ads_stats"
 )
 COUNT_MISSING_AGGREGATION = ("task_us_data",)
 

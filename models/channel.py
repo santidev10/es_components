@@ -2,6 +2,7 @@ from elasticsearch_dsl import Boolean
 from elasticsearch_dsl import Date
 from elasticsearch_dsl import Double
 from elasticsearch_dsl import Float
+from elasticsearch_dsl import Integer
 from elasticsearch_dsl import Keyword
 from elasticsearch_dsl import Long
 from elasticsearch_dsl import Object
@@ -173,6 +174,8 @@ class ChannelSectionBrandSafety(BaseInnerDoc):
     language = Keyword()
     categories = Object()
     rescore = Boolean()  # Flag used if should be rescored by brand safety script
+    limbo_status = Boolean() # Flag used if vetting should be reviewed
+    pre_limbo_score = Integer()  # Brand safety script score
 
 
 class ChannelSectionAuth(BaseInnerDoc):
