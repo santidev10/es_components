@@ -51,7 +51,6 @@ COUNT_AGGREGATION = (
     "analytics.is_cms",
     "custom_properties.preferred",
     "brand_safety",
-    "brand_safety.review",
     "task_us_data.age_group",
     "task_us_data.content_quality",
     "task_us_data.content_type",
