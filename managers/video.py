@@ -229,6 +229,7 @@ class VideoManager(BaseManager):
         aggregations_result = self.adapt_gender_aggregation(aggregations_result)
         aggregations_result = self.adapt_content_type_aggregation(aggregations_result)
         aggregations_result = self.adapt_content_quality_aggregation(aggregations_result)
+        aggregations_result = self.adapt_limbo_status_aggregation(aggregations_result)
         return aggregations_result
 
     def adapt_lang_code_aggregation(self, aggregations):

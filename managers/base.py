@@ -593,6 +593,15 @@ class BaseManager:
             pass
         return aggregations
 
+    def adapt_limbo_status_aggregation(self, aggregations):
+        """ Set bucket key integer as key_as_string boolean"""
+        try:
+            for bucket in aggregations["brand_safety.limbo_status"]["buckets"]:
+                bucket["key"] = bucket["key_as_string"]
+        except KeyError:
+            pass
+        return aggregations
+
     def generate_distinct_values(self, field, pagesize=10000):
         composite = {
             "size": pagesize,
