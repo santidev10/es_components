@@ -53,12 +53,12 @@ COUNT_AGGREGATION = (
     "task_us_data.content_quality",
     "task_us_data.content_type",
     "task_us_data.gender",
-    "custom_properties.is_tracked"
+    "custom_properties.is_tracked",
+    "brand_safety.limbo_status",
 )
 
 COUNT_EXISTS_AGGREGATION = (
     "ads_stats",
-    "brand_safety.limbo_status",
     "monetization.is_monetizable",
     "task_us_data",
 )

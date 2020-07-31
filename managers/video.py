@@ -42,6 +42,7 @@ COUNT_AGGREGATION = (
     "general_data.lang_code",
     "general_data.iab_categories",
     "brand_safety",
+    "brand_safety.limbo_status",
     "stats.flags",
     "task_us_data.age_group",
     "task_us_data.content_quality",
@@ -52,7 +53,6 @@ COUNT_AGGREGATION = (
 
 COUNT_EXISTS_AGGREGATION = (
     "ads_stats",
-    "brand_safety.limbo_status",
     "captions",
     "custom_captions.items",
     "monetization.is_monetizable",
