@@ -25,13 +25,11 @@ class VideoSectionGeneralData(BaseInnerDoc):
     title = Text()
     description = Text()
     thumbnail_image_url = Text(index=False)
-    country = Keyword()
     country_code = Keyword()
     tags = Keyword(multi=True)
     youtube_published_at = Date()
     category = Keyword()
     lang_code = Keyword()
-    language = Keyword()
     duration = Long(index=False)
     license = Keyword(index=False)  # unused
     is_streaming = Boolean(index=False)

@@ -35,10 +35,8 @@ RANGE_AGGREGATION = (
 )
 
 COUNT_AGGREGATION = (
-    "general_data.country",
     "general_data.country_code",
     "general_data.category",
-    "general_data.language",
     "general_data.lang_code",
     "general_data.iab_categories",
     "brand_safety",
