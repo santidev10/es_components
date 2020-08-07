@@ -39,10 +39,8 @@ RANGE_AGGREGATION = (
 )
 
 COUNT_AGGREGATION = (
-    "general_data.country",
     "general_data.country_code",
     "general_data.top_category",
-    "general_data.top_language",
     "general_data.top_lang_code",
     "general_data.iab_categories",
     "analytics.is_auth",
