@@ -59,8 +59,12 @@ COUNT_EXISTS_AGGREGATION = (
     "ads_stats",
     "monetization.is_monetizable",
     "task_us_data",
+    "task_us_data.brand_safety",
 )
-COUNT_MISSING_AGGREGATION = ("task_us_data",)
+COUNT_MISSING_AGGREGATION = (
+    "task_us_data",
+    "task_us_data.brand_safety",
+)
 
 PERCENTILES_AGGREGATION = (
     "stats.subscribers",

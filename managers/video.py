@@ -56,8 +56,15 @@ COUNT_EXISTS_AGGREGATION = (
     "monetization.is_monetizable",
     "stats.flags",
     "task_us_data",
+    "task_us_data.brand_safety",
 )
-COUNT_MISSING_AGGREGATION = ("stats.flags", "custom_captions.items", "captions", "task_us_data")
+COUNT_MISSING_AGGREGATION = (
+    "captions",
+    "custom_captions.items",
+    "stats.flags",
+    "task_us_data",
+    "task_us_data.brand_safety",
+)
 
 PERCENTILES_AGGREGATION = (
     "stats.views",
