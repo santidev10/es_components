@@ -444,7 +444,6 @@ class BaseManager:
             "range": {
                 "field": "brand_safety.overall_score",
                 "ranges": [
-                    # {"from": 0, "to": 69.1},
                     {"from": 70, "to": 79.1},
                     {"from": 80, "to": 89.1},
                     {"from": 90, "to": 100.1},
