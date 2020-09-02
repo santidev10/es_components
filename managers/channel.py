@@ -101,9 +101,8 @@ class ChannelManager(BaseManager):
         return QueryBuilder().build().must().terms().field(CONTENT_OWNER_ID_FIELD) \
             .value(content_owner_ids).get()
 
-    def forced_filters(self, include_deleted=False, include_blocked=False):
-        return super(ChannelManager, self).forced_filters(include_deleted=include_deleted,
-                                                          include_blocked=include_blocked) & \
+    def forced_filters(self, include_deleted=False):
+        return super(ChannelManager, self).forced_filters(include_deleted=include_deleted) & \
                self._filter_existent_section(Sections.GENERAL_DATA) & \
                (
                    self._filter_existent_section(Sections.CMS) |

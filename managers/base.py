@@ -281,10 +281,7 @@ class BaseManager:
     def filter_alive(self):
         return self._filter_nonexistent_section(Sections.DELETED)
 
-    def filter_blocked(self):
-        return QueryBuilder().build().must().term().field(f"{Sections.CUSTOM_PROPERTIES}.blocked").value(True).get()
-
-    def forced_filters(self, include_deleted=False, include_blocked=False):
+    def forced_filters(self, include_deleted=False):
         # "now-1d/d" time format is used
         # it avoids being tied to the current point in time and makes it possible to cache request/response
         outdated_seconds = self.forced_filter_oudated_days * 86400
@@ -292,12 +289,8 @@ class BaseManager:
         field_updated_at = f"{self.forced_filter_section_oudated}.{TimestampFields.UPDATED_AT}"
         filter_range = QueryBuilder().build().must().range().field(field_updated_at) \
             .gt(updated_at).get()
-        filter = filter_range
-        if not include_deleted:
-            filter &= self.filter_alive()
-        if include_blocked:
-            filter &= self.filter_blocked()
-        return filter
+
+        return self.filter_alive() & filter_range if not include_deleted else filter_range
 
     # pylint: disable=too-many-arguments
     def search_nonexistent_section_records(self, ids=None, id_field=MAIN_ID_FIELD,

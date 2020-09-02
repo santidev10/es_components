@@ -118,9 +118,8 @@ class VideoManager(BaseManager):
         values = query.get()
         return values
 
-    def forced_filters(self, include_deleted=False, include_blocked=False):
-        return super(VideoManager, self).forced_filters(include_deleted=include_deleted,
-                                                        include_blocked=include_blocked) &\
+    def forced_filters(self, include_deleted=False):
+        return super(VideoManager, self).forced_filters(include_deleted=include_deleted) &\
                self._filter_existent_section(Sections.GENERAL_DATA)
 
     def get_never_updated_generator(self, outdated_at, never_updated_section, channels_ids=None,
