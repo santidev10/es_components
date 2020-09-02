@@ -35,6 +35,7 @@ class Sections:
 
     CUSTOM_CAPTIONS = "custom_captions"
     TASK_US_DATA = "task_us_data"
+    IAS_DATA = "ias_data"
 
 
 class TimestampFields:

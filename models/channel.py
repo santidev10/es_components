@@ -206,6 +206,10 @@ class ChannelSectionTaskUsData(BaseInnerDoc):
     mismatched_language = Boolean()
 
 
+class ChannelSectionIASData(BaseInnerDoc):
+    ias_verified = Date()
+
+
 class Channel(BaseDocument):
     general_data = Object(ChannelSectionGeneralData)
     stats = Object(ChannelSectionStats)
@@ -219,6 +223,7 @@ class Channel(BaseDocument):
     auth = Object(ChannelSectionAuth)
     similar_channels = Object(ChannelSectionSimilar)
     task_us_data = Object(ChannelSectionTaskUsData)
+    ias_data = Object(ChannelSectionIASData)
 
     general_data_schedule = Object(Schedule)
     stats_schedule = Object(Schedule)
