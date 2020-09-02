@@ -163,6 +163,7 @@ class ChannelSectionCustomPropetries(BaseInnerDoc):
     social_links = Object(enabled=False)
     channel_group = Keyword(index=False)  # unused. copy of stats.channel_group?
     is_tracked = Boolean()
+    blocklist = Boolean()
 
 
 class ChannelSectionBrandSafety(BaseInnerDoc):

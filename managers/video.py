@@ -88,7 +88,8 @@ class VideoManager(BaseManager):
                           Sections.CHANNEL, Sections.CAPTIONS, Sections.MONETIZATION,
                           Sections.ADS_STATS, Sections.CMS, Sections.ANALYTICS_SCHEDULE,
                           Sections.ADS_STATS_SCHEDULE, Sections.CAPTIONS_SCHEDULE,
-                          Sections.BRAND_SAFETY, Sections.CUSTOM_CAPTIONS, Sections.TASK_US_DATA)
+                          Sections.BRAND_SAFETY, Sections.CUSTOM_CAPTIONS, Sections.TASK_US_DATA,
+                          Sections.CUSTOM_PROPERTIES,)
     model = Video
     forced_filter_section_oudated = Sections.GENERAL_DATA
     range_aggregation_fields = RANGE_AGGREGATION
@@ -117,8 +118,9 @@ class VideoManager(BaseManager):
         values = query.get()
         return values
 
-    def forced_filters(self, include_deleted=False):
-        return super(VideoManager, self).forced_filters(include_deleted=include_deleted) &\
+    def forced_filters(self, include_deleted=False, include_blocked=False):
+        return super(VideoManager, self).forced_filters(include_deleted=include_deleted,
+                                                        include_blocked=include_blocked) &\
                self._filter_existent_section(Sections.GENERAL_DATA)
 
     def get_never_updated_generator(self, outdated_at, never_updated_section, channels_ids=None,
