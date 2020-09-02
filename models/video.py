@@ -202,6 +202,11 @@ class VideoSectionTaskUsData(BaseInnerDoc):
     mismatched_language = Boolean()
 
 
+class VideoSectionCustomProperties(BaseInnerDoc):
+    """ Nested Custom Properties section for Video document"""
+    blocklist = Boolean()
+
+
 class Video(BaseDocument):
     general_data = Object(VideoSectionGeneralData)
     stats = Object(VideoSectionStats)
@@ -214,6 +219,7 @@ class Video(BaseDocument):
     brand_safety = Object(VideoSectionBrandSafety)
     custom_captions = Object(VideoSectionCustomCaptions)
     task_us_data = Object(VideoSectionTaskUsData)
+    custom_properties = Object(VideoSectionCustomProperties)
 
     analytics_schedule = Object(Schedule)
     captions_schedule = Object(Schedule)
@@ -259,3 +265,6 @@ class Video(BaseDocument):
 
     def populate_task_us_data(self, **kwargs):
         self._populate_section(Sections.TASK_US_DATA, **kwargs)
+
+    def populate_custom_properties(self, **kwargs):
+        self._populate_section(Sections.CUSTOM_PROPERTIES, **kwargs)
