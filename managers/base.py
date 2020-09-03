@@ -532,7 +532,10 @@ class BaseManager:
         old_buckets = sorted(old_buckets, key=lambda old_bucket: int(old_bucket["key"]))
         for bucket in old_buckets:
             key = bucket["key"]
-            bucket["key"] = mapping[key]
+            adapted_key = mapping.get(key, None)
+            if adapted_key is None:
+                continue
+            bucket["key"] = adapted_key
             new_buckets.append(bucket)
         aggregations[field]["buckets"] = new_buckets
         return aggregations
@@ -546,8 +549,6 @@ class BaseManager:
             "4": "18 - 35 Adults",
             "5": "36 - 54 Older Adults",
             "6": "55+ Seniors",
-            "7": "Group - Kids (not teens)",
-            "8": "Group - Family Friendly"
         }
         try:
             aggregations = self.adapt_vetted_aggregations(aggregations, "task_us_data.age_group", age_groups)
