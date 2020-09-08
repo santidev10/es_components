@@ -96,6 +96,7 @@ class ChannelManager(BaseManager):
     percentiles_aggregation_fields = PERCENTILES_AGGREGATION
     count_exists_aggregation_fields = COUNT_EXISTS_AGGREGATION
     count_missing_aggregation_fields = COUNT_MISSING_AGGREGATION
+    use_admin_brand_safety_labels = False
 
     def by_content_owner_ids_query(self, content_owner_ids):
         return QueryBuilder().build().must().terms().field(CONTENT_OWNER_ID_FIELD) \
@@ -140,7 +141,7 @@ class ChannelManager(BaseManager):
 
         aggregations_result.update(count_exists_aggs_result)
 
-        aggregations_result = add_brand_safety_labels(aggregations_result)
+        aggregations_result = add_brand_safety_labels(aggregations_result, self.use_admin_brand_safety_labels)
         aggregations_result = self.adapt_iab_categories_aggregation(aggregations_result)
         aggregations_result = self.adapt_country_code_aggregation(aggregations_result)
         aggregations_result = self.adapt_lang_code_aggregation(aggregations_result)
@@ -198,3 +199,27 @@ class ChannelManager(BaseManager):
     def _get_enabled_monitoring_params_info(self):
         skipped_sections = (Sections.GENERAL_DATA,)
         return self.sections, skipped_sections, True
+
+
+class VettingAdminChannelManager(ChannelManager):
+    """
+    This manager includes the brand safety aggregation for
+    Channels that have a brand safety score of 'Unsuitable'
+    """
+
+    use_admin_brand_safety_labels = True
+
+    def _get_count_aggs(self):
+        count_aggs = super()._get_count_aggs()
+        count_aggs["brand_safety"] = {
+            "range": {
+                "field": "brand_safety.overall_score",
+                "ranges": [
+                    {"from": 0, "to": 69.1},
+                    {"from": 70, "to": 79.1},
+                    {"from": 80, "to": 89.1},
+                    {"from": 90, "to": 100.1},
+                ]
+            }
+        }
+        return count_aggs
