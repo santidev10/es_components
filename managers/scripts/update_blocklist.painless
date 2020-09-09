@@ -1,0 +1,7 @@
+def custom_properties = ctx._source.custom_properties;
+if (custom_properties == null) {
+    custom_properties = ['created_at': params.now];
+}
+custom_properties.updated_at = params.now;
+custom_properties.blocklist = params.blocklist;
+ctx._source.custom_properties = custom_properties;

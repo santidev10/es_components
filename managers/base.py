@@ -660,6 +660,22 @@ class BaseManager:
             .params(**kwargs)
         return update.execute()
 
+    def update_blocklist(self, filter_query, blocklist, **kwargs):
+        if Sections.CUSTOM_PROPERTIES not in self.upsert_sections:
+            raise BrokenPipeError(f"This manager can't update {Sections.CUSTOM_PROPERTIES} section")
+
+        script = dict(
+            source=CachedScriptsReader.get_script("update_blocklist.painless"),
+            params=dict(
+                now=datetime_service.now().isoformat(),
+                blocklist=blocklist,
+            )
+        )
+        update = self.update(filter_query) \
+            .script(**script) \
+            .params(**kwargs)
+        return update.execute()
+
     def update_rescore(self, filter_query, rescore=False, **kwargs):
         """ Update by query to update custom_properties.rescore boolean """
 
