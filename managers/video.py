@@ -97,6 +97,7 @@ class VideoManager(BaseManager):
     percentiles_aggregation_fields = PERCENTILES_AGGREGATION
     count_exists_aggregation_fields = COUNT_EXISTS_AGGREGATION
     count_missing_aggregation_fields = COUNT_MISSING_AGGREGATION
+    use_admin_brand_safety_labels = False
 
     def get_all_video_ids_generator(self, channel_id):
         _query = self.by_channel_ids_query(channel_id)
@@ -224,7 +225,7 @@ class VideoManager(BaseManager):
 
         count_exists_aggs_result = self._get_count_exists_aggs_result(search, properties)
         aggregations_result.update(count_exists_aggs_result)
-        aggregations_result = add_brand_safety_labels(aggregations_result)
+        aggregations_result = add_brand_safety_labels(aggregations_result, self.use_admin_brand_safety_labels)
         aggregations_result = add_sentiment_labels(aggregations_result)
         aggregations_result = self.adapt_flags_aggregation(aggregations_result)
         aggregations_result = self.adapt_transcripts_aggregation(aggregations_result)
@@ -299,3 +300,27 @@ class VideoManager(BaseManager):
 
     def _get_enabled_monitoring_params_info(self):
         return super(VideoManager, self)._get_enabled_monitoring_params_info() + (True,)
+
+
+class VettingAdminVideoManager(VideoManager):
+    """
+    This manager includes the brand safety aggregation for
+    Videos that have a brand safety score of 'Unsuitable'
+    """
+
+    use_admin_brand_safety_labels = True
+
+    def _get_count_aggs(self):
+        count_aggs = super()._get_count_aggs()
+        count_aggs["brand_safety"] = {
+            "range": {
+                "field": "brand_safety.overall_score",
+                "ranges": [
+                    {"from": 0, "to": 69.1},
+                    {"from": 70, "to": 79.1},
+                    {"from": 80, "to": 89.1},
+                    {"from": 90, "to": 100.1},
+                ]
+            }
+        }
+        return count_aggs
