@@ -465,6 +465,10 @@ class BaseManager:
             }
         }
 
+        if "ias_data.ias_verified:exists" in filters:
+            filters["ias_data.ias_verified:exists"] = \
+                QueryBuilder().build().must().range().field("ias_data.ias_verified").gte("now-7d/d").get()
+
         result = {
             key: search.filter(value).count()
             for key, value in filters.items()
