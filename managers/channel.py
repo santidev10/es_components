@@ -60,6 +60,7 @@ COUNT_EXISTS_AGGREGATION = (
     "monetization.is_monetizable",
     "task_us_data",
     "task_us_data.last_vetted_at",
+    "ias_data.ias_verified",
 )
 COUNT_MISSING_AGGREGATION = (
     "task_us_data",
