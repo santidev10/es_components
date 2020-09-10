@@ -465,6 +465,8 @@ class BaseManager:
             }
         }
 
+        filters = self.adapt_ias_verified_filter(filters)
+
         result = {
             key: search.filter(value).count()
             for key, value in filters.items()
@@ -496,6 +498,12 @@ class BaseManager:
         aggregations_result = aggregations_search.execute().aggregations.to_dict()
         aggregations_result = self.adapt_is_viral_aggregation(aggregations_result)
         return aggregations_result
+
+    def adapt_ias_verified_filter(self, filters):
+        if "ias_data.ias_verified:exists" in filters:
+            filters["ias_data.ias_verified:exists"] = \
+                QueryBuilder().build().must().range().field("ias_data.ias_verified").gte("now-7d/d").get()
+        return filters
 
     def adapt_country_code_aggregation(self, aggregations):
         if "general_data.country_code" in aggregations:
