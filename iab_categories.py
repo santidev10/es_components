@@ -81,6 +81,8 @@ YOUTUBE_TO_IAB_CATEGORIES_MAPPING = {
 IAB_TIER2_SET = []
 with open("es_components/iab_tier2_categories.json", "r") as f:
     IAB_TIER2_CATEGORIES_MAPPING = json.load(f)
+    if "Social" not in IAB_TIER2_CATEGORIES_MAPPING:
+        IAB_TIER2_CATEGORIES_MAPPING["Social"] = []
 
     for tier_1, tier_2 in IAB_TIER2_CATEGORIES_MAPPING.items():
         IAB_TIER2_SET.extend(tier_2)
