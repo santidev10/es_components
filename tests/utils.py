@@ -42,8 +42,8 @@ class ESTestCase(TestCase):
             prefix_patch = patch.object(model_cls.Index, "prefix", new_callable=prefix_mock)
             # pylint: enable=protected-access
 
-            index_patch.__enter__()
-            prefix_patch.__enter__()
+            index_patch.start()
+            prefix_patch.start()
 
             cls._patches.append(index_patch)
             cls._patches.append(prefix_patch)
@@ -55,7 +55,7 @@ class ESTestCase(TestCase):
         if os.getenv("KEEP_TEST_ES_INDEX", "0") != "1":
             cls.__remove_indexes()
         for patch_item in cls._patches:
-            patch_item.__exit__()
+            patch_item.stop()
         del cls._patches[:]
 
     @classmethod
