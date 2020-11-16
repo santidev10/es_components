@@ -578,7 +578,7 @@ class BaseManager:
 
     def adapt_content_quality_aggregation(self, aggregations):
         content_qualities = {
-            "0": "Poor",
+            "0": "Low",
             "1": "Average",
             "2": "Premium",
         }
