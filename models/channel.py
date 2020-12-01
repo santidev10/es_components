@@ -293,3 +293,6 @@ class Channel(BaseDocument):
 
     def populate_task_us_data(self, **kwargs):
         self._populate_section(Sections.TASK_US_DATA, **kwargs)
+
+    def populate_ias_data(self, **kwargs):
+        self._populate_section(Sections.IAS_DATA, **kwargs)
