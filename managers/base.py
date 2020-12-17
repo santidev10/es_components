@@ -32,6 +32,8 @@ from es_components.models.base import BaseDocument
 from es_components.monitor import Monitor
 from es_components.monitor import Warnings
 from es_components.query_builder import QueryBuilder
+from es_components.query_repository import get_ias_verified_exists_filter
+from es_components.query_repository import get_last_vetted_at_exists_filter
 from es_components.utils import chunks
 from es_components.utils import retry_on_conflict
 
@@ -466,6 +468,7 @@ class BaseManager:
         }
 
         filters = self.adapt_ias_verified_filter(filters)
+        filters = self.adapt_last_vetted_at_exists_filter(filters)
 
         result = {
             key: search.filter(value).count()
@@ -499,10 +502,26 @@ class BaseManager:
         aggregations_result = self.adapt_is_viral_aggregation(aggregations_result)
         return aggregations_result
 
-    def adapt_ias_verified_filter(self, filters):
+    @staticmethod
+    def adapt_ias_verified_filter(filters):
         if "ias_data.ias_verified:exists" in filters:
-            filters["ias_data.ias_verified:exists"] = \
-                QueryBuilder().build().must().range().field("ias_data.ias_verified").gte("now-7d/d").get()
+            filters["ias_data.ias_verified:exists"] = get_ias_verified_exists_filter()
+
+        return filters
+
+    @staticmethod
+    def adapt_last_vetted_at_exists_filter(filters):
+        """
+        modify the filter such that instead of filtering on task_us_data.last_vetted_at existing, we check that
+        the field is greater than or equal to a LAST_VETTED_AT_MIN_DATE, which represents the last date of a valid
+        vetted_at timestamp. This of course, will also require that the field exists as well.
+        We don't need to modify the :missing filter here.
+        :param filters:
+        :return: filters
+        """
+        if "task_us_data.last_vetted_at:exists" in filters:
+            filters["task_us_data.last_vetted_at:exists"] = get_last_vetted_at_exists_filter()
+
         return filters
 
     def adapt_country_code_aggregation(self, aggregations):
