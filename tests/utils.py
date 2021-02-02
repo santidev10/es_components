@@ -32,6 +32,7 @@ class ESTestCase(TestCase):
 
     @classmethod
     def setUpClass(cls):
+        super().setUpClass()
         for model_cls in BaseDocument.__subclasses__():
             # pylint: disable=protected-access
             test_index_name = f"test_{model_cls.Index.name}_{uuid.uuid4()}"
@@ -57,6 +58,7 @@ class ESTestCase(TestCase):
         for patch_item in cls._patches:
             patch_item.stop()
         del cls._patches[:]
+        super().tearDownClass()
 
     @classmethod
     def __remove_indexes(cls):
