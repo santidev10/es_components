@@ -1,3 +1,6 @@
+from datetime import datetime
+
+from elasticsearch_dsl import AttrDict
 import pandas
 
 
@@ -37,10 +40,12 @@ def get_counter_dataframe(history, max_sigmas=None, std_period=None, constantly_
 
     if constantly_growing:
         # pylint: disable=no-member
+        # For all diffs <= 0, set is_normal = False
         dataframe.is_normal &= (dataframe.diffs.fillna(0) >= 0)
         # pylint: enable=no-member
 
     if max_sigmas:
+        # if std deviation for history date is > max_sigmas, set is_normal=False
         std_deviation = history.rolling(std_period or 14, min_periods=2).std()
         sigmas = abs(dataframe.diffs / std_deviation).fillna(0)
         # pylint: disable=no-member
@@ -48,6 +53,7 @@ def get_counter_dataframe(history, max_sigmas=None, std_period=None, constantly_
         # pylint: enable=no-member
 
     # pylint: disable=no-member
+    # set diffs as NaN if is normal is False
     dataframe.diffs = dataframe.diffs.mask(~dataframe.is_normal)
     # pylint: enable=no-member
 
@@ -88,3 +94,21 @@ def get_counter_dataframe_tailing_diffs_mean(dataframe, count=None, offset=0, ma
         value = cast_type(value)
 
     return value
+
+
+def get_counter_sum_days(raw_history: AttrDict, days: int):
+    """
+    Calculate sum values for days range by finding the simple average of the last two valid values and multiplying
+        by days
+    """
+    value_for_days = None
+    try:
+        dates = list(sorted(raw_history.to_dict().keys(), key=lambda x: datetime.strptime(x, "%Y-%m-%d")))
+        if len(dates) >= 2:
+            start = dates[-2]
+            end = dates[-1]
+            days_between = (datetime.strptime(end, "%Y-%m-%d") - datetime.strptime(start, "%Y-%m-%d")).days
+            value_for_days = (raw_history[end] - raw_history[start]) / days_between * days
+    except (ZeroDivisionError, AttributeError, KeyError):
+        pass
+    return value_for_days

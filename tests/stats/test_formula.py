@@ -1,7 +1,10 @@
 import math
+from elasticsearch_dsl import AttrDict
 from datetime import datetime
+from datetime import timedelta
 from unittest import TestCase
 
+from es_components.stats.formula import get_counter_sum_days
 from es_components.stats.formula import get_counter_dataframe
 from es_components.stats.formula import get_counter_dataframe_tailing_diffs_mean
 from es_components.stats.formula import get_counter_dataframe_tailing_sum
@@ -295,3 +298,59 @@ class TestCumulativeCounter(MathTestCase):
         value = get_counter_dataframe_tailing_diffs_mean(dataframe, offset=2, count=2)
 
         self.assertEqual(15, value)
+
+    def test_get_counter_sum_days(self):
+        with self.subTest("Requires at least two values"):
+            raw_history = AttrDict({
+                datetime.now().strftime("%Y-%m-%d"): 1000
+            })
+            actual_views = get_counter_sum_days(raw_history, days=7)
+            self.assertEqual(actual_views, None)
+
+        with self.subTest("Last day"):
+            now = datetime.now()
+            start = now - timedelta(days=55)
+            end = now
+
+            start_str = start.strftime("%Y-%m-%d")
+            end_str = end.strftime("%Y-%m-%d")
+            raw_history = AttrDict({
+                end_str: 99432124,
+                start_str: 523,
+            })
+            expected_last_days_views = (raw_history[end_str] - raw_history[start_str]) / (end - start).days * 1
+            actual_last_days_views = get_counter_sum_days(raw_history, days=1)
+            self.assertAlmostEqual(expected_last_days_views, actual_last_days_views)
+
+        with self.subTest("Last 7 days"):
+            now = datetime.now()
+            start = now - timedelta(days=11)
+            end = now
+
+            start_str = start.strftime("%Y-%m-%d")
+            end_str = end.strftime("%Y-%m-%d")
+            raw_history = AttrDict({
+                end_str: 1053,
+                start_str: 40,
+            })
+            expected_last_7_days_views = (raw_history[end_str] - raw_history[start_str]) / (end - start).days * 7
+            actual_last_7_days_views = get_counter_sum_days(raw_history, days=7)
+            self.assertAlmostEqual(expected_last_7_days_views, actual_last_7_days_views)
+
+        with self.subTest("Last 30 days"):
+            past = datetime.now() - timedelta(days=60)
+            start = past + timedelta(days=30)
+            end = start + timedelta(days=5)
+
+            past_str = past.strftime("%Y-%m-%d")
+            start_str = start.strftime("%Y-%m-%d")
+            end_str = end.strftime("%Y-%m-%d")
+            raw_history = AttrDict({
+                end_str: 9822340,
+                start_str: 605423,
+                # This value should not be used as two most recent values are used
+                past_str: 14243,
+            })
+            expected_last_30_days_views = (raw_history[end_str] - raw_history[start_str]) / (end - start).days * 30
+            actual_last_30_days_views = get_counter_sum_days(raw_history, days=30)
+            self.assertAlmostEqual(expected_last_30_days_views, actual_last_30_days_views)
