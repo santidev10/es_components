@@ -40,12 +40,10 @@ def get_counter_dataframe(history, max_sigmas=None, std_period=None, constantly_
 
     if constantly_growing:
         # pylint: disable=no-member
-        # For all diffs <= 0, set is_normal = False
         dataframe.is_normal &= (dataframe.diffs.fillna(0) >= 0)
         # pylint: enable=no-member
 
     if max_sigmas:
-        # if std deviation for history date is > max_sigmas, set is_normal=False
         std_deviation = history.rolling(std_period or 14, min_periods=2).std()
         sigmas = abs(dataframe.diffs / std_deviation).fillna(0)
         # pylint: disable=no-member
@@ -53,7 +51,6 @@ def get_counter_dataframe(history, max_sigmas=None, std_period=None, constantly_
         # pylint: enable=no-member
 
     # pylint: disable=no-member
-    # set diffs as NaN if is normal is False
     dataframe.diffs = dataframe.diffs.mask(~dataframe.is_normal)
     # pylint: enable=no-member
 
