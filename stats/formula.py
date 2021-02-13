@@ -1,3 +1,6 @@
+from datetime import datetime
+
+from elasticsearch_dsl import AttrDict
 import pandas
 
 
@@ -88,3 +91,21 @@ def get_counter_dataframe_tailing_diffs_mean(dataframe, count=None, offset=0, ma
         value = cast_type(value)
 
     return value
+
+
+def get_counter_sum_days(raw_history: AttrDict, days: int):
+    """
+    Calculate sum values for days range by finding the simple average of the last two valid values and multiplying
+        by days
+    """
+    value_for_days = None
+    try:
+        dates = list(sorted(raw_history.to_dict().keys(), key=lambda x: datetime.strptime(x, "%Y-%m-%d")))
+        if len(dates) >= 2:
+            start = dates[-2]
+            end = dates[-1]
+            days_between = (datetime.strptime(end, "%Y-%m-%d") - datetime.strptime(start, "%Y-%m-%d")).days
+            value_for_days = (raw_history[end] - raw_history[start]) / days_between * days
+    except (ZeroDivisionError, AttributeError, KeyError):
+        pass
+    return value_for_days
