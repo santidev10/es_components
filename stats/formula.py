@@ -1,7 +1,8 @@
 from datetime import datetime
 
-from elasticsearch_dsl import AttrDict
 import pandas
+
+from elasticsearch_dsl import AttrDict
 
 
 def get_sentiment(likes, dislikes):
