@@ -1,3 +1,4 @@
+import itertools
 import os
 import re
 import uuid
@@ -73,3 +74,6 @@ class ESTestCase(TestCase):
                 manager_cls().truncate(refresh=True)
             except NotFoundError:
                 pass
+
+
+int_iterator = itertools.count(1, 1)
