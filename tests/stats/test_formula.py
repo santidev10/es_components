@@ -1,8 +1,9 @@
 import math
-from elasticsearch_dsl import AttrDict
 from datetime import datetime
 from datetime import timedelta
 from unittest import TestCase
+
+from elasticsearch_dsl import AttrDict
 
 from es_components.stats.formula import get_counter_sum_days
 from es_components.stats.formula import get_counter_dataframe
