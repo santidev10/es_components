@@ -57,7 +57,7 @@ class BaseManager:
     count_exists_aggregation_fields = ()
     count_missing_aggregation_fields = ()
 
-    def __init__(self, sections=None, upsert_sections=None):
+    def __init__(self, sections=None, upsert_sections=None, context: dict = None):
         """ Initialize manager.
 
         :param sections: tuple of sections name. If sections is not specified,
@@ -76,6 +76,8 @@ class BaseManager:
             connections.connections.get_connection()
         except (KeyError, LocationValueError):
             init_es_connection()
+
+        self.context = context or dict()
 
     def _init_sections(self, sections):
         if sections is None:
@@ -502,10 +504,15 @@ class BaseManager:
         aggregations_result = self.adapt_is_viral_aggregation(aggregations_result)
         return aggregations_result
 
-    @staticmethod
-    def adapt_ias_verified_filter(filters):
+    def adapt_ias_verified_filter(self, filters):
+        """
+        gets the filter for ias verified. timestamp is given from the latest completed IASHistory record
+        :param filters:
+        :return:
+        """
         if "ias_data.ias_verified:exists" in filters:
-            filters["ias_data.ias_verified:exists"] = get_ias_verified_exists_filter()
+            timestamp = self.context.get("ias_last_ingested_timestamp")
+            filters["ias_data.ias_verified:exists"] = get_ias_verified_exists_filter(timestamp)
 
         return filters
 
