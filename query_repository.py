@@ -15,9 +15,11 @@ def get_last_vetted_at_exists_filter() -> Q:
         .gte(LAST_VETTED_AT_MIN_DATE).get()
 
 
-def get_ias_verified_exists_filter() -> Q:
+def get_ias_verified_exists_filter(last_ingested_timestamp: str = None) -> Q:
     """
-    IAS verified date should be no less than one week old in order to be considered to "exist"
+    IAS verified date should be passed in. it's typically the time when an IAS csv was last ingested.
+    Default to no less than one week old if no date is passed
     :return: Q
     """
-    return QueryBuilder().build().must().range().field(f"{Sections.IAS_DATA}.ias_verified").gte("now-7d/d").get()
+    return QueryBuilder().build().must().range().field(f"{Sections.IAS_DATA}.ias_verified") \
+        .gte(last_ingested_timestamp or "now-7d/d").get()
