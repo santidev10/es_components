@@ -94,18 +94,19 @@ class BaseManager:
 
         return sections
 
-    def get(self, ids, skip_none=False):
+    def get(self, ids, skip_none=False, source=None):
         """ Retrieve model entities.
 
         :param ids: a list of ids
         :param skip_none: determine if None value should be skipped
+        :param source: list of fields to source
         :return: list of entities
         """
 
         entities = []
 
         for _ids in chunks(ids, ES_REQUEST_LIMIT):
-            entities += self.model.mget(list(_ids), _source=self.sections)
+            entities += self.model.mget(list(_ids), _source=source or self.sections)
 
         if skip_none and None in entities:
             entities = [entity for entity in entities if entity is not None]
