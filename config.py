@@ -24,5 +24,6 @@ ELASTIC_SEARCH_URLS = os.getenv("ELASTIC_SEARCH_URLS", "").split(",")
 ELASTIC_SEARCH_TIMEOUT = int(os.getenv("ELASTIC_SEARCH_TIMEOUT", "300"))
 ELASTIC_SEARCH_USE_SSL = os.getenv("ELASTIC_SEARCH_USE_SSL", "1") == "1"
 
-AWS_ES_ACCESS_KEY_ID = os.getenv("AWS_ES_ACCESS_KEY_ID", "")
-AWS_ES_SECRET_ACCESS_KEY = os.getenv("AWS_ES_SECRET_ACCESS_KEY", "")
+# Set Access and Secret Keys to an AWS IAM user with ElasticSearch permissions
+AWS_ES_ACCESS_KEY_ID = os.getenv("AWS_ES_ACCESS_KEY_ID", "GUEST")
+AWS_ES_SECRET_ACCESS_KEY = os.getenv("AWS_ES_SECRET_ACCESS_KEY", "GUEST")
