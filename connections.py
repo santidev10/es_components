@@ -20,7 +20,6 @@ def init_es_connection():
             "use_ssl": ELASTIC_SEARCH_USE_SSL,
             "ca_certs": certifi.where(),
             "http_auth": AWS4Auth(AWS_ES_ACCESS_KEY_ID, AWS_ES_SECRET_ACCESS_KEY, "us-east-1", "es"),
-            "use_ssl": True,
             "verify_certs": True,
             "connection_class": RequestsHttpConnection
         }
