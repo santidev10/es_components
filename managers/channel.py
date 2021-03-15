@@ -45,6 +45,7 @@ COUNT_AGGREGATION = (
     "general_data.iab_categories",
     "analytics.is_auth",
     "analytics.is_cms",
+    "auth_channel",
     "custom_properties.preferred",
     "brand_safety",
     "task_us_data.age_group",
@@ -152,7 +153,17 @@ class ChannelManager(BaseManager):
         aggregations_result = self.adapt_is_tracked_aggregation(aggregations_result)
         aggregations_result = self.adapt_content_quality_aggregation(aggregations_result)
         aggregations_result = self.adapt_limbo_status_aggregation(aggregations_result)
+        aggregations_result = self.adapt_auth_channel_aggregation(aggregations_result)
         return aggregations_result
+
+    def adapt_auth_channel_aggregation(self, aggregations):
+        """ sets aggregation for channels with active token in AuthChannel model """
+        if "auth_channel" in aggregations:
+            query = QueryBuilder().build().must().terms().field("main.id").value(self.context.get("auth_channel_ids")).get()
+            query &= self.forced_filters()
+            result = self.search(query).count()
+            aggregations["auth_channel"]["buckets"] = [{"key": "Auth Channels", "doc_count": result}]
+        return aggregations
 
     def adapt_lang_code_aggregation(self, aggregations):
         if "general_data.top_lang_code" in aggregations:
