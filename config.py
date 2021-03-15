@@ -23,8 +23,3 @@ ES_MAX_CHUNK_BYTES = int(os.getenv("ES_MAX_CHUNK_BYTES", "10485760"))
 ELASTIC_SEARCH_URLS = os.getenv("ELASTIC_SEARCH_URLS", "").split(",")
 ELASTIC_SEARCH_TIMEOUT = int(os.getenv("ELASTIC_SEARCH_TIMEOUT", "300"))
 ELASTIC_SEARCH_USE_SSL = os.getenv("ELASTIC_SEARCH_USE_SSL", "1") == "1"
-ELASTIC_SEARCH_VERIFY_CERTS = os.getenv("ELASTIC_SEARCH_VERIFY_CERTS", "0") == "1"
-
-# Set Access and Secret Keys to an AWS IAM user with ElasticSearch permissions
-AWS_ES_ACCESS_KEY_ID = os.getenv("AWS_ES_ACCESS_KEY_ID", "GUEST")
-AWS_ES_SECRET_ACCESS_KEY = os.getenv("AWS_ES_SECRET_ACCESS_KEY", "GUEST")
