@@ -162,7 +162,7 @@ class BaseManager:
 
         for _ids in chunks(ids, ES_REQUEST_LIMIT):
             self.model.search().query("ids", values=list(_ids)).params(
-                conflict="proceed"
+                conflicts="proceed"
             ).delete()
 
     def upsert(self, entries, **kwargs):
