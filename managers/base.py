@@ -154,15 +154,16 @@ class BaseManager:
             refresh=refresh,
         ).delete()
 
-    def delete(self, ids):
+    def delete(self, ids, conflicts="abort"):
         """ Delete entities.
 
         :param ids: a list of ids
+        :param conflicts: string, values can be "proceed" or "abort" (default)
         """
 
         for _ids in chunks(ids, ES_REQUEST_LIMIT):
             self.model.search().query("ids", values=list(_ids)).params(
-                conflicts="proceed"
+                conflicts=conflicts
             ).delete()
 
     def upsert(self, entries, **kwargs):
