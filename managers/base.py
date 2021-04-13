@@ -166,12 +166,13 @@ class BaseManager:
                 conflicts=conflicts
             ).delete()
 
-    def upsert(self, entries, **kwargs):
+    def upsert(self, entries, ignore_update_time_sections=None, **kwargs):
         """ Upsert a list of entries.
 
         :param entries: a list of model objects
+        :param ignore_update_time_sections: Iterable of section names to not update updated_at timestamp
         """
-
+        ignore_update_time_sections = set(ignore_update_time_sections or {})
         for _entries in chunks(entries, ES_REQUEST_LIMIT):
             params = dict(
                 chunk_size=ES_CHUNK_SIZE,
@@ -181,7 +182,7 @@ class BaseManager:
             params.update(kwargs)
             bulk(
                 connections.get_connection(),
-                self._upsert_generator(_entries),
+                self._upsert_generator(_entries, ignore_update_time_sections),
                 **params,
             )
 
@@ -211,25 +212,33 @@ class BaseManager:
         # pylint: enable=protected-access
         return multi_search.execute()
 
-    def _upsert_generator(self, entries):
+    def _upsert_generator(self, entries, ignore_update_time_sections):
         """ Generator to create a dict from entity for upsertion.
 
         Controls that only sections field will be upserted.
 
         :param entries: a list of model objects
+        :param ignore_update_time_sections: Set of section names to not update updated_at timestamp
         """
 
-        def update_timestamp(_entry_dict, timestamp):
+        def update_timestamp(_entry_dict, timestamp, curr_section):
             """ Update datetime created_at(if it is None) and updated_at to passed timestamp. """
+            nonlocal ignore_update_time_sections
             if not _entry_dict:
                 _entry_dict = {}
 
             timestamp_created_at = _entry_dict.get(TimestampFields.CREATED_AT)
+            timestamp_updated_at = _entry_dict.get(TimestampFields.UPDATED_AT)
+
             _entry_dict[TimestampFields.CREATED_AT] = timestamp if timestamp_created_at is None \
                 else datetime_service.localize(timestamp_created_at)
 
-            _entry_dict[TimestampFields.UPDATED_AT] = timestamp
-
+            # If section is to be ignored but is being newly created, then updated_at timestamp should be set anyway
+            if curr_section in ignore_update_time_sections:
+                _entry_dict[TimestampFields.UPDATED_AT] = timestamp if timestamp_updated_at is None \
+                    else datetime_service.localize(timestamp_updated_at)
+            else:
+                _entry_dict[TimestampFields.UPDATED_AT] = timestamp
             return _entry_dict
 
         now = datetime_service.now()
@@ -241,7 +250,8 @@ class BaseManager:
             for section in self.upsert_sections:
                 entry_dict[EsDictFields.DOC][section] = update_timestamp(
                     entry_dict[EsDictFields.SOURCE].get(section),
-                    now
+                    now,
+                    section
                 )
 
                 self._drop_invalid_field_from_section_dict(entry, entry_dict, section)

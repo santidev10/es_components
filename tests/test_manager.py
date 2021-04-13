@@ -5,6 +5,7 @@ from es_components.managers.base import BaseManager
 from es_components.models.base import BaseDocument
 from es_components.models.base import BaseInnerDoc
 from es_components.tests.utils import ESTestCase
+from utils.unittests.int_iterator import int_iterator
 
 
 class ESManagerTestCase(ESTestCase):
@@ -21,6 +22,27 @@ class ESManagerTestCase(ESTestCase):
 
         self.assertRaises(ValueError, item.section_1.update, **{extra_field: None})
         self.assertFalse(hasattr(item.section_1, extra_field))
+
+    def test_upsert_ignore_update_time_sections(self):
+        manager = TestManager()
+        ignore_sections = ["main"]
+        with self.subTest("Adds updated_at timestamp if newly creating even if ignoring section"):
+            item = TestDoc(f"id_{next(int_iterator)}")
+            manager.upsert([item], ignore_update_time_sections=ignore_sections)
+            updated = manager.get([item.main.id])[0]
+            self.assertEqual(updated.main.created_at, updated.main.updated_at)
+
+        with self.subTest("Does not update updated_at with ignore sections for existing documents"):
+            item = manager.get_or_create(f"id_{next(int_iterator)}")[0]
+            manager.upsert([item], ignore_update_time_sections=ignore_sections)
+            updated = manager.get([item.main.id])[0]
+            self.assertNotEqual(item.main.created_at, updated.main.updated_at)
+
+        with self.subTest("Updates updated_at with no ignore update sections"):
+            item = manager.get_or_create(f"id_{next(int_iterator)}")[0]
+            manager.upsert([item], ignore_update_time_sections=None)
+            updated = manager.get([item.main.id])[0]
+            self.assertTrue(item.main.created_at < updated.main.updated_at)
 
 
 class TestSection1(BaseInnerDoc):
