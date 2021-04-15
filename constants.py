@@ -37,6 +37,10 @@ class Sections:
     TASK_US_DATA = "task_us_data"
     IAS_DATA = "ias_data"
 
+    META = "meta"
+    VIDEO = "video"
+    TEXT = "text"
+
 
 class TimestampFields:
     CREATED_AT = "created_at"
