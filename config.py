@@ -13,6 +13,10 @@ KEYWORD_INDEX_NAME = "keywords"
 KEYWORD_INDEX_PREFIX = "keywords_"
 KEYWORD_DOC_TYPE = "keyword"
 
+TRANSCRIPT_INDEX_NAME = "transcripts"
+TRANSCRIPT_INDEX_PREFIX = "transcripts_"
+TRANSCRIPT_DOC_TYPE = "transcript"
+
 ES_REQUEST_LIMIT = int(os.getenv("ES_REQUEST_LIMIT", "10000"))
 # VIQ2-161: Trying to fix: circuit_breaking_exception; orig: "ES_CHUNK_SIZE", "500"
 ES_CHUNK_SIZE = int(os.getenv("ES_CHUNK_SIZE", "400"))
