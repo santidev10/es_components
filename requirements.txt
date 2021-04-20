@@ -1,4 +1,4 @@
 elasticsearch-dsl==7.3.0
-pandas==1.2.3
+pandas==1.2.2
 pycountry==20.7.3
 requests-aws4auth==1.0.1
