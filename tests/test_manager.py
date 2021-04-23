@@ -1,3 +1,5 @@
+import itertools
+
 from elasticsearch_dsl import Keyword
 from elasticsearch_dsl import Object
 
@@ -5,7 +7,9 @@ from es_components.managers.base import BaseManager
 from es_components.models.base import BaseDocument
 from es_components.models.base import BaseInnerDoc
 from es_components.tests.utils import ESTestCase
-from utils.unittests.int_iterator import int_iterator
+
+
+int_iterator = itertools.count(1, 1)
 
 
 class ESManagerTestCase(ESTestCase):
