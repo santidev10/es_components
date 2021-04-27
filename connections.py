@@ -21,7 +21,7 @@ def get_es_connection_configurations():
         "ca_certs": certifi.where()
     }
     if AWS_ES_ACCESS_KEY_ID and AWS_ES_SECRET_ACCESS_KEY:
-        es_connection_config["http_auth"] = AWS4Auth(AWS_ES_ACCESS_KEY_ID, AWS_ES_SECRET_ACCESS_KEY, 'us-east-1', 'es')
+        es_connection_config["http_auth"] = AWS4Auth(AWS_ES_ACCESS_KEY_ID, AWS_ES_SECRET_ACCESS_KEY, "us-east-1", "es")
         es_connection_config["connection_class"] = RequestsHttpConnection
     return es_connection_config
 
