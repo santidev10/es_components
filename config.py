@@ -17,6 +17,10 @@ TRANSCRIPT_INDEX_NAME = "transcripts"
 TRANSCRIPT_INDEX_PREFIX = "transcripts_"
 TRANSCRIPT_DOC_TYPE = "transcript"
 
+VIDEO_LANGUAGE_INDEX_NAME = "videolanguage"
+VIDEO_LANGUAGE_INDEX_PREFIX = "videolanguage_"
+VIDEO_LANGUAGE_DOC_TYPE = "videolanguage"
+
 ES_REQUEST_LIMIT = int(os.getenv("ES_REQUEST_LIMIT", "10000"))
 # VIQ2-161: Trying to fix: circuit_breaking_exception; orig: "ES_CHUNK_SIZE", "500"
 ES_CHUNK_SIZE = int(os.getenv("ES_CHUNK_SIZE", "400"))
