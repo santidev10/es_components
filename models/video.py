@@ -30,6 +30,7 @@ class VideoSectionGeneralData(BaseInnerDoc):
     youtube_published_at = Date()
     category = Keyword()
     lang_code = Keyword()
+    primary_lang_code = Keyword()
     duration = Long(index=True)
     license = Keyword(index=False)  # unused
     is_streaming = Boolean(index=False)
