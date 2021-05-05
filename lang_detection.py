@@ -94,11 +94,10 @@ def detect_video_language(video):
         title = video.general_data.title
         description = video.general_data.description
 
-        video_lang_mgr = VideoLanguageManager(sections=(Sections.GENERAL_DATA, Sections.VIDEO,
-                                                        Sections.TITLE_LANG_DATA, Sections.DESCRIPTION_LANG_DATA))
+        video_lang_mgr = VideoLanguageManager(
+            sections=(Sections.GENERAL_DATA, Sections.TITLE_LANG_DATA, Sections.DESCRIPTION_LANG_DATA))
 
         video_language_object = video_lang_mgr.get_or_create(ids=[video.main.id])[0]
-        video_language_object.video.id = video.main.id
 
         title_lang_data = dict(is_reliable=False, items=[])
         detected_title_language = _detect_language(title)

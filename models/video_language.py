@@ -12,15 +12,6 @@ from es_components.models.base import BaseDocument
 from es_components.models.base import BaseInnerDoc
 
 
-class VideoLanguageSectionVideo(BaseInnerDoc):
-    """
-    Section to store the Video foreign key
-    """
-    # pylint: disable=invalid-name
-    id = Keyword()
-    # pylint: enable=invalid-name
-
-
 class VideoLanguageSectionLanguageDetails(BaseInnerDoc):
     """
     Section to store the processed data for language detection of one language in a video section
@@ -50,8 +41,8 @@ class VideoLanguageSectionLanguageData(BaseInnerDoc):
 class VideoLanguage(BaseDocument):
     """
     Model for storing Video Language Detection data. A Video has one VideoLanguage
+    The id of the VideoLanguage.main.id will be the same as the related YT video ID
     """
-    video = Object(VideoLanguageSectionVideo)
     general_data = Object(VideoLanguageSectionGeneralData)
     title_lang_data = Object(VideoLanguageSectionLanguageData)
     description_lang_data = Object(VideoLanguageSectionLanguageData)
