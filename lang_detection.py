@@ -17,7 +17,8 @@ polyglot_logger.disabled = True
 
 def _get_exclusion_list():
     exclusion_list = list()
-    exclusion_list_file_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "exclusion_list.csv")
+    exclusion_list_file_path = os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                                            "lang_detection_exclusion_list.csv")
     with open(exclusion_list_file_path, "r") as ex:
         ex_reader = reader(ex)
         for word in ex_reader:
