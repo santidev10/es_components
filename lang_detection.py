@@ -8,7 +8,6 @@ from polyglot.text import Detector
 
 from es_components.constants import Sections
 from es_components.models.video import Video
-from es_components.managers.video import VideoManager
 from es_components.managers.video_language import VideoLanguageManager
 
 
@@ -90,11 +89,11 @@ def _detect_language(text):
 
 
 def detect_video_language(video):
+    result = None
     if isinstance(video, Video):
         title = video.general_data.title
         description = video.general_data.description
 
-        video_mgr = VideoManager(sections=Sections.GENERAL_DATA)
         video_lang_mgr = VideoLanguageManager(sections=(Sections.GENERAL_DATA, Sections.VIDEO,
                                                         Sections.TITLE_LANG_DATA, Sections.DESCRIPTION_LANG_DATA))
 
@@ -143,9 +142,6 @@ def detect_video_language(video):
                     video_language_general_data["primary_lang_details"] = description_lang_data["items"][1]
 
             video_language_object.populate_general_data(**video_language_general_data)
-
-            # update video primary language code
-            video.populate_general_data(
-                primary_lang_code=video_language_general_data["primary_lang_details"]["lang_code"])
-            video_mgr.upsert(entries=[video])
+            result = video_language_general_data["primary_lang_details"]["lang_code"]
         video_lang_mgr.upsert(entries=[video_language_object])
+        return result
