@@ -58,9 +58,6 @@ class VideoLanguage(BaseDocument):
     def populate_general_data(self, **kwargs):
         self._populate_section(Sections.GENERAL_DATA, **kwargs)
 
-    def populate_video(self, **kwargs):
-        self._populate_section(Sections.VIDEO, **kwargs)
-
     def populate_title_lang_data(self, **kwargs):
         self._populate_section(Sections.TITLE_LANG_DATA, **kwargs)
 
