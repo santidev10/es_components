@@ -89,7 +89,7 @@ def _detect_language(text):
 
 
 def detect_video_language(video):
-    result = None
+    result = ""
     if isinstance(video, Video):
         title = video.general_data.title
         description = video.general_data.description
