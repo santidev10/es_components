@@ -41,8 +41,8 @@ class Sections:
     VIDEO = "video"
     TEXT = "text"
 
-    TITLE_LANGUAGE_DATA = "title_language_data"
-    DESCRIPTION_LANGUAGE_DATA = "description_language_data"
+    TITLE_LANG_DATA = "title_lang_data"
+    DESCRIPTION_LANG_DATA = "description_lang_data"
 
 
 class TimestampFields:

@@ -21,21 +21,22 @@ class VideoLanguageSectionVideo(BaseInnerDoc):
     # pylint: enable=invalid-name
 
 
-class VideoLanguageSectionGeneralData(BaseInnerDoc):
-    """
-    Section to store all other data related to the video language detection
-    """
-    language_codes = Keyword(multi=True)
-    processed_at = Date()
-
-
 class VideoLanguageSectionLanguageDetails(BaseInnerDoc):
     """
     Section to store the processed data for language detection of one language in a video section
     """
-    language_name = Keyword()
-    language_code = Keyword()
+    lang_name = Keyword()
+    lang_code = Keyword()
     confidence = Integer()
+
+
+class VideoLanguageSectionGeneralData(BaseInnerDoc):
+    """
+    Section to store all other data related to the video language detection
+    """
+    lang_codes = Keyword(multi=True)
+    primary_lang_details = Object(VideoLanguageSectionLanguageDetails, enabled=False)
+    processed_at = Date()
 
 
 class VideoLanguageSectionLanguageData(BaseInnerDoc):
@@ -52,8 +53,8 @@ class VideoLanguage(BaseDocument):
     """
     video = Object(VideoLanguageSectionVideo)
     general_data = Object(VideoLanguageSectionGeneralData)
-    title_language_data = Object(VideoLanguageSectionLanguageData)
-    description_language_data = Object(VideoLanguageSectionLanguageData)
+    title_lang_data = Object(VideoLanguageSectionLanguageData)
+    description_lang_data = Object(VideoLanguageSectionLanguageData)
 
     class Index:
         name = VIDEO_LANGUAGE_INDEX_NAME
@@ -69,8 +70,8 @@ class VideoLanguage(BaseDocument):
     def populate_video(self, **kwargs):
         self._populate_section(Sections.VIDEO, **kwargs)
 
-    def populate_title_language_data(self, **kwargs):
-        self._populate_section(Sections.TITLE_LANGUAGE_DATA, **kwargs)
+    def populate_title_lang_data(self, **kwargs):
+        self._populate_section(Sections.TITLE_LANG_DATA, **kwargs)
 
-    def populate_description_language_data(self, **kwargs):
-        self._populate_section(Sections.DESCRIPTION_LANGUAGE_DATA, **kwargs)
+    def populate_description_lang_data(self, **kwargs):
+        self._populate_section(Sections.DESCRIPTION_LANG_DATA, **kwargs)
