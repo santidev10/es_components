@@ -6,6 +6,7 @@ from csv import reader
 from polyglot.detect.base import logger as polyglot_logger
 from polyglot.text import Detector
 
+from es_components.constants import Sections
 from es_components.models.video import Video
 from es_components.managers.video import VideoManager
 from es_components.managers.video_language import VideoLanguageManager
@@ -92,7 +93,12 @@ def detect_video_language(video):
         title = video.general_data.title
         description = video.general_data.description
 
-        video_language_object = VideoLanguageManager.get_or_create_by_video_id(video_id=video.id)
+        video_mgr = VideoManager(sections=Sections.GENERAL_DATA)
+        video_lang_mgr = VideoLanguageManager(sections=(Sections.GENERAL_DATA, Sections.VIDEO,
+                                                        Sections.TITLE_LANG_DATA, Sections.DESCRIPTION_LANG_DATA))
+
+        video_language_object = video_lang_mgr.get_or_create(ids=[video.main.id])[0]
+        video_language_object.video.id = video.main.id
 
         title_lang_data = dict(is_reliable=False, items=[])
         detected_title_language = _detect_language(title)
@@ -101,16 +107,16 @@ def detect_video_language(video):
             detected_language = dict(lan_name=language["name"], lang_code=language["code"],
                                      confidence=language["confidence"])
             title_lang_data["items"].append(detected_language)
-        video_language_object.populate_title_lang_data(title_lang_data)
+        video_language_object.populate_title_lang_data(**title_lang_data)
 
         description_lang_data = dict(is_reliable=False, items=[])
         detected_description_language = _detect_language(description)
         description_lang_data["is_reliable"] = detected_description_language["is_reliable"]
-        for language in description_lang_data["detected_languages"]:
+        for language in detected_description_language["detected_languages"]:
             detected_language = dict(lan_name=language["name"], lang_code=language["code"],
                                      confidence=language["confidence"])
             description_lang_data["items"].append(detected_language)
-        video_language_object.populate_description_lang_data(description_lang_data)
+        video_language_object.populate_description_lang_data(**description_lang_data)
 
         if len(title_lang_data["items"]) > 0 or len(description_lang_data["items"]) > 0:
             video_language_general_data = dict()
@@ -135,10 +141,10 @@ def detect_video_language(video):
                 elif len(description_lang_data["items"]) > 1 and description_lang_data["items"][1]["lang_code"] != "en":
                     video_language_general_data["primary_lang_details"] = description_lang_data["items"][1]
 
-            video_language_object.populate_general_data(video_language_general_data)
+            video_language_object.populate_general_data(**video_language_general_data)
 
             # update video primary language code
             video.populate_general_data(
                 primary_lang_code=video_language_general_data["primary_lang_details"]["lang_code"])
-            VideoManager.upsert(video)
-        VideoLanguageManager.upsert(video_language_object)
+            video_mgr.upsert(entries=[video])
+        video_lang_mgr.upsert(entries=[video_language_object])
