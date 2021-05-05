@@ -66,7 +66,7 @@ def _detect_lang_table(detector_object):
                                    code=code_detected,
                                    conf=conf_detected,
                                    byte=byte_detected))
-    output['prop'] = round(output['byte'] / output['byte'].sum() * 100, 1)
+    output["prop"] = round(output["byte"] / output["byte"].sum() * 100, 1)
     return output
 
 
