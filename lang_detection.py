@@ -88,44 +88,51 @@ def _detect_language(text):
     return result
 
 
-def detect_video_language(video):
+def detect_video_language(video_id=None, video_title=None, video_description=None):
+    """
+    This function detects the language of a YT Video based on its title and description. It also upserts a VideoLanguage
+    document in ES to keep the language(s) it detected to be used in channel language detection.
+    This function returns a string of the primary language code of the video e.g. "en"
+    """
     result = ""
-    if isinstance(video, Video):
-        title = video.general_data.title
-        description = video.general_data.description
-
+    if video_id and (video_title or video_description):
         video_lang_mgr = VideoLanguageManager(
             sections=(Sections.GENERAL_DATA, Sections.TITLE_LANG_DATA, Sections.DESCRIPTION_LANG_DATA))
 
-        video_language_object = video_lang_mgr.get_or_create(ids=[video.main.id])[0]
+        video_language_object = video_lang_mgr.get_or_create(ids=[video_id])[0]
 
+        # detect the language of the video title
         title_lang_data = dict(is_reliable=False, items=[])
-        detected_title_language = _detect_language(title)
-        title_lang_data["is_reliable"] = detected_title_language["is_reliable"]
-        for language in detected_title_language["detected_languages"]:
-            detected_language = dict(lan_name=language["name"], lang_code=language["code"],
-                                     confidence=language["confidence"])
-            title_lang_data["items"].append(detected_language)
+        if video_title:
+            detected_title_language = _detect_language(video_title)
+            title_lang_data["is_reliable"] = detected_title_language["is_reliable"]
+            for language in detected_title_language["detected_languages"]:
+                detected_language = dict(lang_name=language["name"], lang_code=language["code"],
+                                         confidence=language["confidence"])
+                title_lang_data["items"].append(detected_language)
         video_language_object.populate_title_lang_data(**title_lang_data)
 
+        # detect the language of the video description
         description_lang_data = dict(is_reliable=False, items=[])
-        detected_description_language = _detect_language(description)
-        description_lang_data["is_reliable"] = detected_description_language["is_reliable"]
-        for language in detected_description_language["detected_languages"]:
-            detected_language = dict(lan_name=language["name"], lang_code=language["code"],
-                                     confidence=language["confidence"])
-            description_lang_data["items"].append(detected_language)
+        if video_description:
+            detected_description_language = _detect_language(video_description)
+            description_lang_data["is_reliable"] = detected_description_language["is_reliable"]
+            for language in detected_description_language["detected_languages"]:
+                detected_language = dict(lang_name=language["name"], lang_code=language["code"],
+                                         confidence=language["confidence"])
+                description_lang_data["items"].append(detected_language)
         video_language_object.populate_description_lang_data(**description_lang_data)
 
+        # if we detect at least one language, do the calculation to determine the primary video language
         if len(title_lang_data["items"]) > 0 or len(description_lang_data["items"]) > 0:
             video_language_general_data = dict()
-            video_lang_source = "description"
+            video_lang_source_is_title = False
 
             if ((title_lang_data["is_reliable"] and
                  not description_lang_data["is_reliable"] and
                  len(title_lang_data["items"]) > 0) or (len(title_lang_data["items"]) > 0 and
                                                         len(description_lang_data["items"]) == 0)):
-                video_lang_source = "title"
+                video_lang_source_is_title = True
                 video_language_general_data["primary_lang_details"] = title_lang_data["items"][0]
             else:
                 video_language_general_data["primary_lang_details"] = description_lang_data["items"][0]
@@ -134,13 +141,15 @@ def detect_video_language(video):
             # if detected language is english and conf < 99% then choose secondary as primary language (if available)
             if video_language_general_data["primary_lang_details"]["lang_code"] == "en" and \
                     video_language_general_data["primary_lang_details"]["confidence"] < 99:
-                if video_lang_source == "title" and title_lang_data["is_reliable"] and \
+                if video_lang_source_is_title and title_lang_data["is_reliable"] and \
                         len(title_lang_data["items"]) > 1 and title_lang_data["items"][1]["lang_code"] != "en":
                     video_language_general_data["primary_lang_details"] = title_lang_data["items"][1]
                 elif len(description_lang_data["items"]) > 1 and description_lang_data["items"][1]["lang_code"] != "en":
                     video_language_general_data["primary_lang_details"] = description_lang_data["items"][1]
 
             video_language_object.populate_general_data(**video_language_general_data)
-            result = video_language_general_data["primary_lang_details"]["lang_code"]
+            detected_language_code = video_language_general_data["primary_lang_details"]["lang_code"]
+            if isinstance(detected_language_code, str):
+                result = detected_language_code
         video_lang_mgr.upsert(entries=[video_language_object])
         return result
