@@ -1,4 +1,7 @@
 elasticsearch-dsl==7.3.0
+morfessor==2.0.6
 pandas==1.2.2
+polyglot==16.7.4
 pycountry==20.7.3
+PyICU==2.7.2
 requests-aws4auth==1.0.1
