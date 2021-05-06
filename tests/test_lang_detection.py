@@ -1,12 +1,12 @@
 import itertools
 
-from unittest.mock import patch
 from unittest.mock import Mock
+from unittest.mock import patch
 
-from es_components.models import Video
-from es_components.managers import VideoLanguageManager
-from es_components.tests.utils import ESTestCase
 from es_components.lang_detection import detect_video_language
+from es_components.managers import VideoLanguageManager
+from es_components.models import Video
+from es_components.tests.utils import ESTestCase
 
 
 int_iterator = itertools.count(1, 1)
