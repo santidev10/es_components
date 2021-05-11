@@ -1,8 +1,10 @@
 import os
 import pandas
+import pytz
 import re
 
 from csv import reader
+from datetime import datetime
 from polyglot.detect import Detector
 from polyglot.detect.base import logger as polyglot_logger
 
@@ -123,7 +125,7 @@ def _calculate_video_language_data(video_id=None, video_title=None, video_descri
 
         # if we detect at least one language, do the calculation to determine the primary video language
         if len(title_lang_data["items"]) > 0 or len(description_lang_data["items"]) > 0:
-            video_language_general_data = dict()
+            video_language_general_data = dict(processed_at=datetime.now(tz=pytz.utc))
             video_lang_source_is_title = False
 
             if ((title_lang_data["is_reliable"] and
