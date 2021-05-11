@@ -3,11 +3,10 @@ import pandas
 import re
 
 from csv import reader
+from polyglot.detect import Detector
 from polyglot.detect.base import logger as polyglot_logger
-from polyglot.text import Detector
 
 from es_components.constants import Sections
-from es_components.models.video import Video
 from es_components.managers.video_language import VideoLanguageManager
 
 
@@ -88,13 +87,12 @@ def _detect_language(text):
     return result
 
 
-def detect_video_language(video_id=None, video_title=None, video_description=None):
+def _calculate_video_language_data(video_id=None, video_title=None, video_description=None):
     """
-    This function detects the language of a YT Video based on its title and description. It also upserts a VideoLanguage
-    document in ES to keep the language(s) it detected to be used in channel language detection.
-    This function returns a string of the primary language code of the video e.g. "en"
+    This function will calculate and return the VideoLanguage object without upserting it
+    Also, this function holds the algorithm to detect a video language
     """
-    result = ""
+    result = None
     if video_id and (video_title or video_description):
         video_lang_mgr = VideoLanguageManager(
             sections=(Sections.GENERAL_DATA, Sections.TITLE_LANG_DATA, Sections.DESCRIPTION_LANG_DATA))
@@ -148,8 +146,20 @@ def detect_video_language(video_id=None, video_title=None, video_description=Non
                     video_language_general_data["primary_lang_details"] = description_lang_data["items"][1]
 
             video_language_object.populate_general_data(**video_language_general_data)
-            detected_language_code = video_language_general_data["primary_lang_details"]["lang_code"]
-            if isinstance(detected_language_code, str):
-                result = detected_language_code
-        video_lang_mgr.upsert(entries=[video_language_object])
-        return result
+        result = video_language_object
+    return result
+
+
+def detect_video_language(video_id=None, video_title=None, video_description=None):
+    """
+    This function detects the language of a YT Video based on its title and description. It also upserts a VideoLanguage
+    document in ES to keep the language(s) it detected to be used in channel language detection.
+    This function returns a string of the primary language code of the video e.g. "en"
+    """
+    result = ""
+    video_lang_obj = _calculate_video_language_data(video_id=video_id, video_title=video_title,
+                                                    video_description=video_description)
+    if video_lang_obj and video_lang_obj.general_data and video_lang_obj.general_data.primary_lang_details and \
+            isinstance(video_lang_obj.general_data.primary_lang_details.lang_code, str):
+        result = video_lang_obj.general_data.primary_lang_details.lang_code
+    return result

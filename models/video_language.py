@@ -25,7 +25,6 @@ class VideoLanguageSectionGeneralData(BaseInnerDoc):
     """
     Section to store all other data related to the video language detection
     """
-    lang_codes = Keyword(multi=True)
     primary_lang_details = Object(VideoLanguageSectionLanguageDetails, enabled=False)
     processed_at = Date()
 
