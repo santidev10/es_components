@@ -159,7 +159,11 @@ def detect_video_language(video_id=None, video_title=None, video_description=Non
     result = ""
     video_lang_obj = _calculate_video_language_data(video_id=video_id, video_title=video_title,
                                                     video_description=video_description)
-    if video_lang_obj and video_lang_obj.general_data and video_lang_obj.general_data.primary_lang_details and \
-            isinstance(video_lang_obj.general_data.primary_lang_details.lang_code, str):
-        result = video_lang_obj.general_data.primary_lang_details.lang_code
+    if video_lang_obj:
+        video_lang_mgr = VideoLanguageManager(
+            sections=(Sections.GENERAL_DATA, Sections.TITLE_LANG_DATA, Sections.DESCRIPTION_LANG_DATA))
+        video_lang_mgr.upsert(entries=[video_lang_obj])
+        if video_lang_obj.general_data and video_lang_obj.general_data.primary_lang_details and \
+                isinstance(video_lang_obj.general_data.primary_lang_details.lang_code, str):
+            result = video_lang_obj.general_data.primary_lang_details.lang_code
     return result
