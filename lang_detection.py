@@ -89,7 +89,7 @@ def _detect_language(text):
     return result
 
 
-def _calculate_video_language_data(video_id=None, video_title=None, video_description=None):
+def calculate_video_language_data(video_id=None, video_title=None, video_description=None):
     """
     This function will calculate and return the VideoLanguage object without upserting it
     Also, this function holds the algorithm to detect a video language
@@ -159,7 +159,7 @@ def detect_video_language(video_id=None, video_title=None, video_description=Non
     This function returns a string of the primary language code of the video e.g. "en"
     """
     result = ""
-    video_lang_obj = _calculate_video_language_data(video_id=video_id, video_title=video_title,
+    video_lang_obj = calculate_video_language_data(video_id=video_id, video_title=video_title,
                                                     video_description=video_description)
     if video_lang_obj:
         video_lang_mgr = VideoLanguageManager(
